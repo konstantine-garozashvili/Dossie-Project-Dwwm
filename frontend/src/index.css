@@ -1,3 +1,151 @@
 @tailwind base;
 @tailwind components;
-@tailwind utilities; 
+@tailwind utilities;
+
+/* Add global overflow control */
+html, body {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Prevent horizontal overflow on all containers */
+#root {
+  overflow-x: hidden;
+  width: 100%;
+  position: relative;
+}
+
+/* Global fix for any absolutely positioned elements going outside viewport */
+.absolute, [class*="absolute"] {
+  max-width: 100vw;
+}
+
+/* Cross-browser compatible animations with smooth movement */
+@-webkit-keyframes scroll {
+  0% {
+    -webkit-transform: translateX(0%);
+  }
+  100% {
+    -webkit-transform: translateX(-50%);
+  }
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@-webkit-keyframes scroll-vertical {
+  0% {
+    -webkit-transform: translateY(0%);
+  }
+  100% {
+    -webkit-transform: translateY(-50%);
+  }
+}
+
+@keyframes scroll-vertical {
+  0% {
+    transform: translateY(0%);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+/* Moderate animation speeds for 3D marquee */
+.marquee-moderate {
+  animation-duration: 18s !important;
+}
+
+/* Medium animation speeds for 3D marquee */
+.marquee-medium {
+  animation-duration: 22s !important;
+}
+
+/* Slower animation speeds for 3D marquee */
+.marquee-slow {
+  animation-duration: 25s !important;
+}
+
+/* Optimize animations for better performance */
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee,
+  .animate-marquee-vertical,
+  [class*="animate-"] {
+    animation-duration: 60s !important;
+    transition-duration: 60s !important;
+  }
+}
+
+/* Glass effect fallbacks for browsers that don't support backdrop-filter */
+.glass-card {
+  background-color: rgba(30, 41, 59, 0.8);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+@supports not ((backdrop-filter: blur(4px)) or (-webkit-backdrop-filter: blur(4px))) {
+  .glass-card {
+    background-color: rgba(30, 41, 59, 0.95);
+  }
+}
+
+@layer utilities {
+  .animation-delay-1000 {
+    animation-delay: 1s;
+    -webkit-animation-delay: 1s;
+  }
+  .animation-delay-2000 {
+    animation-delay: 2s;
+    -webkit-animation-delay: 2s;
+  }
+  .animation-delay-3000 {
+    animation-delay: 3s;
+    -webkit-animation-delay: 3s;
+  }
+  .animation-delay-4000 {
+    animation-delay: 4s;
+    -webkit-animation-delay: 4s;
+  }
+}
+
+/* Lower CPU usage for animations */
+.low-cpu-animation {
+  backface-visibility: hidden;
+  perspective: 1000;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* Optimized animation for better performance */
+.optimized-animation {
+  animation-timing-function: linear !important;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Internet Explorer fallbacks */
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+  .marquee-fallback {
+    animation-duration: 30s !important;
+    animation-timing-function: linear !important;
+  }
+}
+
+/* Reduce animation complexity for older browsers */
+@supports (-ms-ime-align:auto) {
+  .marquee-container {
+    contain: layout style;
+  }
+} 

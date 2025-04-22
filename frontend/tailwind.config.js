@@ -1,21 +1,24 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: [
-    "./src/**/*.{js,jsx,ts,tsx}",
-  ],
+export default {
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       keyframes: {
-        marquee: {
-          '0%': { transform: 'translateX(0%)' },
-          '100%': { transform: 'translateX(-100%)' },
+        scroll: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(calc(-50%))' },
+        },
+        'scroll-vertical': {
+          '0%': { transform: 'translateY(0)' },
+          '100%': { transform: 'translateY(calc(-50%))' },
         },
       },
       animation: {
-        marquee: 'marquee 10s linear infinite',
+        marquee: 'scroll 25s linear infinite',
+        'marquee-vertical': 'scroll-vertical 25s linear infinite',
       },
     },
   },
   plugins: [],
-}
+};
 

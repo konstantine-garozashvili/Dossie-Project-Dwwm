@@ -1,8 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Marquee3D } from "@/components/magicui/Marquee3D";
+import { fixLayoutOverflow } from "@/lib/utils";
+import { useInView } from 'react-intersection-observer';
+import { useNavigate } from 'react-router-dom';
+import { FiMonitor, FiCpu, FiHardDrive, FiDatabase, FiShield, FiCloud } from "react-icons/fi";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const services = [
   {
@@ -62,9 +70,31 @@ const Home = () => {
   const scale = useTransform(scrollYProgress, [0, 0.3], [1, 1.1]);
   const opacity = useTransform(scrollYProgress, [0, 0.3], [1, 0.3]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+  const [isAnimatingOut, setIsAnimatingOut] = useState(false);
+  const homeRef = useRef(null);
+  const rootRef = useRef(null);
+
+  useEffect(() => {
+    // Apply the layout overflow fix
+    if (rootRef.current) {
+      fixLayoutOverflow(rootRef.current);
+    }
+    
+    // Additional fix to ensure there's no overflow on the body
+    document.body.style.overflowX = 'hidden';
+    document.documentElement.style.overflowX = 'hidden';
+    
+    // Cleanup function
+    return () => {
+      document.body.style.overflowX = '';
+      document.documentElement.style.overflowX = '';
+    };
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0F172A] to-[#1E293B] text-gray-100">
+    <div className="bg-slate-950 text-white overflow-x-hidden" ref={rootRef}>
       {/* Fixed Navigation */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -130,7 +160,7 @@ const Home = () => {
       {/* Full Screen Hero Section */}
       <motion.section 
         style={{ scale, opacity }}
-        className="relative h-screen w-full flex items-center justify-center"
+        className="relative h-screen w-full flex items-center justify-center overflow-hidden"
       >
         <div className="absolute inset-0 w-full h-full bg-[url('https://images.pexels.com/photos/546819/pexels-photo-546819.jpeg')] bg-cover bg-center bg-fixed opacity-20" />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#0F172A]" />
@@ -140,7 +170,7 @@ const Home = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <Badge className="mb-4 px-3 py-1 bg-cyan-500/20 text-cyan-400 border-cyan-500 text-sm">
+            <Badge className="mb-4 px-3 py-1 bg-cyan-500/20 text-cyan-400 border-cyan-500 text-sm inline-flex w-auto">
               24/7 Support Available
             </Badge>
           </motion.div>
@@ -195,7 +225,7 @@ const Home = () => {
       </motion.section>
 
       {/* Stats Section */}
-      <section className="py-10 px-4 bg-slate-900 relative z-10">
+      <section className="py-10 px-4 bg-slate-900 relative z-10 overflow-hidden">
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
           {stats.map((stat, idx) => (
             <motion.div
@@ -214,10 +244,10 @@ const Home = () => {
       </section>
 
       {/* Services Grid */}
-      <section id="services" className="py-20 px-4">
+      <section id="services" className="py-20 px-4 overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <Badge className="mb-4 px-3 py-1 bg-cyan-500/20 text-cyan-400 border-cyan-500">
+            <Badge className="mb-4 px-3 py-1 bg-cyan-500/20 text-cyan-400 border-cyan-500 inline-flex w-auto">
               Our Expertise
             </Badge>
             <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-300">
@@ -265,10 +295,10 @@ const Home = () => {
       </section>
 
       {/* Repair Process Timeline */}
-      <section id="process" className="py-20 px-4 bg-slate-800/50">
+      <section id="process" className="py-20 px-4 bg-slate-800/50 overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <Badge className="mb-4 px-3 py-1 bg-cyan-500/20 text-cyan-400 border-cyan-500">
+            <Badge className="mb-4 px-3 py-1 bg-cyan-500/20 text-cyan-400 border-cyan-500 inline-flex w-auto">
               Efficient Workflow
             </Badge>
             <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-300">
@@ -306,52 +336,62 @@ const Home = () => {
       </section>
 
       {/* Testimonials */}
-      <section id="testimonials" className="py-20 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <Badge className="mb-4 px-3 py-1 bg-cyan-500/20 text-cyan-400 border-cyan-500">
-              Client Feedback
-            </Badge>
-            <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-300">
-              What Our Customers Say
-            </h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              Don't just take our word for it - hear from our satisfied customers.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.1 }}
-              >
-                <Card className="h-full bg-slate-800 border-slate-700 hover:shadow-lg hover:shadow-cyan-500/10 transition">
-                  <CardContent className="pt-6">
-                    <div className="flex flex-col items-center text-center">
-                      <div className="w-20 h-20 rounded-full overflow-hidden mb-4 border-2 border-cyan-400">
-                        <img src={testimonial.image} alt={testimonial.name} className="w-full h-full object-cover" />
-                      </div>
-                      <p className="text-lg italic mb-6 text-gray-300">"{testimonial.quote}"</p>
-                      <h4 className="font-semibold text-xl">{testimonial.name}</h4>
-                      <p className="text-cyan-400">{testimonial.role}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
+      <section id="testimonials" className="py-20 px-4 bg-slate-900 overflow-hidden">
+        <div className="w-full max-w-full mx-auto relative">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-8 min-h-[600px]">
+            {/* 3D Marquee Reviews */}
+            <div className="w-full lg:w-1/2 h-[600px] flex items-center justify-center order-2 lg:order-1 overflow-hidden">
+              <Marquee3D />
+            </div>
+            
+            {/* Text Content */}
+            <div className="w-full lg:w-1/2 text-left mb-8 lg:mb-0 order-1 lg:order-2 lg:pl-10 lg:pr-8 flex flex-col justify-center">
+              <div className="text-left">
+                <Badge className="mb-4 px-3 py-1 bg-cyan-500/20 text-cyan-400 border-cyan-500 inline-flex w-auto">
+                  Client Reviews
+                </Badge>
+              </div>
+              <h2 className="text-4xl sm:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-300">
+                What Our Clients Think
+              </h2>
+              <p className="text-xl text-gray-400 mb-6">
+                Real feedback from our satisfied customers who have experienced our exceptional service. Our commitment to quality and customer satisfaction is reflected in every review.
+              </p>
+              <div className="mb-8 space-y-4">
+                <div className="flex items-start">
+                  <span className="text-cyan-400 mr-2 text-xl">✓</span>
+                  <p className="text-gray-300">Over 500 positive reviews from satisfied customers</p>
+                </div>
+                <div className="flex items-start">
+                  <span className="text-cyan-400 mr-2 text-xl">✓</span>
+                  <p className="text-gray-300">4.9/5 average rating across all service categories</p>
+                </div>
+                <div className="flex items-start">
+                  <span className="text-cyan-400 mr-2 text-xl">✓</span>
+                  <p className="text-gray-300">98% of clients recommend our services to friends and family</p>
+                </div>
+              </div>
+              <p className="text-lg text-gray-400 italic mb-6">
+                "We believe in letting our clients' experiences speak for themselves. These testimonials represent real people with real problems we've helped solve."
+              </p>
+              <div className="mt-6 flex flex-wrap gap-4">
+                <Button variant="outline" className="border-cyan-400 text-cyan-400 hover:bg-cyan-400/10">
+                  View All Reviews
+                </Button>
+                <Button className="bg-cyan-500 hover:bg-cyan-600">
+                  Share Your Experience
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-20 px-4 bg-slate-900">
+      <section id="contact" className="py-20 px-4 bg-slate-950 overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <Badge className="mb-4 px-3 py-1 bg-cyan-500/20 text-cyan-400 border-cyan-500">
+            <Badge className="mb-4 px-3 py-1 bg-cyan-500/20 text-cyan-400 border-cyan-500 inline-flex w-auto">
               Get In Touch
             </Badge>
             <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-300">
@@ -462,7 +502,7 @@ const Home = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-4 bg-slate-950">
+      <footer className="py-12 px-4 bg-slate-900 overflow-hidden">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10">
           <div className="space-y-4">
             <h3 className="text-2xl font-bold text-cyan-400">DWWM</h3>
