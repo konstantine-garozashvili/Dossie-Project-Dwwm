@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Marquee3D } from "@/components/magicui/Marquee3D";
 import { fixLayoutOverflow } from "@/lib/utils";
 import { useInView } from 'react-intersection-observer';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { FiMonitor, FiCpu, FiHardDrive, FiDatabase, FiShield, FiCloud } from "react-icons/fi";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -72,9 +72,14 @@ const Home = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
   const [isAnimatingOut, setIsAnimatingOut] = useState(false);
   const homeRef = useRef(null);
   const rootRef = useRef(null);
+  const servicesRef = useRef(null);
+  const processRef = useRef(null);
+  const testimonialsRef = useRef(null);
+  const contactRef = useRef(null);
 
   useEffect(() => {
     // Apply the layout overflow fix
@@ -92,6 +97,27 @@ const Home = () => {
       document.documentElement.style.overflowX = '';
     };
   }, []);
+  
+  // Handle hash navigation
+  useEffect(() => {
+    if (location.hash) {
+      // Remove the # character
+      const id = location.hash.substring(1);
+      
+      // Find the element by id
+      const element = document.getElementById(id);
+      
+      if (element) {
+        // Wait a bit for the page to fully render
+        setTimeout(() => {
+          window.scrollTo({
+            top: element.offsetTop - 80, // Adjust for header height
+            behavior: 'smooth'
+          });
+        }, 100);
+      }
+    }
+  }, [location]);
 
   return (
     <div className="bg-slate-950 text-white overflow-x-hidden" ref={rootRef}>
@@ -196,12 +222,12 @@ const Home = () => {
             className="flex flex-col sm:flex-row justify-center gap-4"
           >
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button size="lg" className="w-full sm:w-auto px-8 py-6 text-lg bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600">
+              <Button size="lg" className="w-full sm:w-auto px-8 py-6 text-lg bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600" onClick={() => navigate('/service-request')}>
                 Schedule Repair Now
               </Button>
             </motion.div>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button size="lg" variant="outline" className="w-full sm:w-auto px-8 py-6 text-lg border-white/20 hover:bg-white/5">
+              <Button size="lg" variant="outline" className="w-full sm:w-auto px-8 py-6 text-lg border-white/20 hover:bg-white/5" onClick={() => navigate('/services')}>
                 View Services
               </Button>
             </motion.div>
@@ -244,7 +270,7 @@ const Home = () => {
       </section>
 
       {/* Services Grid */}
-      <section id="services" className="py-20 px-4 overflow-hidden">
+      <section id="services" className="py-20 px-4 overflow-hidden" ref={servicesRef}>
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <Badge className="mb-4 px-3 py-1 bg-cyan-500/20 text-cyan-400 border-cyan-500 inline-flex w-auto">
@@ -283,7 +309,7 @@ const Home = () => {
                     </ul>
                   </CardContent>
                   <CardFooter>
-                    <Button variant="outline" className="w-full border-cyan-400 text-cyan-400 hover:bg-cyan-400/10">
+                    <Button variant="outline" className="w-full border-cyan-400 text-cyan-400 hover:bg-cyan-400/10" onClick={() => navigate('/services')}>
                       Learn More
                     </Button>
                   </CardFooter>
@@ -295,7 +321,7 @@ const Home = () => {
       </section>
 
       {/* Repair Process Timeline */}
-      <section id="process" className="py-20 px-4 bg-slate-800/50 overflow-hidden">
+      <section id="process" className="py-20 px-4 bg-slate-800/50 overflow-hidden" ref={processRef}>
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <Badge className="mb-4 px-3 py-1 bg-cyan-500/20 text-cyan-400 border-cyan-500 inline-flex w-auto">
@@ -336,7 +362,7 @@ const Home = () => {
       </section>
 
       {/* Testimonials */}
-      <section id="testimonials" className="py-20 px-4 bg-slate-900 overflow-hidden">
+      <section id="testimonials" className="py-20 bg-slate-900 overflow-hidden" ref={testimonialsRef}>
         <div className="w-full max-w-full mx-auto relative">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-8 min-h-[600px]">
             {/* 3D Marquee Reviews */}
@@ -375,10 +401,10 @@ const Home = () => {
                 "We believe in letting our clients' experiences speak for themselves. These testimonials represent real people with real problems we've helped solve."
               </p>
               <div className="mt-6 flex flex-wrap gap-4">
-                <Button variant="outline" className="border-cyan-400 text-cyan-400 hover:bg-cyan-400/10">
+                <Button variant="outline" className="border-cyan-400 text-cyan-400 hover:bg-cyan-400/10" onClick={() => navigate('/testimonials')}>
                   View All Reviews
                 </Button>
-                <Button className="bg-cyan-500 hover:bg-cyan-600">
+                <Button className="bg-cyan-500 hover:bg-cyan-600" onClick={() => navigate('/testimonials#share')}>
                   Share Your Experience
                 </Button>
               </div>
@@ -388,7 +414,7 @@ const Home = () => {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-20 px-4 bg-slate-950 overflow-hidden">
+      <section id="contact" className="py-20 bg-gradient-to-b from-slate-900 to-slate-950 overflow-hidden" ref={contactRef}>
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <Badge className="mb-4 px-3 py-1 bg-cyan-500/20 text-cyan-400 border-cyan-500 inline-flex w-auto">
@@ -491,7 +517,7 @@ const Home = () => {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button className="w-full py-6 bg-cyan-500 hover:bg-cyan-600 text-lg">
+                  <Button className="w-full py-6 bg-cyan-500 hover:bg-cyan-600 text-lg" onClick={() => navigate('/contact')}>
                     Send Message
                   </Button>
                 </CardFooter>
@@ -502,7 +528,7 @@ const Home = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-4 bg-slate-900 overflow-hidden">
+      <footer className="bg-slate-950 py-16 px-4 overflow-hidden">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10">
           <div className="space-y-4">
             <h3 className="text-2xl font-bold text-cyan-400">DWWM</h3>
