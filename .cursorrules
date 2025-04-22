@@ -1,0 +1,32 @@
+# Cursor Rules for DWWM Project
+
+## General Structure
+- The project should have separate `frontend` and `backend` directories at the root.
+- The `frontend` directory will contain the React application.
+- The `backend` directory will contain the Node.js/Hono application.
+
+## Frontend (React, Shadcn UI, Magic UI, Tailwind CSS v3)
+- Use Tailwind CSS v3 for all styling.
+- Components should be placed in a `src/components` directory within the `frontend` folder.
+- Reusable UI components leveraging Shadcn UI and Magic UI should be organized logically within `src/components/ui`.
+- Pages or main views should reside in `src/pages` or `src/views`.
+- Utility functions should be in `src/lib` or `src/utils`.
+- Prefer Shadcn UI and Magic UI components for UI elements. Use Tailwind utility classes for layout and custom styles.
+- Follow React best practices (e.g., hooks, functional components).
+
+## Backend (Node.js, Hono)
+- API routes should be defined within a `src/routes` or `src/handlers` directory in the `backend` folder.
+- Business logic should be separated from route handlers, potentially in `src/services` or `src/controllers`.
+- Database interaction logic (SQLite) should be encapsulated, possibly in `src/db` or `src/models`.
+- Use environment variables for configuration (e.g., database path, ports).
+- Follow Hono best practices for middleware and routing.
+
+## Database (SQLite)
+- Database schema migrations should be handled systematically (consider using a library like `knex` or `drizzle-orm` if the project grows).
+- Keep database queries efficient.
+
+## General Coding Style
+- Use consistent naming conventions (e.g., camelCase for variables/functions, PascalCase for components/classes).
+- Add comments only for complex logic or non-obvious code sections.
+- Keep functions small and focused on a single task.
+- Format code consistently (consider using Prettier). 

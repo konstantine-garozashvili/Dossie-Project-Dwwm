@@ -1,0 +1,19 @@
+{
+  "name": "dwwm-backend",
+  "version": "1.0.0",
+  "description": "Backend for DWWM Computer Repair Shop Project",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "hono": "^3.11.7",
+    "sqlite3": "^5.1.6",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  }
+} 

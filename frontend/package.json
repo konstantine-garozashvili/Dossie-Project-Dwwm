@@ -1,0 +1,25 @@
+{
+    "name": "dwwm-frontend",
+    "version": "1.0.0",
+    "private": true,
+    "description": "Frontend for DWWM Computer Repair Shop Project",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview"
+    },
+    "dependencies": {
+        "clsx": "^2.1.1",
+        "framer-motion": "^12.7.4",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "react-router-dom": "^6.22.3"
+    },
+    "devDependencies": {
+        "@vitejs/plugin-react": "^4.4.1",
+        "autoprefixer": "^10.4.21",
+        "postcss": "^8.5.3",
+        "tailwindcss": "^3.4.17",
+        "vite": "^6.3.2"
+    }
+}
