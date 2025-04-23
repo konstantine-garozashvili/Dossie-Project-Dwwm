@@ -9,11 +9,11 @@
     "start": "node src/index.js"
   },
   "dependencies": {
-    "hono": "^3.11.7",
-    "sqlite3": "^5.1.6",
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "hono": "^4.7.7",
+    "sqlite3": "^5.1.6"
   },
   "devDependencies": {
     "nodemon": "^3.0.3"
   }
-} 
+}

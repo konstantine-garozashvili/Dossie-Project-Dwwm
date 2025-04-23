@@ -1,10 +1,11 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import Services from "./pages/Services";
-import ServiceRequest from "./pages/ServiceRequest";
-import RequestConfirmation from "./pages/RequestConfirmation";
-import Layout from "./components/Layout";
+import { Home } from "./pages/Home";
+import { Services } from "./pages/Services";
+import { ServiceRequest } from "./pages/ServiceRequest";
+import { RequestConfirmation } from "./pages/RequestConfirmation";
+import { BecomeTechnician } from "./pages/BecomeTechnician";
+import { Layout } from "./components/Layout";
 
 function App() {
   return (
@@ -13,8 +14,9 @@ function App() {
       <Route path="/services" element={<Layout><Services /></Layout>} />
       <Route path="/service-request" element={<Layout><ServiceRequest /></Layout>} />
       <Route path="/request-confirmation" element={<Layout><RequestConfirmation /></Layout>} />
+      <Route path="/become-technician" element={<Layout><BecomeTechnician /></Layout>} />
     </Routes>
   );
 }
 
-export default App; 
+export default App;

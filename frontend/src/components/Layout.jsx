@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { fixLayoutOverflow } from "@/lib/utils";
 import { useNavigate } from 'react-router-dom';
 
-const Layout = ({ children }) => {
+export const Layout = ({ children }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const rootRef = useRef(null);
@@ -244,4 +244,4 @@ const Layout = ({ children }) => {
   );
 };
 
-export default Layout; 
+export default Layout;

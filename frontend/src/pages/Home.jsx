@@ -65,7 +65,7 @@ const stats = [
   { value: "15+", label: "Years Experience" }
 ];
 
-const Home = () => {
+export const Home = () => {
   const { scrollYProgress } = useScroll();
   const scale = useTransform(scrollYProgress, [0, 0.3], [1, 1.1]);
   const opacity = useTransform(scrollYProgress, [0, 0.3], [1, 0.3]);
@@ -137,11 +137,11 @@ const Home = () => {
               <a href="#testimonials" className="text-gray-300 hover:text-cyan-400 transition-colors">Testimonials</a>
               <a href="#contact" className="text-gray-300 hover:text-cyan-400 transition-colors">Contact</a>
               <div className="pl-4 flex items-center space-x-3 border-l border-slate-700">
-                <Button variant="outline" className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10">
-                  Log In
-                </Button>
-                <Button className="bg-cyan-500 hover:bg-cyan-600">
-                  Register
+                <Button 
+                  className="bg-cyan-500 hover:bg-cyan-600"
+                  onClick={() => navigate('/become-technician')}
+                >
+                  Become a Technician
                 </Button>
               </div>
             </nav>
@@ -170,12 +170,12 @@ const Home = () => {
               <a href="#process" className="block py-2 text-gray-300 hover:text-cyan-400">Process</a>
               <a href="#testimonials" className="block py-2 text-gray-300 hover:text-cyan-400">Testimonials</a>
               <a href="#contact" className="block py-2 text-gray-300 hover:text-cyan-400">Contact</a>
-              <div className="pt-3 flex space-x-3 border-t border-slate-700">
-                <Button variant="outline" className="flex-1 border-cyan-500 text-cyan-400">
-                  Log In
-                </Button>
-                <Button className="flex-1 bg-cyan-500 hover:bg-cyan-600">
-                  Register
+              <div className="pt-3 border-t border-slate-700">
+                <Button 
+                  className="w-full bg-cyan-500 hover:bg-cyan-600"
+                  onClick={() => navigate('/become-technician')}
+                >
+                  Become a Technician
                 </Button>
               </div>
             </motion.div>

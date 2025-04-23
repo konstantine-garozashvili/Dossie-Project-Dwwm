@@ -148,7 +148,7 @@ const servicesData = [
   },
 ];
 
-const Services = () => {
+export const Services = () => {
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -390,4 +390,4 @@ const Services = () => {
   );
 };
 
-export default Services; 
+export default Services;

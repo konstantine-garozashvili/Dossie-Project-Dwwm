@@ -48,7 +48,7 @@ const timeSlots = [
   "3:00 PM - 5:00 PM"
 ];
 
-const ServiceRequest = () => {
+export const ServiceRequest = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -663,4 +663,4 @@ const ServiceRequest = () => {
   );
 };
 
-export default ServiceRequest; 
+export default ServiceRequest;

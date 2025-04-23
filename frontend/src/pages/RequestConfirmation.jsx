@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Check, Mail, Phone, Calendar } from "lucide-react";
 
-const RequestConfirmation = () => {
+export const RequestConfirmation = () => {
   // In a real app, this would come from the server response
   const requestDetails = {
     requestId: "REQ-" + Math.floor(100000 + Math.random() * 900000),
@@ -29,7 +29,7 @@ const RequestConfirmation = () => {
             Service Request Received!
           </h1>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-            Thank you for submitting your repair request. We have received your information and our support team will review it shortly.
+            Thank you for submitting your repair request. Our support team will review your request and contact you with next steps.
           </p>
         </motion.div>
 
@@ -88,7 +88,7 @@ const RequestConfirmation = () => {
                   <div>
                     <h3 className="font-medium text-lg">Appointment Scheduling</h3>
                     <p className="text-gray-400">
-                      Once your request is approved, you'll receive an email with available appointment times.
+                      If your request is approved, our support team will contact you to schedule a convenient appointment time.
                     </p>
                   </div>
                 </div>
@@ -97,14 +97,7 @@ const RequestConfirmation = () => {
           </CardContent>
         </Card>
 
-        <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <Button
-            variant="outline"
-            className="border-cyan-400 text-cyan-400 hover:bg-cyan-400/10"
-            asChild
-          >
-            <Link to="/dashboard">View Your Requests</Link>
-          </Button>
+        <div className="flex justify-center">
           <Button
             className="bg-cyan-500 hover:bg-cyan-600"
             asChild
@@ -117,4 +110,4 @@ const RequestConfirmation = () => {
   );
 };
 
-export default RequestConfirmation; 
+export default RequestConfirmation;

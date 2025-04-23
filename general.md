@@ -1,210 +1,209 @@
-# Computer Repair Service Request Workflow
+# Solutions Professionnelles de Support Informatique
 
-## Overview
-This workflow describes the process for clients to submit computer repair or technical service requests through our platform, and how these requests are handled by our support team and technicians.
+## Notre Vision
+Nous sommes le partenaire de confiance des entreprises françaises pour tous leurs besoins en support informatique. Notre plateforme innovante combine l'expertise technique, la réactivité et les technologies de pointe pour garantir la continuité de vos opérations informatiques.
 
-## User Journey
+## Avantages Concurrentiels
 
-### 1. Request Submission
-- Client accesses the service request form on our website
-- Client selects the type of service needed:
-  - Hardware repair (laptop, desktop, etc.)
-  - Software troubleshooting
-  - Network setup (Wi-Fi, router installation)
-  - Data recovery
-  - Virus removal
-  - Hardware upgrades
-- Client provides equipment details:
-  - Device make/model
-  - Operating system
-  - Purchase date (optional)
-  - Photos of the device/issue (optional)
-- Client provides service location details:
-  - Address
-  - Client type (individual or business)
-  - Business name (if applicable)
-- Client provides contact information:
-  - Full name
-  - Email address
-  - Phone number
-  - Preferred contact method
-- Client provides issue description:
-  - Problem description
-  - When the issue started
-  - Any troubleshooting already attempted
-- Client reviews and submits request
+### 1. Support Intelligent et Proactif
+- Surveillance en temps réel des systèmes
+- Alertes préventives avant les pannes
+- Maintenance prédictive basée sur l'IA
+- Détection automatique des anomalies
 
-### 2. Initial Response
-- System automatically sends confirmation email to client:
-  - Request receipt acknowledgment
-  - Request reference number
-  - Summary of the request details
-  - Estimated response timeframe
-- Request is logged in the support queue with "Pending Review" status
+### 2. Transparence et Contrôle Total
+- Tableau de bord personnalisé pour chaque entreprise
+- Suivi en temps réel des interventions
+- Rapports détaillés de performance
+- Historique complet des maintenances
 
-### 3. Support Team Review
-- Support team member reviews the service request
-- Support team member has three action options:
-  - Accept the request
-  - Request more information (returns to client)
-  - Decline the request (with reason)
-- If more information is needed:
-  - Client receives email with specific questions
-  - Client can update the request with additional information
-  - Request returns to support queue
-- If request is accepted:
-  - Support team assigns priority level
-  - Support team assigns to appropriate technician based on:
-    - Service type
-    - Location
-    - Technician specialization
-    - Technician availability
+### 3. Service Premium Entreprise
+- Accès prioritaire 24/7
+- SLA garantis par contrat
+- Support multilingue
+- Équipe dédiée par compte
 
-### 4. Technician Assignment
-- Selected technician receives notification of new assignment
-- Technician reviews request details
-- Technician schedules service appointment based on:
-  - Urgency of the issue
-  - Client availability
-  - Technician's schedule
-- System sends appointment confirmation to client:
-  - Date of service
-  - Estimated time window
-  - Technician name and contact information
-  - Preparation instructions (if applicable)
+## Parcours Client
 
-### 5. Service Delivery
-- Technician performs service at scheduled time
-- Technician documents:
-  - Issue diagnosis
-  - Actions taken
-  - Parts replaced (if any)
-  - Service completion time
-- Technician updates request status in system
-- If additional work is needed:
-  - Technician submits follow-up request
-  - Client is notified of the additional requirements
-  - Process returns to Support Team Review
+### 1. Demande d'Intervention
+- Interface entreprise personnalisée
+- Sélection du type d'intervention :
+  - Réparation matérielle (postes de travail, serveurs)
+  - Dépannage logiciel
+  - Configuration réseau
+  - Récupération de données
+  - Sécurité informatique
+  - Mises à niveau matérielles
+- Détails de l'équipement :
+  - Marque/modèle
+  - Système d'exploitation
+  - Date d'achat
+  - Photos du problème
+- Informations de localisation :
+  - Adresse de l'entreprise
+  - Département/Service
+  - Contact sur site
+- Coordonnées professionnelles :
+  - Nom du responsable
+  - Email professionnel
+  - Téléphone direct
+  - Mode de contact préféré
+- Description du problème :
+  - Nature de l'incident
+  - Impact sur l'activité
+  - Solutions déjà tentées
 
-### 6. Service Completion
-- Technician marks service as complete
-- System sends service completion notification to client:
-  - Summary of work performed
-  - Any follow-up recommendations
-  - Request for feedback/review
-- Invoice is generated and sent to client
-- Request status is changed to "Completed"
+### 2. Confirmation et Priorisation
+- Confirmation automatique immédiate :
+  - Numéro de ticket prioritaire
+  - Résumé de la demande
+  - Niveau de priorité initial
+  - Délai d'intervention estimé
+- Intégration au système de gestion des incidents
 
-### 7. Follow-up
-- System sends automated follow-up 3 days after service:
-  - Satisfaction survey
-  - Option to report any persisting issues
-- If client reports issues:
-  - New support ticket is created with reference to original
-  - Process returns to Support Team Review
-- If no issues reported:
-  - Request is archived after 14 days
+### 3. Analyse et Affectation
+- Évaluation par l'équipe support senior
+- Options de traitement :
+  - Intervention immédiate
+  - Demande d'informations complémentaires
+  - Réorientation vers un expert spécialisé
+- Processus d'escalade automatique
+- Attribution basée sur :
+  - Expertise requise
+  - Proximité géographique
+  - Disponibilité en temps réel
+  - Niveau de priorité client
 
-## Technical Implementation
+### 4. Planification Intervention
+- Notification instantanée du technicien
+- Optimisation des déplacements
+- Confirmation du rendez-vous avec :
+  - Créneau horaire précis
+  - Profil du technicien
+  - Préparation nécessaire
+  - Contact direct technicien
 
-### Frontend Components
-1. **Service Request Form**
-   - Multi-step form with progress indicator
-   - Service type selection cards with icons
-   - Device information collection
-   - Location and contact information fields
-   - File upload for photos
-   - Request submission confirmation
+### 5. Réalisation et Suivi
+- Intervention sur site ou à distance
+- Documentation en temps réel :
+  - Diagnostic détaillé
+  - Actions effectuées
+  - Pièces remplacées
+  - Tests de validation
+- Mise à jour instantanée du statut
+- Procédure d'escalade si nécessaire
 
-2. **Client Dashboard**
-   - Overview of current and past service requests
-   - Request status tracking
-   - Communication history
-   - Ability to update requests with additional information
-   - Service history
+### 6. Clôture et Validation
+- Rapport d'intervention détaillé
+- Recommandations préventives
+- Validation client obligatoire
+- Facturation automatique
 
-3. **Email Notification Templates**
-   - Request confirmation
-   - Additional information request
-   - Technician assignment notification
-   - Service completion
-   - Follow-up survey
+### 7. Suivi Qualité
+- Enquête de satisfaction
+- Analyse des performances
+- Suggestions d'amélioration
+- Maintenance préventive programmée
 
-### Backend Services
-1. **Request Processing Service**
-   - Validation of request data
-   - Request logging and tracking
-   - Status management
-   - Email notification triggering
+## Architecture Technique
 
-2. **Support Queue Management**
-   - Request prioritization
-   - Technician assignment algorithm
-   - Workload balancing
+### Composants Frontend
+1. **Portail Entreprise**
+   - Interface personnalisée par client
+   - Tableau de bord analytique
+   - Gestion des actifs informatiques
+   - Suivi des interventions en direct
+   - Rapports personnalisables
 
-3. **Technician Scheduling System**
-   - Availability tracking
-   - Route optimization
-   - Calendar integration
+2. **Application Mobile Pro**
+   - Suivi des tickets en temps réel
+   - Chat sécurisé avec les techniciens
+   - Validation des interventions
+   - Notifications push prioritaires
+   - Géolocalisation des techniciens
 
-4. **Client Communication Service**
-   - Email notification system
-   - SMS notifications (optional)
-   - In-app messaging
+3. **Centre de Notifications**
+   - Alertes personnalisées
+   - Communications automatisées
+   - Rapports programmés
+   - Notifications multicanal
 
-5. **Reporting and Analytics**
-   - Service request trends
-   - Resolution time tracking
-   - Customer satisfaction metrics
-   - Technician performance metrics
+### Services Backend
+1. **Gestion des Demandes**
+   - Validation intelligente
+   - Priorisation automatique
+   - Routage intelligent
+   - Traçabilité complète
 
-## Data Models
+2. **Gestion des Ressources**
+   - Optimisation des plannings
+   - Attribution intelligente
+   - Équilibrage de charge
+   - Gestion des compétences
+
+3. **Système de Planification**
+   - Algorithmes d'optimisation
+   - Gestion des urgences
+   - Intégration calendrier
+   - Prévision de charge
+
+4. **Communication Client**
+   - Notifications temps réel
+   - Messagerie sécurisée
+   - Intégration CRM
+   - Support multicanal
+
+5. **Analytics et Reporting**
+   - KPIs personnalisés
+   - Analyses prédictives
+   - Tableaux de bord temps réel
+   - Rapports automatisés
+
+## Modèles de Données
 
 ### ServiceRequest
-- requestId (unique identifier)
-- clientId (reference to Client)
+- requestId (identifiant unique)
+- clientId (référence Client)
 - serviceType (enum)
 - deviceDetails (object)
 - location (object)
 - description (text)
-- photoUrls (array)
-- status (enum: Pending, Accepted, Scheduled, In Progress, Completed, Declined)
-- priority (enum: Low, Medium, High, Urgent)
-- createdAt (timestamp)
-- updatedAt (timestamp)
+- priority (enum: P1, P2, P3, P4)
+- sla (object)
+- status (enum)
+- timestamps (object)
 
 ### Client
-- clientId (unique identifier)
-- fullName (string)
-- email (string)
-- phone (string)
-- address (object)
-- clientType (enum: Individual, Business)
-- businessName (string, optional)
+- clientId (identifiant unique)
+- companyName (string)
+- contacts (array)
+- locations (array)
+- contracts (array)
 - preferences (object)
+- assets (array)
 
 ### Assignment
-- assignmentId (unique identifier)
-- requestId (reference to ServiceRequest)
-- technicianId (reference to Technician)
-- scheduledDate (date)
-- timeWindow (object: start, end)
+- assignmentId (identifiant unique)
+- requestId (référence ServiceRequest)
+- technicianId (référence Technician)
+- schedule (object)
+- priority (enum)
 - notes (text)
-- status (enum: Pending, Confirmed, Completed, Rescheduled, Cancelled)
+- status (enum)
 
 ### Technician
-- technicianId (unique identifier)
-- fullName (string)
-- specializations (array)
-- availability (array of time slots)
-- currentLocation (geo coordinates)
-- contact (object)
-- workload (number)
+- technicianId (identifiant unique)
+- profile (object)
+- skills (array)
+- certifications (array)
+- availability (object)
+- location (object)
+- performance (object)
 
-## Integration Points
-- Email service provider
-- Calendar system
-- Payment processing
-- SMS gateway (optional)
-- File storage service (for photos)
-- Authentication system
+## Points d'Intégration
+- CRM entreprise
+- Système de facturation
+- Gestion des actifs
+- Monitoring système
+- Plateforme de communication
+- Système d'authentification SSO
