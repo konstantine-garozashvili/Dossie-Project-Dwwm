@@ -56,8 +56,8 @@ export const ServiceRequest = () => {
   const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    serviceType: "",
-    deviceType: "",
+    serviceTypes: [],
+    deviceTypes: [],
     deviceDetails: {
       make: "",
       model: "",
@@ -108,6 +108,46 @@ export const ServiceRequest = () => {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { duration: 0.5 } },
     exit: { opacity: 0, transition: { duration: 0.5 } }
+  };
+  
+  // Add a function to toggle service types
+  const toggleServiceType = (serviceId) => {
+    setFormData(prev => {
+      const currentServiceTypes = [...prev.serviceTypes];
+      if (currentServiceTypes.includes(serviceId)) {
+        // Remove the service if it's already selected
+        return {
+          ...prev,
+          serviceTypes: currentServiceTypes.filter(id => id !== serviceId)
+        };
+      } else {
+        // Add the service if it's not already selected
+        return {
+          ...prev,
+          serviceTypes: [...currentServiceTypes, serviceId]
+        };
+      }
+    });
+  };
+  
+  // Add a function to toggle device types
+  const toggleDeviceType = (deviceId) => {
+    setFormData(prev => {
+      const currentDeviceTypes = [...prev.deviceTypes];
+      if (currentDeviceTypes.includes(deviceId)) {
+        // Remove the device if it's already selected
+        return {
+          ...prev,
+          deviceTypes: currentDeviceTypes.filter(id => id !== deviceId)
+        };
+      } else {
+        // Add the device if it's not already selected
+        return {
+          ...prev,
+          deviceTypes: [...currentDeviceTypes, deviceId]
+        };
+      }
+    });
   };
   
   return (
@@ -168,8 +208,8 @@ export const ServiceRequest = () => {
                 className={step === 1 ? "block" : "hidden"}
               >
                 <div className="mb-6 space-y-2">
-                  <h2 className="text-xl font-semibold text-cyan-400">What service do you need?</h2>
-                  <p className="text-gray-400">Select the type of service that best describes your issue</p>
+                  <h2 className="text-xl font-semibold text-cyan-400">What services do you need?</h2>
+                  <p className="text-gray-400">Select all services that apply to your issue</p>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -177,17 +217,17 @@ export const ServiceRequest = () => {
                     <div
                       key={service.id}
                       className={`border rounded-lg p-4 cursor-pointer transition-all
-                        ${formData.serviceType === service.id 
+                        ${formData.serviceTypes.includes(service.id) 
                           ? 'border-cyan-400 bg-cyan-500/10' 
                           : 'border-slate-700 hover:border-slate-500'}`}
-                      onClick={() => updateFormData(null, 'serviceType', service.id)}
+                      onClick={() => toggleServiceType(service.id)}
                     >
                       <div className="flex items-start">
-                        <div className={`w-5 h-5 rounded-full border mr-3 mt-1 flex items-center justify-center
-                          ${formData.serviceType === service.id ? 'border-cyan-400' : 'border-slate-700'}`}
+                        <div className={`w-5 h-5 rounded-md border mr-3 mt-1 flex items-center justify-center
+                          ${formData.serviceTypes.includes(service.id) ? 'border-cyan-400 bg-cyan-500' : 'border-slate-700'}`}
                         >
-                          {formData.serviceType === service.id && 
-                            <div className="w-3 h-3 rounded-full bg-cyan-400"></div>}
+                          {formData.serviceTypes.includes(service.id) && 
+                            <Check className="w-3 h-3 text-white" />}
                         </div>
                         <div>
                           <h3 className="font-medium text-white">{service.name}</h3>
@@ -199,19 +239,24 @@ export const ServiceRequest = () => {
                 </div>
                 
                 <div className="mb-6">
-                  <h3 className="text-lg font-medium mb-2">What type of device do you need help with?</h3>
+                  <h3 className="text-lg font-medium mb-2">What types of devices do you need help with?</h3>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     {deviceTypes.map(device => (
                       <div
                         key={device.id}
                         className={`flex flex-col items-center justify-center p-4 border rounded-lg cursor-pointer transition-all
-                          ${formData.deviceType === device.id 
+                          ${formData.deviceTypes.includes(device.id) 
                             ? 'border-cyan-400 bg-cyan-500/10' 
                             : 'border-slate-700 hover:border-slate-500'}`}
-                        onClick={() => updateFormData(null, 'deviceType', device.id)}
+                        onClick={() => toggleDeviceType(device.id)}
                       >
                         <div className="text-cyan-400 mb-2">{device.icon}</div>
                         <div className="text-center">{device.name}</div>
+                        {formData.deviceTypes.includes(device.id) && (
+                          <div className="mt-2 bg-cyan-500 rounded-full p-1">
+                            <Check className="w-3 h-3 text-white" />
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -553,14 +598,32 @@ export const ServiceRequest = () => {
                 <div className="space-y-6">
                   <div className="border border-slate-700 rounded-lg p-4">
                     <h3 className="font-medium text-lg text-cyan-400 mb-2">Service Details</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2">
-                      <div>
-                        <span className="text-gray-400">Service Type:</span>
-                        <p>{serviceTypes.find(s => s.id === formData.serviceType)?.name || 'Not selected'}</p>
+                    <div>
+                      <span className="text-gray-400">Service Types:</span>
+                      <div className="mt-1 flex flex-wrap gap-2">
+                        {formData.serviceTypes.length > 0 ? (
+                          formData.serviceTypes.map(serviceId => (
+                            <Badge key={serviceId} className="bg-cyan-500/20 text-cyan-400 border-cyan-500">
+                              {serviceTypes.find(s => s.id === serviceId)?.name}
+                            </Badge>
+                          ))
+                        ) : (
+                          <p>No services selected</p>
+                        )}
                       </div>
-                      <div>
-                        <span className="text-gray-400">Device Type:</span>
-                        <p>{deviceTypes.find(d => d.id === formData.deviceType)?.name || 'Not selected'}</p>
+                    </div>
+                    <div className="mt-2">
+                      <span className="text-gray-400">Device Types:</span>
+                      <div className="mt-1 flex flex-wrap gap-2">
+                        {formData.deviceTypes.length > 0 ? (
+                          formData.deviceTypes.map(deviceId => (
+                            <Badge key={deviceId} className="bg-cyan-500/20 text-cyan-400 border-cyan-500">
+                              {deviceTypes.find(d => d.id === deviceId)?.name}
+                            </Badge>
+                          ))
+                        ) : (
+                          <p>No devices selected</p>
+                        )}
                       </div>
                     </div>
                   </div>
