@@ -5,6 +5,7 @@ import { Services } from "./pages/Services";
 import { ServiceRequest } from "./pages/ServiceRequest";
 import { RequestConfirmation } from "./pages/RequestConfirmation";
 import { BecomeTechnician } from "./pages/BecomeTechnician";
+import { ApplicationSubmitted } from "./pages/ApplicationSubmitted";
 import { Layout } from "./components/Layout";
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
       <Route path="/service-request" element={<Layout><ServiceRequest /></Layout>} />
       <Route path="/request-confirmation" element={<Layout><RequestConfirmation /></Layout>} />
       <Route path="/become-technician" element={<Layout><BecomeTechnician /></Layout>} />
+      <Route path="/application-submitted" element={<ApplicationSubmitted />} />
     </Routes>
   );
 }

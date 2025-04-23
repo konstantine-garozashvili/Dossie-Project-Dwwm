@@ -7,11 +7,14 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Check, ChevronRight, ChevronLeft, Calendar, Laptop, Server, Smartphone, Wifi, Shield, Clock, Info } from "lucide-react";
+import { Check, ChevronRight, ChevronLeft, Calendar, Laptop, Server, Smartphone, Wifi, Shield, Clock, Info, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 
 // Hardware types
 const deviceTypes = [
@@ -50,6 +53,7 @@ const timeSlots = [
 
 export const ServiceRequest = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     serviceType: "",
@@ -289,7 +293,7 @@ export const ServiceRequest = () => {
                 </div>
               </motion.div>
               
-              {/* Step 3: Schedule Service (New) */}
+              {/* Step 3: Schedule Service */}
               <motion.div
                 initial="hidden"
                 animate={step === 3 ? "visible" : "hidden"}
@@ -304,42 +308,59 @@ export const ServiceRequest = () => {
                 
                 <div className="mb-8">
                   <Label className="block mb-3">Select a Date</Label>
-                  <div className="flex justify-center mb-6">
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className={`w-full max-w-sm justify-start text-left font-normal bg-slate-900 border-slate-700 hover:bg-slate-800 ${
-                            !formData.schedulingDetails.date && "text-muted-foreground"
-                          }`}
-                        >
-                          <Calendar className="mr-2 h-4 w-4" />
-                          {formData.schedulingDetails.date ? (
-                            format(formData.schedulingDetails.date, "PPP")
-                          ) : (
-                            <span>Select a date</span>
-                          )}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 bg-slate-900 border-slate-700">
-                        <CalendarComponent
-                          mode="single"
-                          selected={formData.schedulingDetails.date}
-                          onSelect={(date) => updateFormData('schedulingDetails', 'date', date)}
-                          initialFocus
-                          disabled={(date) => 
-                            // Disable past dates, Sundays (index 0), and dates more than 30 days in the future
-                            date < new Date(new Date().setHours(0, 0, 0, 0)) || 
-                            date.getDay() === 0 ||
-                            date > new Date(new Date().setDate(new Date().getDate() + 30))
-                          }
-                          className="bg-slate-900 text-white"
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
+                  <Input
+                    type="date"
+                    className="bg-slate-900 border-slate-700 w-full max-w-sm"
+                    value={formData.schedulingDetails.date ? format(formData.schedulingDetails.date, "yyyy-MM-dd") : ""}
+                    onChange={(e) => {
+                      const date = e.target.value ? new Date(e.target.value) : null;
+                      // Check if the date is valid and not a Sunday
+                      if (date) {
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        
+                        // Calculate date 30 days from today
+                        const maxDate = new Date();
+                        maxDate.setDate(today.getDate() + 30);
+                        
+                        // Check if date is valid
+                        if (date < today) {
+                          toast({
+                            title: "Invalid Date",
+                            description: "Please select a date that is not in the past.",
+                            variant: "destructive"
+                          });
+                          return;
+                        }
+                        
+                        if (date.getDay() === 0) {
+                          toast({
+                            title: "Unavailable Day",
+                            description: "Sorry, Sundays are not available for appointments.",
+                            variant: "destructive"
+                          });
+                          return;
+                        }
+                        
+                        if (date > maxDate) {
+                          toast({
+                            title: "Date Too Far",
+                            description: "Please select a date within the next 30 days.",
+                            variant: "destructive"
+                          });
+                          return;
+                        }
+                      }
+                      updateFormData('schedulingDetails', 'date', date);
+                    }}
+                    min={format(new Date(), "yyyy-MM-dd")}
+                    max={format(new Date(new Date().setDate(new Date().getDate() + 30)), "yyyy-MM-dd")}
+                  />
+                  <p className="text-sm text-slate-400 mt-2">
+                    * Select a date within the next 30 days. Sundays are not available.
+                  </p>
                   
-                  <Label className="block mb-3">Select a Time Slot</Label>
+                  <Label className="block mb-3 mt-6">Select a Time Slot</Label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
                     {timeSlots.map((slot, index) => (
                       <div

@@ -2,11 +2,12 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { fixLayoutOverflow } from "@/lib/utils";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export const Layout = ({ children }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const rootRef = useRef(null);
 
   useEffect(() => {
@@ -25,6 +26,8 @@ export const Layout = ({ children }) => {
       document.documentElement.style.overflowX = '';
     };
   }, []);
+
+  const isHomePage = location.pathname === '/';
 
   return (
     <div className="bg-slate-950 text-white overflow-x-hidden" ref={rootRef}>
@@ -84,12 +87,23 @@ export const Layout = ({ children }) => {
               }} className="text-gray-300 hover:text-cyan-400 transition-colors cursor-pointer">Contact</a>
               
               <div className="pl-4 flex items-center space-x-3 border-l border-slate-700">
-                <Button variant="outline" className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10" onClick={() => navigate('/login')}>
-                  Log In
-                </Button>
-                <Button className="bg-cyan-500 hover:bg-cyan-600" onClick={() => navigate('/register')}>
-                  Register
-                </Button>
+                {isHomePage ? (
+                  <>
+                    <Button variant="outline" className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10" onClick={() => navigate('/login')}>
+                      Log In
+                    </Button>
+                    <Button className="bg-cyan-500 hover:bg-cyan-600" onClick={() => navigate('/register')}>
+                      Register
+                    </Button>
+                  </>
+                ) : (
+                  <Button 
+                    className="bg-cyan-500 hover:bg-cyan-600"
+                    onClick={() => navigate('/become-technician')}
+                  >
+                    Become a Technician
+                  </Button>
+                )}
               </div>
             </nav>
             
@@ -162,12 +176,23 @@ export const Layout = ({ children }) => {
               }} className="block py-2 text-gray-300 hover:text-cyan-400 cursor-pointer">Contact</a>
               
               <div className="pt-3 flex space-x-3 border-t border-slate-700">
-                <Button variant="outline" className="flex-1 border-cyan-500 text-cyan-400" onClick={() => navigate('/login')}>
-                  Log In
-                </Button>
-                <Button className="flex-1 bg-cyan-500 hover:bg-cyan-600" onClick={() => navigate('/register')}>
-                  Register
-                </Button>
+                {isHomePage ? (
+                  <>
+                    <Button variant="outline" className="flex-1 border-cyan-500 text-cyan-400" onClick={() => navigate('/login')}>
+                      Log In
+                    </Button>
+                    <Button className="flex-1 bg-cyan-500 hover:bg-cyan-600" onClick={() => navigate('/register')}>
+                      Register
+                    </Button>
+                  </>
+                ) : (
+                  <Button 
+                    className="w-full bg-cyan-500 hover:bg-cyan-600"
+                    onClick={() => navigate('/become-technician')}
+                  >
+                    Become a Technician
+                  </Button>
+                )}
               </div>
             </motion.div>
           )}
