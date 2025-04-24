@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
@@ -7,7 +7,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Check, ChevronRight, ChevronLeft, Calendar, Laptop, Server, Smartphone, Wifi, Shield, Clock, Info, AlertCircle } from "lucide-react";
+import { Check, ChevronRight, ChevronLeft, Calendar, Laptop, Server, Smartphone, Wifi, Shield, Clock, Info, AlertCircle, X, ChevronDown } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -51,6 +51,16 @@ const timeSlots = [
   "3:00 PM - 5:00 PM"
 ];
 
+// Device brands by category
+const deviceBrands = {
+  laptop: ["Apple", "Dell", "HP", "Lenovo", "Asus", "Acer", "Microsoft", "Samsung", "MSI", "Toshiba", "Razer", "Other"],
+  desktop: ["Dell", "HP", "Lenovo", "Apple", "Asus", "Acer", "CyberPower", "iBUYPOWER", "Custom Build", "Other"],
+  smartphone: ["Apple", "Samsung", "Google", "Xiaomi", "OnePlus", "Huawei", "Motorola", "Sony", "LG", "Nokia", "Other"],
+  network: ["Cisco", "Netgear", "TP-Link", "Linksys", "Asus", "Ubiquiti", "D-Link", "Belkin", "Aruba", "Other"],
+  storage: ["Western Digital", "Seagate", "Samsung", "SanDisk", "Crucial", "Kingston", "Toshiba", "LaCie", "Other"],
+  other: ["Other"]
+};
+
 export const ServiceRequest = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -59,7 +69,8 @@ export const ServiceRequest = () => {
     serviceTypes: [],
     deviceTypes: [],
     deviceDetails: {
-      make: "",
+      makes: [],
+      otherMake: "",
       model: "",
       operatingSystem: "",
       purchaseDate: "",
@@ -79,6 +90,94 @@ export const ServiceRequest = () => {
       businessName: "",
     }
   });
+  
+  // For brand selector dropdown
+  const [brandDropdownOpen, setBrandDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const [availableBrands, setAvailableBrands] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setBrandDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dropdownRef]);
+  
+  // Update available brands when device types change
+  useEffect(() => {
+    if (formData.deviceTypes.length > 0) {
+      const brands = new Set();
+      formData.deviceTypes.forEach(deviceType => {
+        const brandsForType = deviceBrands[deviceType] || [];
+        brandsForType.forEach(brand => brands.add(brand));
+      });
+      setAvailableBrands(Array.from(brands));
+    } else {
+      // If no device type selected, show all brands
+      const allBrands = new Set();
+      Object.values(deviceBrands).forEach(brands => {
+        brands.forEach(brand => allBrands.add(brand));
+      });
+      setAvailableBrands(Array.from(allBrands));
+    }
+  }, [formData.deviceTypes]);
+  
+  // Toggle a brand in the selection
+  const toggleBrand = (brand) => {
+    setFormData(prev => {
+      const currentMakes = [...prev.deviceDetails.makes];
+      if (brand === "Other") {
+        // If "Other" is selected, add it to the list if not already there
+        if (!currentMakes.includes("Other")) {
+          return {
+            ...prev,
+            deviceDetails: {
+              ...prev.deviceDetails,
+              makes: [...currentMakes, "Other"]
+            }
+          };
+        }
+        return prev;
+      } else {
+        // For normal brands
+        if (currentMakes.includes(brand)) {
+          return {
+            ...prev,
+            deviceDetails: {
+              ...prev.deviceDetails,
+              makes: currentMakes.filter(m => m !== brand)
+            }
+          };
+        } else {
+          return {
+            ...prev,
+            deviceDetails: {
+              ...prev.deviceDetails,
+              makes: [...currentMakes, brand]
+            }
+          };
+        }
+      }
+    });
+  };
+  
+  // Remove a brand from selection
+  const removeBrand = (brand) => {
+    setFormData(prev => ({
+      ...prev,
+      deviceDetails: {
+        ...prev.deviceDetails,
+        makes: prev.deviceDetails.makes.filter(m => m !== brand)
+      }
+    }));
+  };
   
   const updateFormData = (section, field, value) => {
     if (section) {
@@ -276,28 +375,112 @@ export const ServiceRequest = () => {
                   <p className="text-gray-400">The more details you provide, the better we can diagnose your issue</p>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="device-make">Device Make/Brand</Label>
-                    <Input
-                      id="device-make"
-                      placeholder="e.g., Apple, Dell, HP"
-                      className="bg-slate-900 border-slate-700"
-                      value={formData.deviceDetails.make}
-                      onChange={(e) => updateFormData('deviceDetails', 'make', e.target.value)}
-                    />
+                <div className="mb-6">
+                  <Label className="block mb-2">Device Make/Brand</Label>
+                  <div className="relative" ref={dropdownRef}>
+                    <div 
+                      className={`flex flex-wrap gap-2 min-h-10 p-2 border rounded-md cursor-pointer ${
+                        brandDropdownOpen 
+                          ? 'border-cyan-500 ring-2 ring-cyan-500/50' 
+                          : 'border-slate-700'
+                      } bg-slate-900`}
+                      onClick={() => setBrandDropdownOpen(!brandDropdownOpen)}
+                    >
+                      {formData.deviceDetails.makes.length === 0 ? (
+                        <div className="text-gray-400 py-1">Select brand(s)</div>
+                      ) : (
+                        <>
+                          {formData.deviceDetails.makes.map(brand => (
+                            <Badge 
+                              key={brand} 
+                              className="bg-cyan-500/20 text-cyan-400 flex items-center gap-1"
+                            >
+                              {brand}
+                              <button 
+                                type="button" 
+                                className="ml-1 hover:text-white"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  removeBrand(brand);
+                                }}
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </Badge>
+                          ))}
+                        </>
+                      )}
+                      <div className="ml-auto flex items-center">
+                        <ChevronDown className={`h-4 w-4 transition-transform ${brandDropdownOpen ? 'rotate-180' : ''}`} />
+                      </div>
+                    </div>
+                    
+                    {brandDropdownOpen && (
+                      <div className="absolute z-10 mt-1 w-full rounded-md border border-slate-700 bg-slate-800 shadow-lg">
+                        <div className="p-2">
+                          <Input
+                            type="text"
+                            placeholder="Search brands..."
+                            className="bg-slate-900 border-slate-700"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        </div>
+                        <div className="max-h-60 overflow-auto p-2">
+                          {availableBrands
+                            .filter(brand => brand.toLowerCase().includes(searchQuery.toLowerCase()))
+                            .map(brand => (
+                              <div
+                                key={brand}
+                                className={`flex items-center px-2 py-1.5 cursor-pointer rounded hover:bg-slate-700 ${
+                                  formData.deviceDetails.makes.includes(brand) ? 'bg-cyan-500/20' : ''
+                                }`}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleBrand(brand);
+                                }}
+                              >
+                                <div className={`w-5 h-5 rounded border mr-3 flex items-center justify-center
+                                  ${formData.deviceDetails.makes.includes(brand) ? 'border-cyan-400 bg-cyan-500' : 'border-slate-700'}`}
+                                >
+                                  {formData.deviceDetails.makes.includes(brand) && 
+                                    <Check className="w-3 h-3 text-white" />}
+                                </div>
+                                <span>{brand}</span>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                   
-                  <div className="space-y-2">
-                    <Label htmlFor="device-model">Device Model</Label>
-                    <Input
-                      id="device-model"
-                      placeholder="e.g., MacBook Pro, XPS 13"
-                      className="bg-slate-900 border-slate-700"
-                      value={formData.deviceDetails.model}
-                      onChange={(e) => updateFormData('deviceDetails', 'model', e.target.value)}
-                    />
-                  </div>
+                  {formData.deviceDetails.makes.includes("Other") && (
+                    <div className="mt-2">
+                      <Label htmlFor="other-brand">Specify other brand</Label>
+                      <Input
+                        id="other-brand"
+                        placeholder="Enter brand name"
+                        className="bg-slate-900 border-slate-700 mt-1"
+                        value={formData.deviceDetails.otherMake}
+                        onChange={(e) => updateFormData('deviceDetails', 'otherMake', e.target.value)}
+                      />
+                    </div>
+                  )}
+                  <p className="text-sm text-slate-400 mt-2">
+                    You can select multiple brands if needed
+                  </p>
+                </div>
+                
+                <div className="mb-6">
+                  <Label htmlFor="device-model">Device Model</Label>
+                  <Input
+                    id="device-model"
+                    placeholder="e.g., MacBook Pro, XPS 13"
+                    className="bg-slate-900 border-slate-700"
+                    value={formData.deviceDetails.model}
+                    onChange={(e) => updateFormData('deviceDetails', 'model', e.target.value)}
+                  />
                 </div>
                 
                 <div className="mb-6">
@@ -633,7 +816,17 @@ export const ServiceRequest = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2">
                       <div>
                         <span className="text-gray-400">Make/Brand:</span>
-                        <p>{formData.deviceDetails.make || 'Not provided'}</p>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {formData.deviceDetails.makes.length > 0 ? (
+                            formData.deviceDetails.makes.map(brand => (
+                              <Badge key={brand} className="bg-cyan-500/20 text-cyan-400 border-cyan-500">
+                                {brand === "Other" ? formData.deviceDetails.otherMake || "Other" : brand}
+                              </Badge>
+                            ))
+                          ) : (
+                            <p>Not provided</p>
+                          )}
+                        </div>
                       </div>
                       <div>
                         <span className="text-gray-400">Model:</span>
