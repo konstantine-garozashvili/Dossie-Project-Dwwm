@@ -26,7 +26,6 @@ import {
   Clock,
   ArrowRight,
   FileText,
-  MessageSquare,
   Star
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -141,12 +140,6 @@ export const TechnicianDashboard = () => {
     { id: 5, name: "Carte graphique GTX 1650", quantity: 0, status: "Rupture" }
   ];
 
-  const recentMessages = [
-    { id: 1, sender: "Sophie Martin", content: "Avez-vous pu récupérer mes fichiers?", time: "10:45", unread: true },
-    { id: 2, sender: "Support IT13", content: "Un nouveau client a été assigné", time: "09:30", unread: true },
-    { id: 3, sender: "Jean Dupont", content: "Merci pour la réparation rapide!", time: "Hier", unread: false }
-  ];
-
   const getPriorityColor = (priority) => {
     switch (priority) {
       case "Urgente": return "bg-red-500/20 text-red-400";
@@ -228,24 +221,6 @@ export const TechnicianDashboard = () => {
                 <li>
                   <Button 
                     variant="ghost"
-                    className={`w-full justify-start ${activeTab === 'messages' ? 'bg-slate-800' : ''}`}
-                    onClick={() => setActiveTab('messages')}
-                  >
-                    <MessageSquare className="mr-3 h-5 w-5" />
-                    {sidebarOpen && (
-                      <div className="flex items-center justify-between w-full">
-                        <span>Messages</span>
-                        <Badge className="bg-cyan-500 text-white ml-1 text-xs">2</Badge>
-                      </div>
-                    )}
-                    {!sidebarOpen && (
-                      <Badge className="bg-cyan-500 text-white absolute top-1 right-1 text-xs min-w-[18px] h-[18px] flex items-center justify-center p-0">2</Badge>
-                    )}
-                  </Button>
-                </li>
-                <li>
-                  <Button 
-                    variant="ghost"
                     className={`w-full justify-start ${activeTab === 'parametres' ? 'bg-slate-800' : ''}`}
                     onClick={() => setActiveTab('parametres')}
                   >
@@ -288,7 +263,6 @@ export const TechnicianDashboard = () => {
               {activeTab === 'taches' && "Mes Tâches"}
               {activeTab === 'calendrier' && "Calendrier"}
               {activeTab === 'inventaire' && "Inventaire"}
-              {activeTab === 'messages' && "Messages"}
               {activeTab === 'parametres' && "Paramètres"}
             </h1>
           </div>
@@ -464,46 +438,6 @@ export const TechnicianDashboard = () => {
                     </table>
                   </div>
                 </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="messages" className="mt-0">
-              <Card className="bg-slate-800 border-slate-700">
-                <CardHeader>
-                  <CardTitle>Messages</CardTitle>
-                  <CardDescription>Communications avec clients et équipe</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {recentMessages.map((message) => (
-                      <div 
-                        key={message.id} 
-                        className={`p-4 rounded-lg border ${message.unread ? 'bg-slate-700/40 border-cyan-600/30' : 'bg-slate-800/50 border-slate-700'}`}
-                      >
-                        <div className="flex justify-between mb-2">
-                          <div className="font-medium flex items-center gap-2">
-                            {message.sender}
-                            {message.unread && (
-                              <span className="inline-block w-2 h-2 bg-cyan-500 rounded-full"></span>
-                            )}
-                          </div>
-                          <span className="text-sm text-gray-400">{message.time}</span>
-                        </div>
-                        <p className="text-gray-300">{message.content}</p>
-                        <div className="mt-3 flex justify-end">
-                          <Button size="sm" variant="outline" className="text-xs h-8">
-                            Répondre
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-                <CardFooter className="flex justify-center border-t border-slate-700 pt-4">
-                  <Button variant="outline" className="w-full md:w-auto border-slate-600">
-                    Voir tous les messages
-                  </Button>
-                </CardFooter>
               </Card>
             </TabsContent>
 
