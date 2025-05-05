@@ -7,6 +7,8 @@ import { RequestConfirmation } from "./pages/RequestConfirmation";
 import { BecomeTechnician } from "./pages/BecomeTechnician";
 import { ApplicationSubmitted } from "./pages/ApplicationSubmitted";
 import { Layout } from "./components/Layout";
+import { AdminLogin } from "./pages/AdminLogin";
+import { AdminDashboard } from "./pages/AdminDashboard";
 
 function App() {
   return (
@@ -17,6 +19,8 @@ function App() {
       <Route path="/request-confirmation" element={<Layout><RequestConfirmation /></Layout>} />
       <Route path="/become-technician" element={<Layout><BecomeTechnician /></Layout>} />
       <Route path="/application-submitted" element={<ApplicationSubmitted />} />
+      <Route path="/adminlog" element={<AdminLogin />} />
+      <Route path="/dashboardadmin" element={<AdminDashboard />} />
     </Routes>
   );
 }

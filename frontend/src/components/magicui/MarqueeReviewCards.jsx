@@ -4,44 +4,44 @@ import { Marquee } from "./marquee";
 
 const reviews = [
   {
-    name: "Jack",
-    username: "@jack",
-    body: "I've never seen anything like this before. It's amazing. I love it.",
+    name: "Jacques",
+    username: "@jacques",
+    body: "Je n'ai jamais rien vu de tel auparavant. C'est incroyable. J'adore.",
     img: "https://avatar.vercel.sh/jack",
     color: "from-green-400 to-green-500"
   },
   {
-    name: "Jill",
-    username: "@jill",
-    body: "I don't know what to say. I'm speechless. This is amazing.",
+    name: "Julie",
+    username: "@julie",
+    body: "Je ne sais pas quoi dire. Je suis sans voix. C'est incroyable.",
     img: "https://avatar.vercel.sh/jill",
     color: "from-purple-400 to-pink-500"
   },
   {
-    name: "John",
-    username: "@john",
-    body: "I'm at a loss for words. This is amazing. I love it.",
+    name: "Jean",
+    username: "@jean",
+    body: "Je suis à court de mots. C'est incroyable. J'adore.",
     img: "https://avatar.vercel.sh/john",
     color: "from-blue-500 to-blue-600"
   },
   {
-    name: "Jane",
-    username: "@jane",
-    body: "I'm at a loss for words. This is amazing. I love it.",
+    name: "Jeanne",
+    username: "@jeanne",
+    body: "Je suis à court de mots. C'est incroyable. J'adore.",
     img: "https://avatar.vercel.sh/jane",
     color: "from-pink-400 to-orange-500"
   },
   {
-    name: "Jenny",
-    username: "@jenny",
-    body: "I'm at a loss for words. This is amazing. I love it.",
+    name: "Jennie",
+    username: "@jennie",
+    body: "Je suis à court de mots. C'est incroyable. J'adore.",
     img: "https://avatar.vercel.sh/jenny",
     color: "from-purple-500 to-indigo-500"
   },
   {
-    name: "James",
-    username: "@james",
-    body: "I'm at a loss for words. This is amazing. I love it.",
+    name: "Jerome",
+    username: "@jerome",
+    body: "Je suis à court de mots. C'est incroyable. J'adore.",
     img: "https://avatar.vercel.sh/james",
     color: "from-blue-500 to-green-500"
   },

@@ -5,27 +5,27 @@ import { Marquee } from "./marquee";
 // Sample reviews data - creating more cards
 const reviewContent = [
   {
-    name: "Michael Johnson",
-    username: "Business Owner",
-    body: "They saved my laptop when I thought all my data was lost. Fast service, fair prices!",
+    name: "Michel Dupont",
+    username: "Chef d'Entreprise",
+    body: "Ils ont sauvé mon ordinateur portable quand je pensais que toutes mes données étaient perdues. Service rapide, prix justes !",
     img: "https://randomuser.me/api/portraits/men/32.jpg",
   },
   {
-    name: "Sarah Thompson",
-    username: "Graphic Designer",
-    body: "I rely on my workstation for my career, and their team keeps it running flawlessly.",
+    name: "Sophie Martin",
+    username: "Designer Graphique",
+    body: "Je compte sur ma station de travail pour ma carrière, et leur équipe la maintient en parfait état de fonctionnement.",
     img: "https://randomuser.me/api/portraits/women/44.jpg",
   },
   {
-    name: "David Rodriguez",
-    username: "Student",
-    body: "Same-day repair saved my final project when my laptop crashed before submission.",
+    name: "David Moreau",
+    username: "Étudiant",
+    body: "La réparation le jour même a sauvé mon projet final quand mon ordinateur portable a planté avant la soumission.",
     img: "https://randomuser.me/api/portraits/men/67.jpg",
   },
   {
-    name: "Emily Chen",
-    username: "Software Developer",
-    body: "Professional diagnosis and repair of my custom PC build. Highly recommended!",
+    name: "Émilie Chen",
+    username: "Développeuse Logiciel",
+    body: "Diagnostic et réparation professionnels de mon PC sur mesure. Hautement recommandé !",
     img: "https://randomuser.me/api/portraits/women/22.jpg",
   },
 ];
@@ -36,22 +36,22 @@ const reviews = [
   ...reviewContent.map((review, i) => ({
     ...review,
     username: `${review.username}`,
-    name: `Alex ${String.fromCharCode(65 + i)}`,
-    body: "The team fixed my computer in record time. Great customer service!",
+    name: `Alexandre ${String.fromCharCode(65 + i)}`,
+    body: "L'équipe a réparé mon ordinateur en un temps record. Excellent service client !",
     img: `https://randomuser.me/api/portraits/men/${20 + i}.jpg`,
   })),
   ...reviewContent.map((review, i) => ({
     ...review,
     username: `${review.username}`,
-    name: `Jessica ${String.fromCharCode(69 + i)}`,
-    body: "Very professional service. They diagnosed and fixed my laptop issues quickly.",
+    name: `Juliette ${String.fromCharCode(69 + i)}`,
+    body: "Service très professionnel. Ils ont diagnostiqué et résolu mes problèmes d'ordinateur portable rapidement.",
     img: `https://randomuser.me/api/portraits/women/${30 + i}.jpg`,
   })),
   ...reviewContent.map((review, i) => ({
     ...review,
     username: `${review.username}`,
-    name: `Ryan ${String.fromCharCode(73 + i)}`,
-    body: "Excellent service! They recovered all my important files after a hard drive failure.",
+    name: `Raphaël ${String.fromCharCode(73 + i)}`,
+    body: "Service excellent ! Ils ont récupéré tous mes fichiers importants après une panne de disque dur.",
     img: `https://randomuser.me/api/portraits/men/${40 + i}.jpg`,
   })),
 ];

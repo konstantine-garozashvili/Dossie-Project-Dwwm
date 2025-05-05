@@ -16,49 +16,49 @@ import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 
-// Hardware types
+// Types d'appareils
 const deviceTypes = [
-  { id: "laptop", name: "Laptop", icon: <Laptop className="w-6 h-6" /> },
-  { id: "desktop", name: "Desktop Computer", icon: <Server className="w-6 h-6" /> },
+  { id: "laptop", name: "Ordinateur Portable", icon: <Laptop className="w-6 h-6" /> },
+  { id: "desktop", name: "Ordinateur de Bureau", icon: <Server className="w-6 h-6" /> },
   { id: "smartphone", name: "Smartphone", icon: <Smartphone className="w-6 h-6" /> },
-  { id: "network", name: "Network Equipment", icon: <Wifi className="w-6 h-6" /> },
-  { id: "storage", name: "Storage Device", icon: <Shield className="w-6 h-6" /> },
-  { id: "other", name: "Other", icon: <Shield className="w-6 h-6" /> },
+  { id: "network", name: "Équipement Réseau", icon: <Wifi className="w-6 h-6" /> },
+  { id: "storage", name: "Périphérique de Stockage", icon: <Shield className="w-6 h-6" /> },
+  { id: "other", name: "Autre", icon: <Shield className="w-6 h-6" /> },
 ];
 
-// Service types
+// Types de services
 const serviceTypes = [
-  { id: "hardware-repair", name: "Hardware Repair", description: "Fix physical components of your device" },
-  { id: "software-issue", name: "Software Issue", description: "Resolve software problems, crashes, or errors" },
-  { id: "virus-removal", name: "Virus Removal", description: "Remove malware, viruses, and unwanted software" },
-  { id: "data-recovery", name: "Data Recovery", description: "Recover lost or deleted files and data" },
-  { id: "network-setup", name: "Network Setup", description: "Wi-Fi setup, router configuration, or network troubleshooting" },
-  { id: "hardware-upgrade", name: "Hardware Upgrade", description: "Upgrade components for better performance" },
+  { id: "hardware-repair", name: "Réparation Matérielle", description: "Réparation des composants physiques de votre appareil" },
+  { id: "software-issue", name: "Problème Logiciel", description: "Résolution des problèmes logiciels, plantages ou erreurs" },
+  { id: "virus-removal", name: "Suppression de Virus", description: "Élimination des logiciels malveillants, virus et programmes indésirables" },
+  { id: "data-recovery", name: "Récupération de Données", description: "Récupération de fichiers et données perdus ou supprimés" },
+  { id: "network-setup", name: "Configuration Réseau", description: "Configuration Wi-Fi, routeur ou dépannage réseau" },
+  { id: "hardware-upgrade", name: "Mise à Niveau Matérielle", description: "Amélioration des composants pour de meilleures performances" },
 ];
 
-// Operating systems
+// Systèmes d'exploitation
 const operatingSystems = [
   "Windows 11", "Windows 10", "Windows 8/8.1", "Windows 7", 
-  "macOS Sonoma", "macOS Ventura", "macOS Monterey", "macOS Older Version",
-  "Linux", "Chrome OS", "Android", "iOS/iPadOS", "Other"
+  "macOS Sonoma", "macOS Ventura", "macOS Monterey", "macOS Version plus ancienne",
+  "Linux", "Chrome OS", "Android", "iOS/iPadOS", "Autre"
 ];
 
-// Available time slots
+// Créneaux horaires disponibles
 const timeSlots = [
-  "9:00 AM - 11:00 AM",
-  "11:00 AM - 1:00 PM", 
-  "1:00 PM - 3:00 PM",
-  "3:00 PM - 5:00 PM"
+  "9h00 - 11h00",
+  "11h00 - 13h00", 
+  "13h00 - 15h00",
+  "15h00 - 17h00"
 ];
 
-// Device brands by category
+// Marques d'appareils par catégorie
 const deviceBrands = {
-  laptop: ["Apple", "Dell", "HP", "Lenovo", "Asus", "Acer", "Microsoft", "Samsung", "MSI", "Toshiba", "Razer", "Other"],
-  desktop: ["Dell", "HP", "Lenovo", "Apple", "Asus", "Acer", "CyberPower", "iBUYPOWER", "Custom Build", "Other"],
-  smartphone: ["Apple", "Samsung", "Google", "Xiaomi", "OnePlus", "Huawei", "Motorola", "Sony", "LG", "Nokia", "Other"],
-  network: ["Cisco", "Netgear", "TP-Link", "Linksys", "Asus", "Ubiquiti", "D-Link", "Belkin", "Aruba", "Other"],
-  storage: ["Western Digital", "Seagate", "Samsung", "SanDisk", "Crucial", "Kingston", "Toshiba", "LaCie", "Other"],
-  other: ["Other"]
+  laptop: ["Apple", "Dell", "HP", "Lenovo", "Asus", "Acer", "Microsoft", "Samsung", "MSI", "Toshiba", "Razer", "Autre"],
+  desktop: ["Dell", "HP", "Lenovo", "Apple", "Asus", "Acer", "CyberPower", "iBUYPOWER", "Assemblé sur mesure", "Autre"],
+  smartphone: ["Apple", "Samsung", "Google", "Xiaomi", "OnePlus", "Huawei", "Motorola", "Sony", "LG", "Nokia", "Autre"],
+  network: ["Cisco", "Netgear", "TP-Link", "Linksys", "Asus", "Ubiquiti", "D-Link", "Belkin", "Aruba", "Autre"],
+  storage: ["Western Digital", "Seagate", "Samsung", "SanDisk", "Crucial", "Kingston", "Toshiba", "LaCie", "Autre"],
+  other: ["Autre"]
 };
 
 export const ServiceRequest = () => {
@@ -254,17 +254,17 @@ export const ServiceRequest = () => {
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-10">
           <Badge className="mb-4 px-3 py-1 bg-cyan-500/20 text-cyan-400 border-cyan-500 inline-flex w-auto">
-            Service Request
+            Demande de Service
           </Badge>
           <h1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-300">
-            Schedule Your Computer Repair
+            Planifiez Votre Réparation Informatique
           </h1>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-            Tell us about your issue, and our expert technicians will help you get your device working again.
+            Décrivez votre problème, et nos techniciens experts vous aideront à remettre votre appareil en état de marche.
           </p>
         </div>
         
-        {/* Progress indicator */}
+        {/* Indicateur de progression */}
         <div className="mb-8">
           <div className="flex justify-between">
             {[1, 2, 3, 4, 5].map(num => (
@@ -276,11 +276,11 @@ export const ServiceRequest = () => {
                   {step > num ? <Check className="w-5 h-5" /> : num}
                 </div>
                 <div className={`text-sm ${step >= num ? 'text-gray-200' : 'text-gray-500'}`}>
-                  {num === 1 ? 'Service Type' : 
-                   num === 2 ? 'Device Details' : 
-                   num === 3 ? 'Schedule Service' : 
-                   num === 4 ? 'Your Information' :
-                   'Review & Submit'}
+                  {num === 1 ? 'Type de Service' : 
+                   num === 2 ? 'Détails de l\'Appareil' : 
+                   num === 3 ? 'Planification' : 
+                   num === 4 ? 'Vos Informations' :
+                   'Vérification & Envoi'}
                 </div>
               </div>
             ))}
@@ -307,8 +307,8 @@ export const ServiceRequest = () => {
                 className={step === 1 ? "block" : "hidden"}
               >
                 <div className="mb-6 space-y-2">
-                  <h2 className="text-xl font-semibold text-cyan-400">What services do you need?</h2>
-                  <p className="text-gray-400">Select all services that apply to your issue</p>
+                  <h2 className="text-xl font-semibold text-cyan-400">De quels services avez-vous besoin ?</h2>
+                  <p className="text-gray-400">Sélectionnez tous les services qui s'appliquent à votre problème</p>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -338,7 +338,7 @@ export const ServiceRequest = () => {
                 </div>
                 
                 <div className="mb-6">
-                  <h3 className="text-lg font-medium mb-2">What types of devices do you need help with?</h3>
+                  <h3 className="text-lg font-medium mb-2">Avec quels types d'appareils avez-vous besoin d'aide ?</h3>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     {deviceTypes.map(device => (
                       <div
@@ -371,12 +371,12 @@ export const ServiceRequest = () => {
                 className={step === 2 ? "block" : "hidden"}
               >
                 <div className="mb-6 space-y-2">
-                  <h2 className="text-xl font-semibold text-cyan-400">Tell us about your device</h2>
-                  <p className="text-gray-400">The more details you provide, the better we can diagnose your issue</p>
+                  <h2 className="text-xl font-semibold text-cyan-400">Parlez-nous de votre appareil</h2>
+                  <p className="text-gray-400">Plus vous fournissez de détails, mieux nous pourrons diagnostiquer votre problème</p>
                 </div>
                 
                 <div className="mb-6">
-                  <Label className="block mb-2">Device Make/Brand</Label>
+                  <Label className="block mb-2">Marque de l'appareil</Label>
                   <div className="relative" ref={dropdownRef}>
                     <div 
                       className={`flex flex-wrap gap-2 min-h-10 p-2 border rounded-md cursor-pointer ${
@@ -387,7 +387,7 @@ export const ServiceRequest = () => {
                       onClick={() => setBrandDropdownOpen(!brandDropdownOpen)}
                     >
                       {formData.deviceDetails.makes.length === 0 ? (
-                        <div className="text-gray-400 py-1">Select brand(s)</div>
+                        <div className="text-gray-400 py-1">Sélectionnez une ou plusieurs marques</div>
                       ) : (
                         <>
                           {formData.deviceDetails.makes.map(brand => (
@@ -420,7 +420,7 @@ export const ServiceRequest = () => {
                         <div className="p-2">
                           <Input
                             type="text"
-                            placeholder="Search brands..."
+                            placeholder="Rechercher des marques..."
                             className="bg-slate-900 border-slate-700"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
@@ -455,12 +455,12 @@ export const ServiceRequest = () => {
                     )}
                   </div>
                   
-                  {formData.deviceDetails.makes.includes("Other") && (
+                  {formData.deviceDetails.makes.includes("Autre") && (
                     <div className="mt-2">
-                      <Label htmlFor="other-brand">Specify other brand</Label>
+                      <Label htmlFor="other-brand">Précisez la marque</Label>
                       <Input
                         id="other-brand"
-                        placeholder="Enter brand name"
+                        placeholder="Entrez le nom de la marque"
                         className="bg-slate-900 border-slate-700 mt-1"
                         value={formData.deviceDetails.otherMake}
                         onChange={(e) => updateFormData('deviceDetails', 'otherMake', e.target.value)}
@@ -468,15 +468,15 @@ export const ServiceRequest = () => {
                     </div>
                   )}
                   <p className="text-sm text-slate-400 mt-2">
-                    You can select multiple brands if needed
+                    Vous pouvez sélectionner plusieurs marques si nécessaire
                   </p>
                 </div>
                 
                 <div className="mb-6">
-                  <Label htmlFor="device-model">Device Model</Label>
+                  <Label htmlFor="device-model">Modèle de l'appareil</Label>
                   <Input
                     id="device-model"
-                    placeholder="e.g., MacBook Pro, XPS 13"
+                    placeholder="ex: MacBook Pro, XPS 13"
                     className="bg-slate-900 border-slate-700"
                     value={formData.deviceDetails.model}
                     onChange={(e) => updateFormData('deviceDetails', 'model', e.target.value)}
@@ -484,14 +484,14 @@ export const ServiceRequest = () => {
                 </div>
                 
                 <div className="mb-6">
-                  <Label htmlFor="operating-system">Operating System</Label>
+                  <Label htmlFor="operating-system">Système d'exploitation</Label>
                   <select
                     id="operating-system"
                     className="w-full h-10 rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white ring-offset-slate-700 focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
                     value={formData.deviceDetails.operatingSystem}
                     onChange={(e) => updateFormData('deviceDetails', 'operatingSystem', e.target.value)}
                   >
-                    <option value="">Select operating system</option>
+                    <option value="">Sélectionnez un système d'exploitation</option>
                     {operatingSystems.map(os => (
                       <option key={os} value={os}>{os}</option>
                     ))}
@@ -499,7 +499,7 @@ export const ServiceRequest = () => {
                 </div>
                 
                 <div className="mb-6">
-                  <Label htmlFor="purchase-date">Approximate Purchase Date (optional)</Label>
+                  <Label htmlFor="purchase-date">Date d'achat approximative (optionnel)</Label>
                   <Input
                     id="purchase-date"
                     type="date"
@@ -510,10 +510,10 @@ export const ServiceRequest = () => {
                 </div>
                 
                 <div className="mb-6">
-                  <Label htmlFor="problem-description">Describe the problem in detail</Label>
+                  <Label htmlFor="problem-description">Décrivez le problème en détail</Label>
                   <Textarea
                     id="problem-description"
-                    placeholder="Please provide as much detail as possible about the issue you're experiencing..."
+                    placeholder="Veuillez fournir autant de détails que possible sur le problème que vous rencontrez..."
                     className="bg-slate-900 border-slate-700 min-h-[150px]"
                     value={formData.deviceDetails.problemDescription}
                     onChange={(e) => updateFormData('deviceDetails', 'problemDescription', e.target.value)}
@@ -530,12 +530,12 @@ export const ServiceRequest = () => {
                 className={step === 3 ? "block" : "hidden"}
               >
                 <div className="mb-6 space-y-2">
-                  <h2 className="text-xl font-semibold text-cyan-400">Schedule Your Service</h2>
-                  <p className="text-gray-400">Choose a convenient date and time for our technician to help you</p>
+                  <h2 className="text-xl font-semibold text-cyan-400">Planifiez votre service</h2>
+                  <p className="text-gray-400">Choisissez une date et une heure qui vous conviennent pour que notre technicien puisse vous aider</p>
                 </div>
                 
                 <div className="mb-8">
-                  <Label className="block mb-3">Select a Date</Label>
+                  <Label className="block mb-3">Sélectionnez une date</Label>
                   <Input
                     type="date"
                     className="bg-slate-900 border-slate-700 w-full max-w-sm"
@@ -554,8 +554,8 @@ export const ServiceRequest = () => {
                         // Check if date is valid
                         if (date < today) {
                           toast({
-                            title: "Invalid Date",
-                            description: "Please select a date that is not in the past.",
+                            title: "Date invalide",
+                            description: "Veuillez sélectionner une date qui n'est pas dans le passé.",
                             variant: "destructive"
                           });
                           return;
@@ -563,8 +563,8 @@ export const ServiceRequest = () => {
                         
                         if (date.getDay() === 0) {
                           toast({
-                            title: "Unavailable Day",
-                            description: "Sorry, Sundays are not available for appointments.",
+                            title: "Jour indisponible",
+                            description: "Désolé, les dimanches ne sont pas disponibles pour les rendez-vous.",
                             variant: "destructive"
                           });
                           return;
@@ -572,8 +572,8 @@ export const ServiceRequest = () => {
                         
                         if (date > maxDate) {
                           toast({
-                            title: "Date Too Far",
-                            description: "Please select a date within the next 30 days.",
+                            title: "Date trop éloignée",
+                            description: "Veuillez sélectionner une date dans les 30 prochains jours.",
                             variant: "destructive"
                           });
                           return;
@@ -585,10 +585,10 @@ export const ServiceRequest = () => {
                     max={format(new Date(new Date().setDate(new Date().getDate() + 30)), "yyyy-MM-dd")}
                   />
                   <p className="text-sm text-slate-400 mt-2">
-                    * Select a date within the next 30 days. Sundays are not available.
+                    * Sélectionnez une date dans les 30 prochains jours. Les dimanches ne sont pas disponibles.
                   </p>
                   
-                  <Label className="block mb-3 mt-6">Select a Time Slot</Label>
+                  <Label className="block mb-3 mt-6">Sélectionnez un créneau horaire</Label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
                     {timeSlots.map((slot, index) => (
                       <div
@@ -613,13 +613,13 @@ export const ServiceRequest = () => {
                   <div className="p-4 border border-cyan-800/30 bg-cyan-900/10 rounded-lg">
                     <h3 className="text-cyan-400 font-medium mb-2 flex items-center">
                       <Info className="h-5 w-5 mr-2" />
-                      Appointment Information
+                      Informations sur le rendez-vous
                     </h3>
                     <p className="text-gray-300 text-sm mb-2">
-                      Our technician will arrive during your selected time slot. Service visits typically last 1-2 hours depending on the complexity of the issue.
+                      Notre technicien arrivera pendant le créneau horaire que vous avez sélectionné. Les visites de service durent généralement 1 à 2 heures selon la complexité du problème.
                     </p>
                     <p className="text-gray-300 text-sm">
-                      If you need to reschedule, please contact us at least 24 hours in advance.
+                      Si vous devez reporter, veuillez nous contacter au moins 24 heures à l'avance.
                     </p>
                   </div>
                 </div>
@@ -634,12 +634,12 @@ export const ServiceRequest = () => {
                 className={step === 4 ? "block" : "hidden"}
               >
                 <div className="mb-6 space-y-2">
-                  <h2 className="text-xl font-semibold text-cyan-400">Your Information</h2>
-                  <p className="text-gray-400">Tell us how to contact you and where service is needed</p>
+                  <h2 className="text-xl font-semibold text-cyan-400">Vos informations</h2>
+                  <p className="text-gray-400">Indiquez-nous comment vous contacter et où le service est nécessaire</p>
                 </div>
                 
                 <div className="mb-6">
-                  <Label className="text-lg font-medium mb-2">Are you an individual or business?</Label>
+                  <Label className="text-lg font-medium mb-2">Êtes-vous un particulier ou une entreprise ?</Label>
                   <div className="flex gap-4">
                     <div className="flex items-center space-x-2">
                       <input
@@ -651,7 +651,7 @@ export const ServiceRequest = () => {
                         onChange={() => updateFormData(null, 'clientType', 'individual')}
                         className="h-4 w-4 text-cyan-500"
                       />
-                      <Label htmlFor="individual">Individual</Label>
+                      <Label htmlFor="individual">Particulier</Label>
                     </div>
                     <div className="flex items-center space-x-2">
                       <input
@@ -663,17 +663,17 @@ export const ServiceRequest = () => {
                         onChange={() => updateFormData(null, 'clientType', 'business')}
                         className="h-4 w-4 text-cyan-500"
                       />
-                      <Label htmlFor="business">Business</Label>
+                      <Label htmlFor="business">Entreprise</Label>
                     </div>
                   </div>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                   <div className="space-y-2">
-                    <Label htmlFor="full-name">Full Name</Label>
+                    <Label htmlFor="full-name">Nom complet</Label>
                     <Input
                       id="full-name"
-                      placeholder="Your full name"
+                      placeholder="Votre nom complet"
                       className="bg-slate-900 border-slate-700"
                       value={formData.contactInfo.fullName}
                       onChange={(e) => updateFormData('contactInfo', 'fullName', e.target.value)}
@@ -682,10 +682,10 @@ export const ServiceRequest = () => {
                   
                   {formData.clientType === "business" && (
                     <div className="space-y-2">
-                      <Label htmlFor="business-name">Business Name</Label>
+                      <Label htmlFor="business-name">Nom de l'entreprise</Label>
                       <Input
                         id="business-name"
-                        placeholder="Your business name"
+                        placeholder="Nom de votre entreprise"
                         className="bg-slate-900 border-slate-700"
                         value={formData.contactInfo.businessName}
                         onChange={(e) => updateFormData('contactInfo', 'businessName', e.target.value)}
@@ -696,11 +696,11 @@ export const ServiceRequest = () => {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email Address</Label>
+                    <Label htmlFor="email">Adresse email</Label>
                     <Input
                       id="email"
                       type="email"
-                      placeholder="your.email@example.com"
+                      placeholder="votre.email@exemple.com"
                       className="bg-slate-900 border-slate-700"
                       value={formData.contactInfo.email}
                       onChange={(e) => updateFormData('contactInfo', 'email', e.target.value)}
@@ -708,10 +708,10 @@ export const ServiceRequest = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number</Label>
+                    <Label htmlFor="phone">Numéro de téléphone</Label>
                     <Input
                       id="phone"
-                      placeholder="Your phone number"
+                      placeholder="Votre numéro de téléphone"
                       className="bg-slate-900 border-slate-700"
                       value={formData.contactInfo.phone}
                       onChange={(e) => updateFormData('contactInfo', 'phone', e.target.value)}
@@ -720,7 +720,7 @@ export const ServiceRequest = () => {
                 </div>
                 
                 <div className="mb-6">
-                  <Label className="text-lg font-medium mb-2">Preferred Contact Method</Label>
+                  <Label className="text-lg font-medium mb-2">Méthode de contact préférée</Label>
                   <div className="flex gap-4">
                     <div className="flex items-center space-x-2">
                       <input
@@ -744,16 +744,16 @@ export const ServiceRequest = () => {
                         onChange={() => updateFormData('contactInfo', 'preferredContact', 'phone')}
                         className="h-4 w-4 text-cyan-500"
                       />
-                      <Label htmlFor="contact-phone">Phone</Label>
+                      <Label htmlFor="contact-phone">Téléphone</Label>
                     </div>
                   </div>
                 </div>
                 
                 <div className="mb-6">
-                  <Label htmlFor="address">Service Address</Label>
+                  <Label htmlFor="address">Adresse de service</Label>
                   <Textarea
                     id="address"
-                    placeholder="Enter the address where service is needed"
+                    placeholder="Entrez l'adresse où le service est nécessaire"
                     className="bg-slate-900 border-slate-700"
                     value={formData.contactInfo.address}
                     onChange={(e) => updateFormData('contactInfo', 'address', e.target.value)}
@@ -761,7 +761,7 @@ export const ServiceRequest = () => {
                 </div>
 
                 <div className="mt-6 text-gray-400">
-                  <p>By submitting this request, you agree to our <a href="#" className="text-cyan-400 underline">Terms of Service</a> and <a href="#" className="text-cyan-400 underline">Privacy Policy</a>.</p>
+                  <p>En soumettant cette demande, vous acceptez nos <a href="#" className="text-cyan-400 underline">Conditions d'utilisation</a> et notre <a href="#" className="text-cyan-400 underline">Politique de confidentialité</a>.</p>
                 </div>
               </motion.div>
               
@@ -774,15 +774,15 @@ export const ServiceRequest = () => {
                 className={step === 5 ? "block" : "hidden"}
               >
                 <div className="mb-6 space-y-2">
-                  <h2 className="text-xl font-semibold text-cyan-400">Review Your Request</h2>
-                  <p className="text-gray-400">Please verify all information before submitting</p>
+                  <h2 className="text-xl font-semibold text-cyan-400">Vérifiez votre demande</h2>
+                  <p className="text-gray-400">Veuillez vérifier toutes les informations avant de soumettre</p>
                 </div>
                 
                 <div className="space-y-6">
                   <div className="border border-slate-700 rounded-lg p-4">
-                    <h3 className="font-medium text-lg text-cyan-400 mb-2">Service Details</h3>
+                    <h3 className="font-medium text-lg text-cyan-400 mb-2">Détails du service</h3>
                     <div>
-                      <span className="text-gray-400">Service Types:</span>
+                      <span className="text-gray-400">Types de services :</span>
                       <div className="mt-1 flex flex-wrap gap-2">
                         {formData.serviceTypes.length > 0 ? (
                           formData.serviceTypes.map(serviceId => (
@@ -791,12 +791,12 @@ export const ServiceRequest = () => {
                             </Badge>
                           ))
                         ) : (
-                          <p>No services selected</p>
+                          <p>Aucun service sélectionné</p>
                         )}
                       </div>
                     </div>
                     <div className="mt-2">
-                      <span className="text-gray-400">Device Types:</span>
+                      <span className="text-gray-400">Types d'appareils :</span>
                       <div className="mt-1 flex flex-wrap gap-2">
                         {formData.deviceTypes.length > 0 ? (
                           formData.deviceTypes.map(deviceId => (
@@ -805,101 +805,101 @@ export const ServiceRequest = () => {
                             </Badge>
                           ))
                         ) : (
-                          <p>No devices selected</p>
+                          <p>Aucun appareil sélectionné</p>
                         )}
                       </div>
                     </div>
                   </div>
                   
                   <div className="border border-slate-700 rounded-lg p-4">
-                    <h3 className="font-medium text-lg text-cyan-400 mb-2">Device Information</h3>
+                    <h3 className="font-medium text-lg text-cyan-400 mb-2">Informations sur l'appareil</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2">
                       <div>
-                        <span className="text-gray-400">Make/Brand:</span>
+                        <span className="text-gray-400">Marque :</span>
                         <div className="flex flex-wrap gap-1 mt-1">
                           {formData.deviceDetails.makes.length > 0 ? (
                             formData.deviceDetails.makes.map(brand => (
                               <Badge key={brand} className="bg-cyan-500/20 text-cyan-400 border-cyan-500">
-                                {brand === "Other" ? formData.deviceDetails.otherMake || "Other" : brand}
+                                {brand === "Autre" ? formData.deviceDetails.otherMake || "Autre" : brand}
                               </Badge>
                             ))
                           ) : (
-                            <p>Not provided</p>
+                            <p>Non fourni</p>
                           )}
                         </div>
                       </div>
                       <div>
-                        <span className="text-gray-400">Model:</span>
-                        <p>{formData.deviceDetails.model || 'Not provided'}</p>
+                        <span className="text-gray-400">Modèle :</span>
+                        <p>{formData.deviceDetails.model || 'Non fourni'}</p>
                       </div>
                       <div>
-                        <span className="text-gray-400">Operating System:</span>
-                        <p>{formData.deviceDetails.operatingSystem || 'Not selected'}</p>
+                        <span className="text-gray-400">Système d'exploitation :</span>
+                        <p>{formData.deviceDetails.operatingSystem || 'Non sélectionné'}</p>
                       </div>
                       <div>
-                        <span className="text-gray-400">Purchase Date:</span>
-                        <p>{formData.deviceDetails.purchaseDate || 'Not provided'}</p>
+                        <span className="text-gray-400">Date d'achat :</span>
+                        <p>{formData.deviceDetails.purchaseDate || 'Non fourni'}</p>
                       </div>
                     </div>
                     <div className="mt-2">
-                      <span className="text-gray-400">Problem Description:</span>
-                      <p className="mt-1">{formData.deviceDetails.problemDescription || 'Not provided'}</p>
+                      <span className="text-gray-400">Description du problème :</span>
+                      <p className="mt-1">{formData.deviceDetails.problemDescription || 'Non fourni'}</p>
                     </div>
                   </div>
                   
                   <div className="border border-slate-700 rounded-lg p-4">
-                    <h3 className="font-medium text-lg text-cyan-400 mb-2">Appointment Details</h3>
+                    <h3 className="font-medium text-lg text-cyan-400 mb-2">Détails du rendez-vous</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2">
                       <div>
-                        <span className="text-gray-400">Service Date:</span>
-                        <p>{formData.schedulingDetails.date ? format(formData.schedulingDetails.date, "PPP") : 'Not selected'}</p>
+                        <span className="text-gray-400">Date de service :</span>
+                        <p>{formData.schedulingDetails.date ? format(formData.schedulingDetails.date, "PPP") : 'Non sélectionné'}</p>
                       </div>
                       <div>
-                        <span className="text-gray-400">Time Slot:</span>
-                        <p>{formData.schedulingDetails.timeSlot || 'Not selected'}</p>
+                        <span className="text-gray-400">Créneau horaire :</span>
+                        <p>{formData.schedulingDetails.timeSlot || 'Non sélectionné'}</p>
                       </div>
                     </div>
                   </div>
                   
                   <div className="border border-slate-700 rounded-lg p-4">
-                    <h3 className="font-medium text-lg text-cyan-400 mb-2">Contact Information</h3>
+                    <h3 className="font-medium text-lg text-cyan-400 mb-2">Informations de contact</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2">
                       <div>
-                        <span className="text-gray-400">Client Type:</span>
-                        <p className="capitalize">{formData.clientType}</p>
+                        <span className="text-gray-400">Type de client :</span>
+                        <p className="capitalize">{formData.clientType === "individual" ? "Particulier" : "Entreprise"}</p>
                       </div>
                       {formData.clientType === "business" && (
                         <div>
-                          <span className="text-gray-400">Business Name:</span>
-                          <p>{formData.contactInfo.businessName || 'Not provided'}</p>
+                          <span className="text-gray-400">Nom de l'entreprise :</span>
+                          <p>{formData.contactInfo.businessName || 'Non fourni'}</p>
                         </div>
                       )}
                       <div>
-                        <span className="text-gray-400">Full Name:</span>
-                        <p>{formData.contactInfo.fullName || 'Not provided'}</p>
+                        <span className="text-gray-400">Nom complet :</span>
+                        <p>{formData.contactInfo.fullName || 'Non fourni'}</p>
                       </div>
                       <div>
-                        <span className="text-gray-400">Email:</span>
-                        <p>{formData.contactInfo.email || 'Not provided'}</p>
+                        <span className="text-gray-400">Email :</span>
+                        <p>{formData.contactInfo.email || 'Non fourni'}</p>
                       </div>
                       <div>
-                        <span className="text-gray-400">Phone:</span>
-                        <p>{formData.contactInfo.phone || 'Not provided'}</p>
+                        <span className="text-gray-400">Téléphone :</span>
+                        <p>{formData.contactInfo.phone || 'Non fourni'}</p>
                       </div>
                       <div>
-                        <span className="text-gray-400">Preferred Contact:</span>
-                        <p className="capitalize">{formData.contactInfo.preferredContact}</p>
+                        <span className="text-gray-400">Contact préféré :</span>
+                        <p className="capitalize">{formData.contactInfo.preferredContact === "email" ? "Email" : "Téléphone"}</p>
                       </div>
                     </div>
                     <div className="mt-2">
-                      <span className="text-gray-400">Service Address:</span>
-                      <p className="mt-1">{formData.contactInfo.address || 'Not provided'}</p>
+                      <span className="text-gray-400">Adresse de service :</span>
+                      <p className="mt-1">{formData.contactInfo.address || 'Non fourni'}</p>
                     </div>
                   </div>
                 </div>
                 
                 <div className="mt-6 text-gray-400">
-                  <p>By submitting this request, you agree to our <a href="#" className="text-cyan-400 underline">Terms of Service</a> and <a href="#" className="text-cyan-400 underline">Privacy Policy</a>.</p>
+                  <p>En soumettant cette demande, vous acceptez nos <a href="#" className="text-cyan-400 underline">Conditions d'utilisation</a> et notre <a href="#" className="text-cyan-400 underline">Politique de confidentialité</a>.</p>
                 </div>
               </motion.div>
             </form>
@@ -913,7 +913,7 @@ export const ServiceRequest = () => {
                 onClick={prevStep}
                 className="border-slate-600"
               >
-                <ChevronLeft className="w-4 h-4 mr-2" /> Back
+                <ChevronLeft className="w-4 h-4 mr-2" /> Retour
               </Button>
             )}
             {step < 5 ? (
@@ -922,7 +922,7 @@ export const ServiceRequest = () => {
                 onClick={nextStep}
                 className="ml-auto bg-cyan-500 hover:bg-cyan-600"
               >
-                Next <ChevronRight className="w-4 h-4 ml-2" />
+                Suivant <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
             ) : (
               <Button
@@ -930,7 +930,7 @@ export const ServiceRequest = () => {
                 onClick={handleSubmit}
                 className="ml-auto bg-cyan-500 hover:bg-cyan-600"
               >
-                Submit Request
+                Soumettre la demande
               </Button>
             )}
           </CardFooter>

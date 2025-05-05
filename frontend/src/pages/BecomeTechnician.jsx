@@ -12,13 +12,13 @@ import { Laptop, Scroll, Star, Wrench, Award, Upload, X, CheckCircle, AlertCircl
 import { useToast } from '@/components/ui/use-toast';
 
 const specializations = [
-  'Hardware Repair',
-  'Software Troubleshooting',
-  'Network Setup',
-  'Data Recovery',
-  'Mobile Device Repair',
-  'Security Systems',
-  'General IT Support'
+  'Réparation Matérielle',
+  'Dépannage Logiciel',
+  'Configuration Réseau',
+  'Récupération de Données',
+  'Réparation d\'Appareils Mobiles',
+  'Systèmes de Sécurité',
+  'Support Informatique Général'
 ];
 
 const allowedFileTypes = {
@@ -206,13 +206,13 @@ export const BecomeTechnician = () => {
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-10">
           <Badge className="mb-4 px-3 py-1 bg-cyan-500/20 text-cyan-400 border-cyan-500 inline-flex w-auto">
-            Join Our Team
+            Rejoignez Notre Équipe
           </Badge>
           <h1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-300">
-            Become a Certified Technician
+            Devenez un Technicien Certifié
           </h1>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-            Join our network of skilled technicians and help customers solve their technical problems.
+            Rejoignez notre réseau de techniciens qualifiés et aidez nos clients à résoudre leurs problèmes techniques.
           </p>
         </div>
 
@@ -224,9 +224,9 @@ export const BecomeTechnician = () => {
                 <div className="p-2 rounded-lg bg-cyan-500/20">
                   <Wrench className="w-6 h-6 text-cyan-400" />
                 </div>
-                <h3 className="text-lg font-semibold">Flexible Schedule</h3>
+                <h3 className="text-lg font-semibold">Horaires Flexibles</h3>
               </div>
-              <p className="text-gray-400">Work on your own terms and choose your availability.</p>
+              <p className="text-gray-400">Travaillez selon vos conditions et choisissez votre disponibilité.</p>
             </CardContent>
           </Card>
 
@@ -236,9 +236,9 @@ export const BecomeTechnician = () => {
                 <div className="p-2 rounded-lg bg-cyan-500/20">
                   <Award className="w-6 h-6 text-cyan-400" />
                 </div>
-                <h3 className="text-lg font-semibold">Professional Growth</h3>
+                <h3 className="text-lg font-semibold">Évolution Professionnelle</h3>
               </div>
-              <p className="text-gray-400">Access training and certification opportunities.</p>
+              <p className="text-gray-400">Accédez à des formations et opportunités de certification.</p>
             </CardContent>
           </Card>
 
@@ -248,9 +248,9 @@ export const BecomeTechnician = () => {
                 <div className="p-2 rounded-lg bg-cyan-500/20">
                   <Star className="w-6 h-6 text-cyan-400" />
                 </div>
-                <h3 className="text-lg font-semibold">Competitive Pay</h3>
+                <h3 className="text-lg font-semibold">Rémunération Compétitive</h3>
               </div>
-              <p className="text-gray-400">Earn competitive rates based on your expertise.</p>
+              <p className="text-gray-400">Gagnez des tarifs compétitifs basés sur votre expertise.</p>
             </CardContent>
           </Card>
         </div>
@@ -261,13 +261,13 @@ export const BecomeTechnician = () => {
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Personal Information */}
               <div className="space-y-4">
-                <h2 className="text-xl font-semibold text-cyan-400 mb-4">Personal Information</h2>
+                <h2 className="text-xl font-semibold text-cyan-400 mb-4">Informations Personnelles</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Full Name</Label>
+                    <Label>Nom Complet</Label>
                     <Input
                       className="bg-slate-900 border-slate-700"
-                      placeholder="Enter your full name"
+                      placeholder="Entrez votre nom complet"
                       value={formData.personalInfo.fullName}
                       onChange={(e) => updateFormData('personalInfo', 'fullName', e.target.value)}
                       required
@@ -278,28 +278,28 @@ export const BecomeTechnician = () => {
                     <Input
                       type="email"
                       className="bg-slate-900 border-slate-700"
-                      placeholder="Enter your email"
+                      placeholder="Entrez votre email"
                       value={formData.personalInfo.email}
                       onChange={(e) => updateFormData('personalInfo', 'email', e.target.value)}
                       required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Phone Number</Label>
+                    <Label>Numéro de Téléphone</Label>
                     <Input
                       type="tel"
                       className="bg-slate-900 border-slate-700"
-                      placeholder="Enter your phone number"
+                      placeholder="Entrez votre numéro de téléphone"
                       value={formData.personalInfo.phone}
                       onChange={(e) => updateFormData('personalInfo', 'phone', e.target.value)}
                       required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Location</Label>
+                    <Label>Localisation</Label>
                     <Input
                       className="bg-slate-900 border-slate-700"
-                      placeholder="City, State"
+                      placeholder="Ville, Région"
                       value={formData.personalInfo.location}
                       onChange={(e) => updateFormData('personalInfo', 'location', e.target.value)}
                       required
@@ -310,17 +310,17 @@ export const BecomeTechnician = () => {
 
               {/* Professional Information */}
               <div className="space-y-4">
-                <h2 className="text-xl font-semibold text-cyan-400 mb-4">Professional Information</h2>
+                <h2 className="text-xl font-semibold text-cyan-400 mb-4">Informations Professionnelles</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Primary Specialization</Label>
+                    <Label>Spécialisation Principale</Label>
                     <Select
                       value={formData.professionalInfo.specialization}
                       onValueChange={(value) => updateFormData('professionalInfo', 'specialization', value)}
                       required
                     >
                       <SelectTrigger className="bg-slate-900 border-slate-700">
-                        <SelectValue placeholder="Select your specialization" />
+                        <SelectValue placeholder="Sélectionnez votre spécialisation" />
                       </SelectTrigger>
                       <SelectContent>
                         {specializations.map((spec) => (
@@ -330,11 +330,11 @@ export const BecomeTechnician = () => {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label>Years of Experience</Label>
+                    <Label>Années d'Expérience</Label>
                     <Input
                       type="number"
                       className="bg-slate-900 border-slate-700"
-                      placeholder="Years of experience"
+                      placeholder="Années d'expérience"
                       value={formData.professionalInfo.yearsExperience}
                       onChange={(e) => updateFormData('professionalInfo', 'yearsExperience', e.target.value)}
                       required
@@ -345,7 +345,7 @@ export const BecomeTechnician = () => {
                     <Label>Certifications</Label>
                     <Textarea
                       className="bg-slate-900 border-slate-700"
-                      placeholder="List your relevant certifications"
+                      placeholder="Listez vos certifications pertinentes"
                       value={formData.professionalInfo.certifications}
                       onChange={(e) => updateFormData('professionalInfo', 'certifications', e.target.value)}
                     />
@@ -355,22 +355,22 @@ export const BecomeTechnician = () => {
 
               {/* Background Information */}
               <div className="space-y-4">
-                <h2 className="text-xl font-semibold text-cyan-400 mb-4">Background Information</h2>
+                <h2 className="text-xl font-semibold text-cyan-400 mb-4">Informations Contextuelles</h2>
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label>Education</Label>
+                    <Label>Formation</Label>
                     <Textarea
                       className="bg-slate-900 border-slate-700"
-                      placeholder="Describe your educational background"
+                      placeholder="Décrivez votre parcours éducatif"
                       value={formData.background.education}
                       onChange={(e) => updateFormData('background', 'education', e.target.value)}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Work History</Label>
+                    <Label>Expérience Professionnelle</Label>
                     <Textarea
                       className="bg-slate-900 border-slate-700"
-                      placeholder="Summarize your relevant work experience"
+                      placeholder="Résumez votre expérience professionnelle pertinente"
                       value={formData.background.workHistory}
                       onChange={(e) => updateFormData('background', 'workHistory', e.target.value)}
                     />
@@ -384,7 +384,7 @@ export const BecomeTechnician = () => {
                 
                 {/* CV Upload */}
                 <div className="space-y-2">
-                  <Label>CV / Resume <span className="text-red-500">*</span></Label>
+                  <Label>CV / Curriculum Vitae <span className="text-red-500">*</span></Label>
                   <div className="flex flex-col space-y-2">
                     <div className="grid grid-cols-1 gap-2">
                       {documents.cv ? (
@@ -434,7 +434,7 @@ export const BecomeTechnician = () => {
                 
                 {/* Diplomas Upload */}
                 <div className="space-y-2">
-                  <Label>Diplomas and Certificates</Label>
+                  <Label>Diplômes et Certificats</Label>
                   <div className="flex flex-col space-y-2">
                     <div className="grid grid-cols-1 gap-2">
                       {documents.diplomas.length > 0 && (
@@ -488,7 +488,7 @@ export const BecomeTechnician = () => {
                 
                 {/* Motivation Letter Upload */}
                 <div className="space-y-2">
-                  <Label>Motivation Letter</Label>
+                  <Label>Lettre de Motivation</Label>
                   <div className="flex flex-col space-y-2">
                     <div className="grid grid-cols-1 gap-2">
                       {documents.motivationLetter ? (
@@ -543,7 +543,7 @@ export const BecomeTechnician = () => {
                   className="bg-cyan-500 hover:bg-cyan-600" 
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? 'Envoi en cours...' : 'Submit Application'}
+                  {isSubmitting ? 'Envoi en cours...' : 'Soumettre la Candidature'}
                 </Button>
               </div>
             </form>

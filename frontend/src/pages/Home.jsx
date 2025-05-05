@@ -14,55 +14,55 @@ import { Label } from "@/components/ui/label";
 
 const services = [
   {
-    title: "Hardware Repairs",
-    items: ["Motherboard Diagnostics", "Screen Replacement", "Keyboard Repair", "Battery Replacement"],
+    title: "Réparations Matérielles",
+    items: ["Diagnostic de Carte Mère", "Remplacement d'Écran", "Réparation de Clavier", "Remplacement de Batterie"],
     icon: "💻"
   },
   {
-    title: "Software Solutions",
-    items: ["OS Installation", "Virus Removal", "Data Recovery", "Driver Updates"],
+    title: "Solutions Logicielles",
+    items: ["Installation OS", "Suppression de Virus", "Récupération de Données", "Mises à Jour de Pilotes"],
     icon: "🛠️"
   },
   {
-    title: "Network Services",
-    items: ["Wi-Fi Setup", "Router Configuration", "LAN Wiring", "Security Setup"],
+    title: "Services Réseau",
+    items: ["Configuration Wi-Fi", "Configuration Routeur", "Câblage LAN", "Configuration Sécurité"],
     icon: "📶"
   }
 ];
 
 const processSteps = [
-  { title: "Diagnosis", description: "Comprehensive system analysis" },
-  { title: "Quote", description: "Transparent pricing" },
-  { title: "Repair", description: "Certified technician work" },
-  { title: "Testing", description: "Quality assurance check" }
+  { title: "Diagnostic", description: "Analyse complète du système" },
+  { title: "Devis", description: "Prix transparents" },
+  { title: "Réparation", description: "Travail par technicien certifié" },
+  { title: "Test", description: "Contrôle d'assurance qualité" }
 ];
 
 const testimonials = [
   {
-    name: "Michael Johnson",
-    role: "Business Owner",
-    quote: "They saved my laptop when I thought all my data was lost. Fast service, fair prices!",
+    name: "Michel Dupont",
+    role: "Chef d'Entreprise",
+    quote: "Ils ont sauvé mon ordinateur portable quand je pensais que toutes mes données étaient perdues. Service rapide, prix justes !",
     image: "https://randomuser.me/api/portraits/men/32.jpg"
   },
   {
-    name: "Sarah Thompson",
-    role: "Graphic Designer",
-    quote: "I rely on my workstation for my career, and their team keeps it running flawlessly.",
+    name: "Sophie Martin",
+    role: "Designer Graphique",
+    quote: "Je compte sur ma station de travail pour ma carrière, et leur équipe la maintient en parfait état de fonctionnement.",
     image: "https://randomuser.me/api/portraits/women/44.jpg"
   },
   {
-    name: "David Rodriguez",
-    role: "Student",
-    quote: "Same-day repair saved my final project when my laptop crashed before submission.",
+    name: "David Moreau",
+    role: "Étudiant",
+    quote: "La réparation le jour même a sauvé mon projet final quand mon ordinateur portable a planté avant la soumission.",
     image: "https://randomuser.me/api/portraits/men/67.jpg"
   }
 ];
 
 const stats = [
-  { value: "5000+", label: "Repairs Completed" },
-  { value: "98%", label: "Customer Satisfaction" },
-  { value: "24/7", label: "Support Available" },
-  { value: "15+", label: "Years Experience" }
+  { value: "5000+", label: "Réparations Effectuées" },
+  { value: "98%", label: "Satisfaction Client" },
+  { value: "24/7", label: "Assistance Disponible" },
+  { value: "15+", label: "Années d'Expérience" }
 ];
 
 export const Home = () => {
@@ -133,15 +133,15 @@ export const Home = () => {
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-8">
               <a href="#services" className="text-gray-300 hover:text-cyan-400 transition-colors">Services</a>
-              <a href="#process" className="text-gray-300 hover:text-cyan-400 transition-colors">Process</a>
-              <a href="#testimonials" className="text-gray-300 hover:text-cyan-400 transition-colors">Testimonials</a>
+              <a href="#process" className="text-gray-300 hover:text-cyan-400 transition-colors">Processus</a>
+              <a href="#testimonials" className="text-gray-300 hover:text-cyan-400 transition-colors">Témoignages</a>
               <a href="#contact" className="text-gray-300 hover:text-cyan-400 transition-colors">Contact</a>
               <div className="pl-4 flex items-center space-x-3 border-l border-slate-700">
                 <Button 
                   className="bg-cyan-500 hover:bg-cyan-600"
                   onClick={() => navigate('/become-technician')}
                 >
-                  Become a Technician
+                  Devenir Technicien
                 </Button>
               </div>
             </nav>
@@ -167,15 +167,15 @@ export const Home = () => {
               className="md:hidden py-4 space-y-3"
             >
               <a href="#services" className="block py-2 text-gray-300 hover:text-cyan-400">Services</a>
-              <a href="#process" className="block py-2 text-gray-300 hover:text-cyan-400">Process</a>
-              <a href="#testimonials" className="block py-2 text-gray-300 hover:text-cyan-400">Testimonials</a>
+              <a href="#process" className="block py-2 text-gray-300 hover:text-cyan-400">Processus</a>
+              <a href="#testimonials" className="block py-2 text-gray-300 hover:text-cyan-400">Témoignages</a>
               <a href="#contact" className="block py-2 text-gray-300 hover:text-cyan-400">Contact</a>
               <div className="pt-3 border-t border-slate-700">
                 <Button 
                   className="w-full bg-cyan-500 hover:bg-cyan-600"
                   onClick={() => navigate('/become-technician')}
                 >
-                  Become a Technician
+                  Devenir Technicien
                 </Button>
               </div>
             </motion.div>
@@ -197,7 +197,7 @@ export const Home = () => {
             transition={{ delay: 0.2 }}
           >
             <Badge className="mb-4 px-3 py-1 bg-cyan-500/20 text-cyan-400 border-cyan-500 text-sm inline-flex w-auto">
-              24/7 Support Available
+              Assistance 24/7 Disponible
             </Badge>
           </motion.div>
           <motion.h1 
@@ -205,7 +205,7 @@ export const Home = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-5xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-300 mb-6"
           >
-            Expert Computer Repair Services
+            Services de Réparation Informatique Experts
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0 }}
@@ -213,7 +213,7 @@ export const Home = () => {
             transition={{ delay: 0.3 }}
             className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto"
           >
-            Professional solutions for all your tech needs - laptops, desktops, networks, and data recovery with guaranteed results
+            Solutions professionnelles pour tous vos besoins technologiques - ordinateurs portables, de bureau, réseaux et récupération de données avec résultats garantis
           </motion.p>
           <motion.div 
             initial={{ opacity: 0 }}
@@ -223,12 +223,12 @@ export const Home = () => {
           >
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button size="lg" className="w-full sm:w-auto px-8 py-6 text-lg bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600" onClick={() => navigate('/service-request')}>
-                Schedule Repair Now
+                Planifier une Réparation
               </Button>
             </motion.div>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button size="lg" variant="outline" className="w-full sm:w-auto px-8 py-6 text-lg border-white/20 hover:bg-white/5" onClick={() => navigate('/services')}>
-                View Services
+                Voir les Services
               </Button>
             </motion.div>
           </motion.div>
@@ -274,13 +274,13 @@ export const Home = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <Badge className="mb-4 px-3 py-1 bg-cyan-500/20 text-cyan-400 border-cyan-500 inline-flex w-auto">
-              Our Expertise
+              Notre Expertise
             </Badge>
             <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-300">
-              Professional Computer Services
+              Services Informatiques Professionnels
             </h2>
             <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              From hardware repairs to software solutions, our expert technicians can solve your tech problems quickly and affordably.
+              Des réparations matérielles aux solutions logicielles, nos techniciens experts peuvent résoudre vos problèmes techniques rapidement et à prix abordable.
             </p>
           </div>
           
@@ -310,7 +310,7 @@ export const Home = () => {
                   </CardContent>
                   <CardFooter>
                     <Button variant="outline" className="w-full border-cyan-400 text-cyan-400 hover:bg-cyan-400/10" onClick={() => navigate('/services')}>
-                      Learn More
+                      En Savoir Plus
                     </Button>
                   </CardFooter>
                 </Card>
@@ -325,13 +325,13 @@ export const Home = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <Badge className="mb-4 px-3 py-1 bg-cyan-500/20 text-cyan-400 border-cyan-500 inline-flex w-auto">
-              Efficient Workflow
+              Flux de Travail Efficace
             </Badge>
             <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-300">
-              Our Repair Process
+              Notre Processus de Réparation
             </h2>
             <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              We follow a streamlined process to ensure your device is fixed quickly without compromising quality.
+              Nous suivons un processus optimisé pour assurer que votre appareil soit réparé rapidement sans compromettre la qualité.
             </p>
           </div>
           
@@ -374,38 +374,38 @@ export const Home = () => {
             <div className="w-full lg:w-1/2 text-left mb-8 lg:mb-0 order-1 lg:order-2 lg:pl-10 lg:pr-8 flex flex-col justify-center">
               <div className="text-left">
                 <Badge className="mb-4 px-3 py-1 bg-cyan-500/20 text-cyan-400 border-cyan-500 inline-flex w-auto">
-                  Client Reviews
+                  Avis Clients
                 </Badge>
               </div>
               <h2 className="text-4xl sm:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-300">
-                What Our Clients Think
+                Ce Que Pensent Nos Clients
               </h2>
               <p className="text-xl text-gray-400 mb-6">
-                Real feedback from our satisfied customers who have experienced our exceptional service. Our commitment to quality and customer satisfaction is reflected in every review.
+                Des témoignages réels de nos clients satisfaits qui ont expérimenté notre service exceptionnel. Notre engagement envers la qualité et la satisfaction client se reflète dans chaque avis.
               </p>
               <div className="mb-8 space-y-4">
                 <div className="flex items-start">
                   <span className="text-cyan-400 mr-2 text-xl">✓</span>
-                  <p className="text-gray-300">Over 500 positive reviews from satisfied customers</p>
+                  <p className="text-gray-300">Plus de 500 avis positifs de clients satisfaits</p>
                 </div>
                 <div className="flex items-start">
                   <span className="text-cyan-400 mr-2 text-xl">✓</span>
-                  <p className="text-gray-300">4.9/5 average rating across all service categories</p>
+                  <p className="text-gray-300">Note moyenne de 4,9/5 dans toutes les catégories de service</p>
                 </div>
                 <div className="flex items-start">
                   <span className="text-cyan-400 mr-2 text-xl">✓</span>
-                  <p className="text-gray-300">98% of clients recommend our services to friends and family</p>
+                  <p className="text-gray-300">98% des clients recommandent nos services à leurs amis et famille</p>
                 </div>
               </div>
               <p className="text-lg text-gray-400 italic mb-6">
-                "We believe in letting our clients' experiences speak for themselves. These testimonials represent real people with real problems we've helped solve."
+                "Nous croyons en la valeur des expériences de nos clients. Ces témoignages représentent de vraies personnes avec de vrais problèmes que nous avons aidé à résoudre."
               </p>
               <div className="mt-6 flex flex-wrap gap-4">
                 <Button variant="outline" className="border-cyan-400 text-cyan-400 hover:bg-cyan-400/10" onClick={() => navigate('/testimonials')}>
-                  View All Reviews
+                  Voir Tous les Avis
                 </Button>
                 <Button className="bg-cyan-500 hover:bg-cyan-600" onClick={() => navigate('/testimonials#share')}>
-                  Share Your Experience
+                  Partagez Votre Expérience
                 </Button>
               </div>
             </div>
@@ -418,13 +418,13 @@ export const Home = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <Badge className="mb-4 px-3 py-1 bg-cyan-500/20 text-cyan-400 border-cyan-500 inline-flex w-auto">
-              Get In Touch
+              Contactez-Nous
             </Badge>
             <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-300">
-              Need Immediate Help?
+              Besoin d'Aide Immédiate ?
             </h2>
             <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              Our experts are available 24/7 to assist you with any computer issues.
+              Nos experts sont disponibles 24/7 pour vous aider avec tout problème informatique.
             </p>
           </div>
           
@@ -442,7 +442,7 @@ export const Home = () => {
                       📞
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold">24/7 Support</h3>
+                      <h3 className="text-lg font-semibold">Assistance 24/7</h3>
                       <p className="text-cyan-400">(123) 456-7890</p>
                     </div>
                   </div>
@@ -451,8 +451,8 @@ export const Home = () => {
                       📍
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold">Our Location</h3>
-                      <p className="text-cyan-400">123 Tech Street, Digital City</p>
+                      <h3 className="text-lg font-semibold">Notre Adresse</h3>
+                      <p className="text-cyan-400">123 Rue Technologie, Ville Numérique</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
@@ -460,7 +460,7 @@ export const Home = () => {
                       ✉️
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold">Email Us</h3>
+                      <h3 className="text-lg font-semibold">Email</h3>
                       <p className="text-cyan-400">support@dwwmcomputers.com</p>
                     </div>
                   </div>
@@ -469,8 +469,8 @@ export const Home = () => {
                       🕒
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold">Hours</h3>
-                      <p className="text-cyan-400">Open Monday-Saturday, 9am-6pm</p>
+                      <h3 className="text-lg font-semibold">Horaires</h3>
+                      <p className="text-cyan-400">Ouvert du lundi au samedi, 9h-18h</p>
                     </div>
                   </div>
                 </CardContent>
@@ -485,32 +485,32 @@ export const Home = () => {
             >
               <Card className="bg-slate-800 border-slate-700">
                 <CardHeader>
-                  <CardTitle>Send Us a Message</CardTitle>
+                  <CardTitle>Envoyez-Nous un Message</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="space-y-2">
-                    <label className="text-sm" htmlFor="name">Your Name</label>
+                    <label className="text-sm" htmlFor="name">Votre Nom</label>
                     <input
                       id="name"
                       type="text"
-                      placeholder="Enter your name"
+                      placeholder="Entrez votre nom"
                       className="w-full p-4 bg-slate-900 rounded-lg border border-slate-700 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm" htmlFor="email">Your Email</label>
+                    <label className="text-sm" htmlFor="email">Votre Email</label>
                     <input
                       id="email"
                       type="email"
-                      placeholder="Enter your email"
+                      placeholder="Entrez votre email"
                       className="w-full p-4 bg-slate-900 rounded-lg border border-slate-700 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm" htmlFor="message">Your Message</label>
+                    <label className="text-sm" htmlFor="message">Votre Message</label>
                     <textarea
                       id="message"
-                      placeholder="Describe your issue"
+                      placeholder="Décrivez votre problème"
                       rows="4"
                       className="w-full p-4 bg-slate-900 rounded-lg border border-slate-700 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50"
                     />
@@ -518,7 +518,7 @@ export const Home = () => {
                 </CardContent>
                 <CardFooter>
                   <Button className="w-full py-6 bg-cyan-500 hover:bg-cyan-600 text-lg" onClick={() => navigate('/contact')}>
-                    Send Message
+                    Envoyer le Message
                   </Button>
                 </CardFooter>
               </Card>
@@ -532,7 +532,7 @@ export const Home = () => {
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10">
           <div className="space-y-4">
             <h3 className="text-2xl font-bold text-cyan-400">DWWM</h3>
-            <p className="text-gray-400">Your trusted partner for all computer needs since 2023.</p>
+            <p className="text-gray-400">Votre partenaire de confiance pour tous vos besoins informatiques depuis 2023.</p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-cyan-400">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
@@ -549,43 +549,43 @@ export const Home = () => {
           <div>
             <h4 className="text-lg font-semibold mb-4">Services</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-400 hover:text-cyan-400">Computer Repair</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-cyan-400">Data Recovery</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-cyan-400">Virus Removal</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-cyan-400">Network Setup</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-cyan-400">Hardware Upgrades</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-cyan-400">Réparation Informatique</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-cyan-400">Récupération de Données</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-cyan-400">Suppression de Virus</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-cyan-400">Configuration Réseau</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-cyan-400">Mises à Niveau Matérielles</a></li>
             </ul>
           </div>
           
           <div>
-            <h4 className="text-lg font-semibold mb-4">Company</h4>
+            <h4 className="text-lg font-semibold mb-4">Entreprise</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-400 hover:text-cyan-400">About Us</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-cyan-400">Our Team</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-cyan-400">Careers</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-cyan-400">Terms of Service</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-cyan-400">Privacy Policy</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-cyan-400">À Propos</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-cyan-400">Notre Équipe</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-cyan-400">Carrières</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-cyan-400">Conditions d'Utilisation</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-cyan-400">Politique de Confidentialité</a></li>
             </ul>
           </div>
           
           <div>
             <h4 className="text-lg font-semibold mb-4">Newsletter</h4>
-            <p className="text-gray-400 mb-4">Subscribe to our newsletter for tips and updates.</p>
+            <p className="text-gray-400 mb-4">Abonnez-vous à notre newsletter pour des conseils et mises à jour.</p>
             <div className="flex">
               <input
                 type="email"
-                placeholder="Your email"
+                placeholder="Votre email"
                 className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-l-lg focus:outline-none focus:border-cyan-500"
               />
               <Button className="rounded-l-none bg-cyan-500 hover:bg-cyan-600">
-                Join
+                Rejoindre
               </Button>
             </div>
           </div>
         </div>
         
         <div className="max-w-7xl mx-auto mt-12 pt-6 border-t border-slate-800 text-center sm:text-left">
-          <p className="text-gray-500">© {new Date().getFullYear()} DWWM Computer Shop. All rights reserved.</p>
+          <p className="text-gray-500">© {new Date().getFullYear()} DWWM Computer Shop. Tous droits réservés.</p>
         </div>
       </footer>
     </div>
