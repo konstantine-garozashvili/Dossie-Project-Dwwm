@@ -9,6 +9,8 @@ import { ApplicationSubmitted } from "./pages/ApplicationSubmitted";
 import { Layout } from "./components/Layout";
 import { AdminLogin } from "./pages/AdminLogin";
 import { AdminDashboard } from "./pages/AdminDashboard";
+import { TechnicianLogin } from "./pages/TechnicianLogin";
+import { TechnicianDashboard } from "./pages/TechnicianDashboard";
 
 function App() {
   return (
@@ -21,6 +23,8 @@ function App() {
       <Route path="/application-submitted" element={<ApplicationSubmitted />} />
       <Route path="/adminlog" element={<AdminLogin />} />
       <Route path="/dashboardadmin" element={<AdminDashboard />} />
+      <Route path="/techlog" element={<TechnicianLogin />} />
+      <Route path="/dashboardtech" element={<TechnicianDashboard />} />
     </Routes>
   );
 }

@@ -7,8 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/componen
 import { motion } from "framer-motion";
 import { AlertCircle } from "lucide-react";
 
-export const AdminLogin = () => {
-  const [username, setUsername] = useState('');
+export const TechnicianLogin = () => {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -24,9 +24,9 @@ export const AdminLogin = () => {
       // Simuler une vérification de connexion pour la démo frontend
       setTimeout(() => {
         // Pour le frontend uniquement, accepter un identifiant de test
-        if (username === 'admin@it13.com' && password === 'admin123') {
-          localStorage.setItem('adminToken', 'demo-token-12345');
-          navigate('/dashboardadmin');
+        if (email === 'tech@it13.com' && password === 'tech123') {
+          localStorage.setItem('techToken', 'tech-token-12345');
+          navigate('/dashboardtech');
         } else {
           setError('Identifiants incorrects. Veuillez réessayer.');
         }
@@ -48,8 +48,8 @@ export const AdminLogin = () => {
       >
         <Card className="bg-slate-900 border-slate-800 shadow-xl">
           <CardHeader className="text-center border-b border-slate-800 pb-6">
-            <CardTitle className="text-2xl font-bold text-white">Administration IT13</CardTitle>
-            <p className="text-gray-400 mt-2">Connectez-vous pour accéder au tableau de bord</p>
+            <CardTitle className="text-2xl font-bold text-white">Espace Technicien IT13</CardTitle>
+            <p className="text-gray-400 mt-2">Connectez-vous pour accéder à votre espace technicien</p>
           </CardHeader>
           
           <CardContent className="pt-6">
@@ -63,13 +63,13 @@ export const AdminLogin = () => {
               
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="username">Nom d'utilisateur</Label>
+                  <Label htmlFor="email">Adresse email</Label>
                   <Input
-                    id="username"
+                    id="email"
                     type="email"
-                    placeholder="admin@it13.com"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="tech@it13.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     className="bg-slate-800 border-slate-700"
                     required
                   />
@@ -104,7 +104,7 @@ export const AdminLogin = () => {
           
           <CardFooter className="flex justify-center border-t border-slate-800 pt-6">
             <p className="text-sm text-gray-400">
-              Ceci est une interface d'administration. <span className="text-cyan-400">Accès restreint</span>.
+              Espace réservé aux techniciens. <span className="text-cyan-400">Accès restreint</span>.
             </p>
           </CardFooter>
         </Card>
@@ -113,4 +113,4 @@ export const AdminLogin = () => {
   );
 };
 
-export default AdminLogin; 
+export default TechnicianLogin; 

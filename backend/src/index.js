@@ -28,7 +28,7 @@ let db;
 })();
 
 // Basic routes
-app.get('/', (c) => c.text('DWWM Computer Shop API - Service de réparation informatique'));
+app.get('/', (c) => c.text('IT13 - Service de réparation informatique'));
 
 app.get('/api/health', (c) => {
   return c.json({

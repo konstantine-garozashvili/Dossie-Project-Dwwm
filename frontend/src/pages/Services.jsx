@@ -551,7 +551,7 @@ export const Services = () => {
         >
           <div className="text-center mb-10">
             <h2 className="text-3xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-300">
-              Pourquoi Choisir DWWM Computer Shop?
+              Pourquoi Choisir IT13?
             </h2>
             <p className="text-xl text-gray-400 max-w-3xl mx-auto">
               Avec des milliers de clients satisfaits, voici pourquoi vous devriez nous confier vos besoins en réparation informatique.

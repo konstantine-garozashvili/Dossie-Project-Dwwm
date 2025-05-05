@@ -36,7 +36,7 @@ export const Layout = ({ children }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-2">
-              <div className="text-2xl font-bold text-cyan-400 cursor-pointer" onClick={() => navigate('/')}>DWWM</div>
+              <div className="text-2xl font-bold text-cyan-400 cursor-pointer" onClick={() => navigate('/')}>IT13</div>
               <div className="hidden md:block text-xl font-semibold cursor-pointer" onClick={() => navigate('/')}>Boutique Informatique</div>
             </div>
             
@@ -208,7 +208,7 @@ export const Layout = ({ children }) => {
       <footer className="py-12 px-4 bg-slate-900 overflow-hidden">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10">
           <div className="space-y-4">
-            <h3 className="text-2xl font-bold text-cyan-400 cursor-pointer" onClick={() => navigate('/')}>DWWM</h3>
+            <h3 className="text-2xl font-bold text-cyan-400 cursor-pointer" onClick={() => navigate('/')}>IT13</h3>
             <p className="text-gray-400">Votre partenaire de confiance pour tous vos besoins informatiques depuis 2023.</p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-cyan-400">
@@ -262,7 +262,7 @@ export const Layout = ({ children }) => {
         </div>
         
         <div className="max-w-7xl mx-auto mt-12 pt-6 border-t border-slate-800 text-center sm:text-left">
-          <p className="text-gray-500">© {new Date().getFullYear()} DWWM Boutique Informatique. Tous droits réservés.</p>
+          <p className="text-gray-500">© {new Date().getFullYear()} IT13 Boutique Informatique. Tous droits réservés.</p>
         </div>
       </footer>
     </div>

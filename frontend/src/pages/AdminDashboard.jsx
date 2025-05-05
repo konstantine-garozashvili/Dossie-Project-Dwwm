@@ -114,7 +114,7 @@ export const AdminDashboard = () => {
         <div className="h-full flex flex-col justify-between py-5">
           <div>
             <div className={`flex items-center px-6 mb-8 ${!sidebarOpen && 'lg:justify-center'}`}>
-              <div className="text-2xl font-bold text-cyan-400">DWWM</div>
+              <div className="text-2xl font-bold text-cyan-400">IT13</div>
               {sidebarOpen && <div className="ml-2 text-xl font-semibold">Admin</div>}
             </div>
             
@@ -229,8 +229,8 @@ export const AdminDashboard = () => {
                 <span className="text-sm font-medium">AD</span>
               </div>
               <div className="hidden md:block">
-                <div className="text-sm font-medium">Admin DWWM</div>
-                <div className="text-xs text-gray-400">admin@dwwm.com</div>
+                <div className="text-sm font-medium">Admin IT13</div>
+                <div className="text-xs text-gray-400">admin@it13.com</div>
               </div>
             </div>
           </div>

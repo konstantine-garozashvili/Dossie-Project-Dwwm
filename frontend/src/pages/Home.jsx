@@ -126,8 +126,8 @@ export const Home = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-2">
-              <div className="text-2xl font-bold text-cyan-400">DWWM</div>
-              <div className="hidden md:block text-xl font-semibold">Computer Shop</div>
+              <div className="text-2xl font-bold text-cyan-400">IT13</div>
+              <div className="hidden md:block text-xl font-semibold">Boutique Informatique</div>
             </div>
             
             {/* Desktop Navigation */}
@@ -461,7 +461,7 @@ export const Home = () => {
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold">Email</h3>
-                      <p className="text-cyan-400">support@dwwmcomputers.com</p>
+                      <p className="text-cyan-400">support@it13.com</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
@@ -531,7 +531,7 @@ export const Home = () => {
       <footer className="bg-slate-950 py-16 px-4 overflow-hidden">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10">
           <div className="space-y-4">
-            <h3 className="text-2xl font-bold text-cyan-400">DWWM</h3>
+            <h3 className="text-2xl font-bold text-cyan-400">IT13</h3>
             <p className="text-gray-400">Votre partenaire de confiance pour tous vos besoins informatiques depuis 2023.</p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-cyan-400">
@@ -585,7 +585,7 @@ export const Home = () => {
         </div>
         
         <div className="max-w-7xl mx-auto mt-12 pt-6 border-t border-slate-800 text-center sm:text-left">
-          <p className="text-gray-500">© {new Date().getFullYear()} DWWM Computer Shop. Tous droits réservés.</p>
+          <p className="text-gray-500">© {new Date().getFullYear()} IT13 Boutique Informatique. Tous droits réservés.</p>
         </div>
       </footer>
     </div>

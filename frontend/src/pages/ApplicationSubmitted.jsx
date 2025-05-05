@@ -28,7 +28,7 @@ export const ApplicationSubmitted = () => {
           </h1>
           
           <p className="text-xl text-gray-400 mb-8">
-            Merci d'avoir soumis votre candidature pour devenir technicien chez DWWM Computer Shop. Notre équipe examinera votre candidature et vous contactera prochainement.
+            Merci d'avoir soumis votre candidature pour devenir technicien chez IT13 Boutique Informatique. Notre équipe examinera votre candidature et vous contactera prochainement.
           </p>
           
           <div className="bg-slate-800 border border-slate-700 rounded-lg p-6 mb-8">
@@ -74,7 +74,7 @@ export const ApplicationSubmitted = () => {
               Retour à l'accueil
             </Button>
             <Button 
-              onClick={() => window.location.href = 'mailto:support@dwwm-computer.com'}
+              onClick={() => window.location.href = 'mailto:support@it13.com'}
               className="bg-cyan-500 hover:bg-cyan-600"
             >
               Contactez notre support
