@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,35 +6,34 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { AlertCircle } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const TechnicianLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { technicianLogin, isAuthenticated, isLoading, isTechnician } = useAuth();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (isAuthenticated && isTechnician()) {
+      navigate('/dashboardtech');
+    }
+  }, [isAuthenticated, isTechnician, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setIsLoading(true);
-
-    // Dans une implémentation réelle, envoyez ces données à une API
+    
     try {
-      // Simuler une vérification de connexion pour la démo frontend
-      setTimeout(() => {
-        // Pour le frontend uniquement, accepter un identifiant de test
-        if (email === 'tech@it13.com' && password === 'tech123') {
-          localStorage.setItem('techToken', 'tech-token-12345');
-          navigate('/dashboardtech');
-        } else {
-          setError('Identifiants incorrects. Veuillez réessayer.');
-        }
-        setIsLoading(false);
-      }, 1000);
+      const success = await technicianLogin(email, password);
+      if (!success) {
+        setError('Identifiants incorrects. Veuillez réessayer.');
+      }
     } catch (err) {
       setError('Une erreur est survenue. Veuillez réessayer plus tard.');
-      setIsLoading(false);
+      console.error('Login error:', err);
     }
   };
 
@@ -67,7 +66,7 @@ export const TechnicianLogin = () => {
                   <Input
                     id="email"
                     type="email"
-                    placeholder="tech@it13.com"
+                    placeholder="technician@bigproject.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="bg-slate-800 border-slate-700"

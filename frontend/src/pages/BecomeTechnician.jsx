@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
@@ -7,9 +7,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Laptop, Scroll, Star, Wrench, Award, Upload, X, CheckCircle, AlertCircle } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import Select from 'react-select';
 
 const specializations = [
   'Réparation Matérielle',
@@ -29,6 +30,12 @@ const allowedFileTypes = {
 
 const maxFileSize = 5 * 1024 * 1024; // 5MB
 
+// Regex patterns
+const nameRegex = /^[A-Za-zÀ-ÿ' -]+$/;
+const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
+const phoneRegex = /^0[1-9]\d{8}$/;
+const phoneIntlRegex = /^\+33[1-9]\d{8}$/;
+
 export const BecomeTechnician = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -41,15 +48,12 @@ export const BecomeTechnician = () => {
       location: '',
     },
     professionalInfo: {
-      specialization: '',
+      specializations: [],
       yearsExperience: '',
-      certifications: '',
       availability: '',
       toolsEquipment: '',
     },
     background: {
-      education: '',
-      workHistory: '',
       references: '',
     },
     additionalInfo: {
@@ -68,8 +72,17 @@ export const BecomeTechnician = () => {
   const [fileErrors, setFileErrors] = useState({
     cv: '',
     diplomas: '',
-    motivationLetter: ''
+    motivationLetter: '',
+    fullName: '',
+    email: '',
+    phone: '',
+    location: '',
+    specializations: '',
   });
+
+  const [addressSuggestions, setAddressSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const addressInputRef = useRef(null);
 
   const validateFile = (file, type) => {
     if (!file) return '';
@@ -143,9 +156,92 @@ export const BecomeTechnician = () => {
     }));
   };
 
+  // Address autocomplete handler
+  const handleAddressChange = async (e) => {
+    const value = e.target.value;
+    updateFormData('personalInfo', 'location', value);
+    if (value.length > 3) {
+      const res = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(value)}&limit=10`);
+      const data = await res.json();
+      setAddressSuggestions(data.features || []);
+      setShowSuggestions(true);
+    } else {
+      setAddressSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleAddressSelect = (suggestion) => {
+    updateFormData('personalInfo', 'location', suggestion.properties.label);
+    setAddressSuggestions([]);
+    setShowSuggestions(false);
+  };
+
+  // Format phone to international on blur
+  const formatPhoneToIntl = (value) => {
+    // Remove all non-digit characters
+    let digits = value.replace(/\D/g, '');
+    // Only keep the first 10 digits
+    digits = digits.slice(0, 10);
+    if (digits.length === 10 && digits.startsWith('0')) {
+      return `+33${digits.slice(1)}`;
+    }
+    return value;
+  };
+
+  // Handle phone input change (limit to 10 digits)
+  const handlePhoneChange = (e) => {
+    let value = e.target.value.replace(/\D/g, '');
+    value = value.slice(0, 10);
+    updateFormData('personalInfo', 'phone', value);
+  };
+
+  // On blur, format to international if valid
+  const handlePhoneBlur = (e) => {
+    const formatted = formatPhoneToIntl(e.target.value);
+    updateFormData('personalInfo', 'phone', formatted);
+  };
+
+  // Validation function
+  const validateForm = () => {
+    let valid = true;
+    let errors = {};
+    // Specializations validation
+    if (!formData.professionalInfo.specializations || formData.professionalInfo.specializations.length === 0) {
+      errors.specializations = 'Veuillez sélectionner au moins une spécialisation';
+      valid = false;
+    }
+    // Accept either 10-digit French or +33 international
+    const phoneVal = formData.personalInfo.phone;
+    if (!(phoneRegex.test(phoneVal) || phoneIntlRegex.test(phoneVal))) {
+      errors.phone = 'Numéro de téléphone français invalide (10 chiffres ou format international)';
+      valid = false;
+    }
+    if (!nameRegex.test(formData.personalInfo.fullName)) {
+      errors.fullName = 'Nom invalide (lettres, espaces, tirets uniquement)';
+      valid = false;
+    }
+    if (!emailRegex.test(formData.personalInfo.email)) {
+      errors.email = 'Email invalide';
+      valid = false;
+    }
+    if (!formData.personalInfo.location) {
+      errors.location = 'Adresse requise';
+      valid = false;
+    }
+    setFileErrors(prev => ({ ...prev, ...errors }));
+    return valid;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+
+    // Regex validation
+    if (!validateForm()) {
+      setIsSubmitting(false);
+      return;
+    }
 
     // Check required files
     if (!documents.cv) {
@@ -157,8 +253,29 @@ export const BecomeTechnician = () => {
     // Create form data for file upload
     const formDataToSend = new FormData();
     
-    // Add form field data
-    formDataToSend.append('data', JSON.stringify(formData));
+    // Add form field data - ensure it's structured as expected by backend
+    formDataToSend.append('data', JSON.stringify({
+      personalInfo: {
+        fullName: formData.personalInfo.fullName,
+        email: formData.personalInfo.email,
+        phone: formData.personalInfo.phone,
+        location: formData.personalInfo.location
+      },
+      professionalInfo: {
+        specializations: formData.professionalInfo.specializations,
+        yearsExperience: formData.professionalInfo.yearsExperience,
+        availability: formData.professionalInfo.availability,
+        toolsEquipment: formData.professionalInfo.toolsEquipment
+      },
+      background: {
+        references: formData.background.references
+      },
+      additionalInfo: {
+        skills: formData.additionalInfo.skills,
+        languages: formData.additionalInfo.languages,
+        transportAvailable: formData.additionalInfo.transportAvailable
+      }
+    }));
     
     // Add files
     formDataToSend.append('cv', documents.cv);
@@ -272,6 +389,7 @@ export const BecomeTechnician = () => {
                       onChange={(e) => updateFormData('personalInfo', 'fullName', e.target.value)}
                       required
                     />
+                    {fileErrors.fullName && <div className="text-red-500 text-xs">{fileErrors.fullName}</div>}
                   </div>
                   <div className="space-y-2">
                     <Label>Email</Label>
@@ -283,6 +401,7 @@ export const BecomeTechnician = () => {
                       onChange={(e) => updateFormData('personalInfo', 'email', e.target.value)}
                       required
                     />
+                    {fileErrors.email && <div className="text-red-500 text-xs">{fileErrors.email}</div>}
                   </div>
                   <div className="space-y-2">
                     <Label>Numéro de Téléphone</Label>
@@ -291,19 +410,38 @@ export const BecomeTechnician = () => {
                       className="bg-slate-900 border-slate-700"
                       placeholder="Entrez votre numéro de téléphone"
                       value={formData.personalInfo.phone}
-                      onChange={(e) => updateFormData('personalInfo', 'phone', e.target.value)}
+                      onChange={handlePhoneChange}
+                      onBlur={handlePhoneBlur}
                       required
+                      maxLength={13} // +33XXXXXXXXX is 12 chars, 10 for local
                     />
+                    {fileErrors.phone && <div className="text-red-500 text-xs">{fileErrors.phone}</div>}
                   </div>
-                  <div className="space-y-2">
-                    <Label>Localisation</Label>
+                  <div className="space-y-2 relative">
+                    <Label>Adresse</Label>
                     <Input
+                      ref={addressInputRef}
                       className="bg-slate-900 border-slate-700"
-                      placeholder="Ville, Région"
+                      placeholder="Adresse, Ville, Code Postal"
                       value={formData.personalInfo.location}
-                      onChange={(e) => updateFormData('personalInfo', 'location', e.target.value)}
+                      onChange={handleAddressChange}
+                      autoComplete="off"
                       required
                     />
+                    {showSuggestions && addressSuggestions.length > 0 && (
+                      <div className="absolute z-10 bg-white text-black border border-gray-300 rounded shadow w-full max-h-48 overflow-auto">
+                        {addressSuggestions.map((suggestion, idx) => (
+                          <div
+                            key={idx}
+                            className="px-3 py-2 hover:bg-cyan-100 cursor-pointer"
+                            onClick={() => handleAddressSelect(suggestion)}
+                          >
+                            {suggestion.properties.label}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {fileErrors.location && <div className="text-red-500 text-xs">{fileErrors.location}</div>}
                   </div>
                 </div>
               </div>
@@ -312,22 +450,78 @@ export const BecomeTechnician = () => {
               <div className="space-y-4">
                 <h2 className="text-xl font-semibold text-cyan-400 mb-4">Informations Professionnelles</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Spécialisation Principale</Label>
+                  <div className="space-y-2 col-span-2">
+                    <Label>Spécialisations Principales</Label>
                     <Select
-                      value={formData.professionalInfo.specialization}
-                      onValueChange={(value) => updateFormData('professionalInfo', 'specialization', value)}
-                      required
-                    >
-                      <SelectTrigger className="bg-slate-900 border-slate-700">
-                        <SelectValue placeholder="Sélectionnez votre spécialisation" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {specializations.map((spec) => (
-                          <SelectItem key={spec} value={spec}>{spec}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      isMulti
+                      options={specializations.map(spec => ({ value: spec, label: spec }))}
+                      value={formData.professionalInfo.specializations.map(spec => ({ value: spec, label: spec }))}
+                      onChange={selected => {
+                        updateFormData('professionalInfo', 'specializations', selected.map(opt => opt.value));
+                      }}
+                      classNamePrefix="react-select"
+                      placeholder="Sélectionnez une ou plusieurs spécialisations"
+                      styles={{
+                        control: (baseStyles) => ({
+                          ...baseStyles,
+                          backgroundColor: '#0f172a', // slate-900
+                          borderColor: '#334155', // slate-700
+                          color: 'white',
+                          boxShadow: 'none',
+                          '&:hover': { borderColor: '#22d3ee' }, // cyan-400
+                        }),
+                        menu: (baseStyles) => ({
+                          ...baseStyles,
+                          backgroundColor: '#1e293b', // slate-800
+                          border: '1px solid #334155', // slate-700
+                          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.3)'
+                        }),
+                        option: (baseStyles, { isFocused, isSelected }) => ({
+                          ...baseStyles,
+                          backgroundColor: isSelected 
+                            ? '#06b6d4' // cyan-500
+                            : isFocused 
+                              ? '#0e7490' // cyan-700
+                              : undefined,
+                          color: isSelected || isFocused ? 'white' : '#e2e8f0', // slate-200
+                          cursor: 'pointer',
+                          ':active': {
+                            backgroundColor: '#0891b2' // cyan-600
+                          }
+                        }),
+                        multiValue: (baseStyles) => ({
+                          ...baseStyles,
+                          backgroundColor: '#0e7490', // cyan-700
+                          borderRadius: '0.25rem'
+                        }),
+                        multiValueLabel: (baseStyles) => ({
+                          ...baseStyles,
+                          color: 'white',
+                          fontWeight: 500
+                        }),
+                        multiValueRemove: (baseStyles) => ({
+                          ...baseStyles,
+                          color: '#e2e8f0',
+                          ':hover': {
+                            backgroundColor: '#0e7490', // cyan-700
+                            color: 'white'
+                          }
+                        }),
+                        input: (baseStyles) => ({
+                          ...baseStyles,
+                          color: 'white'
+                        }),
+                        placeholder: (baseStyles) => ({
+                          ...baseStyles,
+                          color: '#94a3b8' // slate-400
+                        }),
+                        singleValue: (baseStyles) => ({
+                          ...baseStyles,
+                          color: 'white'
+                        }),
+                      }}
+                    />
+                    {fileErrors.specializations && <div className="text-red-500 text-xs">{fileErrors.specializations}</div>}
                   </div>
                   <div className="space-y-2">
                     <Label>Années d'Expérience</Label>
@@ -339,40 +533,6 @@ export const BecomeTechnician = () => {
                       onChange={(e) => updateFormData('professionalInfo', 'yearsExperience', e.target.value)}
                       required
                       min="0"
-                    />
-                  </div>
-                  <div className="space-y-2 col-span-2">
-                    <Label>Certifications</Label>
-                    <Textarea
-                      className="bg-slate-900 border-slate-700"
-                      placeholder="Listez vos certifications pertinentes"
-                      value={formData.professionalInfo.certifications}
-                      onChange={(e) => updateFormData('professionalInfo', 'certifications', e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Background Information */}
-              <div className="space-y-4">
-                <h2 className="text-xl font-semibold text-cyan-400 mb-4">Informations Contextuelles</h2>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>Formation</Label>
-                    <Textarea
-                      className="bg-slate-900 border-slate-700"
-                      placeholder="Décrivez votre parcours éducatif"
-                      value={formData.background.education}
-                      onChange={(e) => updateFormData('background', 'education', e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Expérience Professionnelle</Label>
-                    <Textarea
-                      className="bg-slate-900 border-slate-700"
-                      placeholder="Résumez votre expérience professionnelle pertinente"
-                      value={formData.background.workHistory}
-                      onChange={(e) => updateFormData('background', 'workHistory', e.target.value)}
                     />
                   </div>
                 </div>

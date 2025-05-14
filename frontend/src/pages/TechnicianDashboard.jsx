@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useNotifications } from '@/contexts/NotificationContext';
+import NotificationDisplay from '@/components/NotificationDisplay';
 import { 
   Card, 
   CardContent, 
@@ -39,6 +41,8 @@ export const TechnicianDashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [techId, setTechId] = useState(null);
+  const { initializeNotifications, unreadCount } = useNotifications();
 
   // Vérifier l'authentification
   useEffect(() => {
@@ -46,12 +50,25 @@ export const TechnicianDashboard = () => {
     if (!token) {
       navigate('/techlog');
     } else {
-      // Simuler le chargement des données
-      setTimeout(() => {
-        setLoading(false);
-      }, 800);
+      try {
+        // Decode the token to get technician ID (in a real app, you would validate this on the server)
+        const tokenData = JSON.parse(atob(token.split('.')[1]));
+        setTechId(tokenData.id);
+        
+        // Initialize notifications for this technician
+        initializeNotifications(tokenData.id, 'technician');
+        
+        // Simuler le chargement des données
+        setTimeout(() => {
+          setLoading(false);
+        }, 800);
+      } catch (err) {
+        console.error('Error parsing token:', err);
+        localStorage.removeItem('techToken');
+        navigate('/techlog');
+      }
     }
-  }, [navigate]);
+  }, [navigate, initializeNotifications]);
 
   // Gestion de la taille d'écran pour le responsive
   useEffect(() => {
@@ -226,6 +243,25 @@ export const TechnicianDashboard = () => {
                   >
                     <Settings className="mr-3 h-5 w-5" />
                     {sidebarOpen && <span>Paramètres</span>}
+                  </Button>
+                </li>
+                <li>
+                  <Button 
+                    variant="ghost" 
+                    className={`w-full justify-start ${activeTab === 'notifications' ? 'bg-slate-800' : ''}`}
+                    onClick={() => setActiveTab('notifications')}
+                  >
+                    <Bell className="mr-3 h-5 w-5" />
+                    {sidebarOpen && (
+                      <div className="flex items-center">
+                        <span>Notifications</span>
+                        {unreadCount > 0 && (
+                          <div className="ml-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                            {unreadCount > 9 ? '9+' : unreadCount}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </Button>
                 </li>
               </ul>
@@ -465,4 +501,4 @@ export const TechnicianDashboard = () => {
   );
 };
 
-export default TechnicianDashboard; 
+export default TechnicianDashboard;

@@ -1,5 +1,8 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
+import { Toaster } from "@/components/ui/toaster";
+import { NotificationProvider } from "./contexts/NotificationContext";
+import { AuthProvider } from "./contexts/AuthContext";
 import { Home } from "./pages/Home";
 import { Services } from "./pages/Services";
 import { ServiceRequest } from "./pages/ServiceRequest";
@@ -11,21 +14,35 @@ import { AdminLogin } from "./pages/AdminLogin";
 import { AdminDashboard } from "./pages/AdminDashboard";
 import { TechnicianLogin } from "./pages/TechnicianLogin";
 import { TechnicianDashboard } from "./pages/TechnicianDashboard";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/services" element={<Layout><Services /></Layout>} />
-      <Route path="/service-request" element={<Layout><ServiceRequest /></Layout>} />
-      <Route path="/request-confirmation" element={<Layout><RequestConfirmation /></Layout>} />
-      <Route path="/become-technician" element={<Layout><BecomeTechnician /></Layout>} />
-      <Route path="/application-submitted" element={<ApplicationSubmitted />} />
-      <Route path="/adminlog" element={<AdminLogin />} />
-      <Route path="/dashboardadmin" element={<AdminDashboard />} />
-      <Route path="/techlog" element={<TechnicianLogin />} />
-      <Route path="/dashboardtech" element={<TechnicianDashboard />} />
-    </Routes>
+    <NotificationProvider>
+      <AuthProvider>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/services" element={<Layout><Services /></Layout>} />
+          <Route path="/service-request" element={<Layout><ServiceRequest /></Layout>} />
+          <Route path="/request-confirmation" element={<Layout><RequestConfirmation /></Layout>} />
+          <Route path="/become-technician" element={<Layout><BecomeTechnician /></Layout>} />
+          <Route path="/application-submitted" element={<ApplicationSubmitted />} />
+          <Route path="/adminlog" element={<AdminLogin />} />
+          <Route path="/dashboardadmin" element={
+            <ProtectedRoute requiredRole="admin">
+              <AdminDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/techlog" element={<TechnicianLogin />} />
+          <Route path="/dashboardtech" element={
+            <ProtectedRoute requiredRole="technician">
+              <TechnicianDashboard />
+            </ProtectedRoute>
+          } />
+        </Routes>
+        <Toaster />
+      </AuthProvider>
+    </NotificationProvider>
   );
 }
 

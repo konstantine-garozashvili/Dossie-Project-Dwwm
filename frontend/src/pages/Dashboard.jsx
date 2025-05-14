@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Clock, CheckCircle, AlertCircle, Tool, Calendar, User, UserCog, Settings, Users } from 'lucide-react';
+import { Clock, CheckCircle, AlertCircle, Wrench, Calendar, User, UserCog, Settings, Users } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -586,7 +586,7 @@ const handleStatusUpdate = (request, newStatus) => {
                       {requests.filter(r => r.status === 'inProgress').length}
                     </h3>
                   </div>
-                  <Tool className="w-8 h-8 text-blue-400" />
+                  <Wrench className="w-8 h-8 text-blue-400" />
                 </div>
               </CardContent>
             </Card>
