@@ -7,7 +7,7 @@ import { Home, User, List, Calendar, Wrench, Settings, LogOut, Server, LineChart
 const navLinksConfig = {
   admin: [
     { text: 'Aperçu', icon: Home, value: 'apercu' },
-    { text: 'Utilisateurs', icon: AdminUsersIcon, value: 'utilisateurs' },
+    { text: 'Techniciens', icon: AdminUsersIcon, value: 'techniciens' },
     { text: 'Services', icon: Server, value: 'services' },
     { text: 'Rapports', icon: LineChart, value: 'rapports' },
     { text: 'Paramètres', icon: Settings, value: 'parametres' },

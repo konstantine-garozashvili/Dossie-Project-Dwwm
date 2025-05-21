@@ -38,10 +38,7 @@ export function initializeDatabase() {
       user_id INTEGER NOT NULL,
       user_type TEXT NOT NULL CHECK(user_type IN ('admin', 'technician')),
       cloudinary_public_id TEXT NOT NULL,
-      cloudinary_url TEXT NOT NULL,
       cloudinary_secure_url TEXT NOT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       UNIQUE(user_id, user_type)
     );
   `);
@@ -67,7 +64,12 @@ export function initializeDatabase() {
       email TEXT UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
       name TEXT NOT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      surname TEXT NOT NULL,
+      phone_number TEXT,
+      specialization TEXT,
+      status TEXT DEFAULT 'active' CHECK(status IN ('active', 'inactive', 'pending_approval')),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `);
   console.log('Checked/created technicians table.');
@@ -87,6 +89,33 @@ export function initializeDatabase() {
     console.log(`Default admin user '${defaultAdminEmail}' created.`);
   } else {
     console.log(`Admin user '${defaultAdminEmail}' already exists.`);
+  }
+
+  // Seed default technicians if they don't exist
+  const sampleTechnicians = [
+    { email: 'tech1@it13.com', name: 'Jean', surname: 'Technicien', password: 'password1', phone_number: '0102030401', specialization: 'Réparation Matérielle', status: 'active' },
+    { email: 'tech2@it13.com', name: 'Alice', surname: 'Depan', password: 'password2', phone_number: '0102030402', specialization: 'Dépannage Logiciel', status: 'active' },
+    { email: 'tech3@it13.com', name: 'Bob', surname: 'Reseau', password: 'password3', phone_number: '0102030403', specialization: 'Configuration Réseau', status: 'pending_approval' },
+    { email: 'tech4@it13.com', name: 'Carla', surname: 'Mobile', password: 'password4', phone_number: '0102030404', specialization: 'Réparation d\'Appareils Mobiles', status: 'inactive' },
+    { email: 'tech5@it13.com', name: 'David', surname: 'Securite', password: 'password5', phone_number: '0102030405', specialization: 'Systèmes de Sécurité', status: 'active' }
+  ];
+
+  const techCheckStmt = db.prepare('SELECT id FROM technicians WHERE email = ?');
+  const insertTechStmt = db.prepare(
+    'INSERT INTO technicians (name, surname, email, password_hash, phone_number, specialization, status) VALUES (?, ?, ?, ?, ?, ?, ?)'
+  );
+
+  const saltRounds = 10;
+
+  for (const tech of sampleTechnicians) {
+    const existingTech = techCheckStmt.get(tech.email);
+    if (!existingTech) {
+      const hashedPassword = bcrypt.hashSync(tech.password, saltRounds);
+      insertTechStmt.run(tech.name, tech.surname, tech.email, hashedPassword, tech.phone_number, tech.specialization, tech.status);
+      console.log(`Sample technician '${tech.email}' created.`);
+    } else {
+      console.log(`Sample technician '${tech.email}' already exists.`);
+    }
   }
 
   console.log('Database initialization complete.');

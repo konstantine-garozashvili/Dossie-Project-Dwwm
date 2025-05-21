@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { fixLayoutOverflow } from "@/lib/utils";
+// import { fixLayoutOverflow } from "@/lib/utils"; // Commented out
 import { useNavigate, useLocation } from 'react-router-dom';
 
 export const Layout = ({ children }) => {
@@ -12,9 +12,9 @@ export const Layout = ({ children }) => {
 
   useEffect(() => {
     // Apply the layout overflow fix
-    if (rootRef.current) {
-      fixLayoutOverflow(rootRef.current);
-    }
+    // if (rootRef.current) { // Commented out
+    //   fixLayoutOverflow(rootRef.current); // Commented out
+    // }
     
     // Additional fix to ensure there's no overflow on the body
     document.body.style.overflowX = 'hidden';

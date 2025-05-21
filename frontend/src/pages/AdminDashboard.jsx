@@ -30,7 +30,15 @@ import {
   Search,
   Menu,
   X,
-  User
+  User,
+  PlusCircle,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  AlertCircle,
+  Loader2,
+  RefreshCw
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Input } from '@/components/ui/input';
@@ -40,11 +48,25 @@ import BottomDockNavigation from '@/components/SidebarNavigation';
 import CollapsibleSidebar from '@/components/CollapsibleSidebar';
 import useResponsive from '@/hooks/useResponsive';
 import { PROFILE_ENDPOINTS } from '@/config/api';
+import { useToast } from "@/components/ui/use-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+
+// Admin specific components
+import TechnicianTable from '@/components/admin/TechnicianTable';
+import TechnicianFormDialog from '@/components/admin/TechnicianFormDialog';
+import TechnicianDetailsDialog from '@/components/admin/TechnicianDetailsDialog';
 
 // Define pageTitles mapping here for better organization
 const pageTitles = {
   apercu: "Tableau de Bord",
-  utilisateurs: "Gestion des Utilisateurs",
+  techniciens: "Gestion des Techniciens",
   services: "Gestion des Services",
   rapports: "Rapports et Analyses",
   parametres: "Paramètres du Compte",
@@ -53,6 +75,7 @@ const pageTitles = {
 
 export const AdminDashboard = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("apercu");
   const [loading, setLoading] = useState(true);
   const [adminData, setAdminData] = useState({
@@ -64,6 +87,23 @@ export const AdminDashboard = () => {
   const [profilePictureUrl, setProfilePictureUrl] = useState('');
   const isSmallScreen = useResponsive(); // Hook for responsive behavior
   const [sidebarOpen, setSidebarOpen] = useState(false); // State for sidebar
+
+  // State for Technicians CRUD
+  const [technicians, setTechnicians] = useState([]);
+  const [isLoadingTechnicians, setIsLoadingTechnicians] = useState(false);
+  const [technicianError, setTechnicianError] = useState(null);
+  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
+  const [currentTechnician, setCurrentTechnician] = useState(null); // For editing or viewing details
+  const [isSubmittingForm, setIsSubmittingForm] = useState(false); // For form submission loading state
+
+  // Pagination and Filtering State
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalTechnicians, setTotalTechnicians] = useState(0);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState(''); // e.g., 'active', 'inactive'
+  const [limitPerPage, setLimitPerPage] = useState(10);
 
   useEffect(() => {
     const storedAdminInfo = localStorage.getItem('adminInfo');
@@ -239,6 +279,199 @@ export const AdminDashboard = () => {
     </Card>
   );
 
+  // Fetch technicians function
+  const fetchTechnicians = async (page = currentPage, limit = limitPerPage, search = searchTerm, status = statusFilter) => {
+    setIsLoadingTechnicians(true);
+    setTechnicianError(null);
+    const adminToken = localStorage.getItem('adminToken');
+    if (!adminToken) {
+      toast({ title: "Erreur d'authentification", description: "Veuillez vous reconnecter.", variant: "destructive" });
+      setIsLoadingTechnicians(false);
+      navigate('/adminlog');
+      return;
+    }
+
+    try {
+      const queryParams = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+      });
+      if (search) queryParams.append('search', search);
+      if (status && status !== '_all_') queryParams.append('status', status);
+
+      const response = await fetch(`/api/admin/technicians?${queryParams.toString()}`, {
+        headers: {
+          'Authorization': `Bearer ${adminToken}`,
+          'Accept': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: "Erreur lors de la récupération des techniciens." }));
+        throw new Error(errorData.message || `HTTP error ${response.status}`);
+      }
+      const data = await response.json();
+      if (data.success) {
+        setTechnicians(data.technicians || []);
+        setCurrentPage(data.pagination.page);
+        setTotalPages(data.pagination.totalPages);
+        setTotalTechnicians(data.pagination.total);
+      } else {
+        throw new Error(data.message || "Échec de la récupération des techniciens.");
+      }
+    } catch (err) {
+      console.error("Fetch technicians error:", err);
+      setTechnicianError(err.message);
+      setTechnicians([]); // Clear data on error
+      toast({ title: "Erreur", description: err.message, variant: "destructive" });
+    } finally {
+      setIsLoadingTechnicians(false);
+    }
+  };
+
+  // useEffect for initial fetch when 'techniciens' tab is active
+  useEffect(() => {
+    if (activeTab === 'techniciens') {
+      fetchTechnicians(1, limitPerPage, '', ''); // Reset to page 1 and clear filters on tab switch
+    } else {
+      // Clear technician data and reset pagination when navigating away from the tab
+      setTechnicians([]);
+      setCurrentPage(1);
+      setTotalPages(1);
+      setTotalTechnicians(0);
+      setSearchTerm('');
+      setStatusFilter('');
+      setTechnicianError(null);
+    }
+  }, [activeTab]); // Only re-run if activeTab changes
+
+  // Handlers for Technicians CRUD
+  const handleOpenAddForm = () => {
+    setCurrentTechnician(null); // Clear any existing data for "Add" mode
+    setIsFormDialogOpen(true);
+  };
+
+  const handleOpenEditForm = (technician) => {
+    setCurrentTechnician(technician);
+    setIsFormDialogOpen(true);
+  };
+
+  const handleOpenDetails = (technician) => {
+    setCurrentTechnician(technician);
+    setIsDetailsDialogOpen(true);
+  };
+
+  const handleFormSubmit = async (formData) => {
+    setIsSubmittingForm(true);
+    setTechnicianError(null);
+    const adminToken = localStorage.getItem('adminToken');
+
+    const method = currentTechnician ? 'PUT' : 'POST';
+    const url = currentTechnician 
+      ? `/api/admin/technicians/${currentTechnician.id}` 
+      : '/api/admin/technicians';
+
+    try {
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${adminToken}`,
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || (currentTechnician ? "Erreur lors de la mise à jour du technicien." : "Erreur lors de la création du technicien."));
+      }
+
+      toast({
+        title: currentTechnician ? "Technicien Mis à Jour" : "Technicien Ajouté",
+        description: `Le technicien ${formData.name} ${formData.surname} a été ${currentTechnician ? 'mis à jour' : 'ajouté'} avec succès.`,
+        variant: "success",
+      });
+      setIsFormDialogOpen(false);
+      fetchTechnicians(currentPage); // Refresh the list, stay on current page if possible
+    } catch (err) {
+      console.error("Submit technician error:", err);
+      setTechnicianError(err.message);
+      toast({ title: "Erreur de Soumission", description: err.message, variant: "destructive" });
+    } finally {
+      setIsSubmittingForm(false);
+    }
+  };
+
+  const handleDeleteTechnician = async (technicianId) => {
+    if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce technicien ? Cette action est irréversible.")) {
+      return;
+    }
+    setIsLoadingTechnicians(true); // Can use a specific loading state or general table loading
+    setTechnicianError(null);
+    const adminToken = localStorage.getItem('adminToken');
+
+    try {
+      const response = await fetch(`/api/admin/technicians/${technicianId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${adminToken}`,
+          'Accept': 'application/json'
+        }
+      });
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Erreur lors de la suppression du technicien.");
+      }
+      toast({
+        title: "Technicien Supprimé",
+        description: result.message || "Le technicien a été supprimé avec succès.",
+        variant: "success",
+      });
+      // If current page becomes empty after deletion, try to go to previous page or first page
+      if (technicians.length === 1 && currentPage > 1) {
+        fetchTechnicians(currentPage - 1);
+      } else {
+        fetchTechnicians(currentPage);
+      }
+    } catch (err) {
+      console.error("Delete technician error:", err);
+      setTechnicianError(err.message);
+      toast({ title: "Erreur de Suppression", description: err.message, variant: "destructive" });
+    } finally {
+      setIsLoadingTechnicians(false);
+    }
+  };
+  
+  // Pagination and Filter Handlers
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const handleStatusFilterChange = (value) => {
+    setStatusFilter(value);
+  };
+
+  const handleApplyFilters = () => {
+    setCurrentPage(1); // Reset to page 1 when applying new filters
+    fetchTechnicians(1, limitPerPage, searchTerm, statusFilter);
+  };
+
+  const handleResetFilters = () => {
+    setSearchTerm('');
+    setStatusFilter('');
+    setCurrentPage(1);
+    fetchTechnicians(1, limitPerPage, '', '');
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+      fetchTechnicians(newPage, limitPerPage, searchTerm, statusFilter);
+    }
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case "apercu":
@@ -248,8 +481,137 @@ export const AdminDashboard = () => {
             {renderRecentRequests()}
           </>
         );
-      case "utilisateurs":
-        return <div className="text-white">Contenu de la gestion des utilisateurs</div>;
+      case "techniciens":
+        return (
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+              <div>
+                <h2 className="text-2xl font-semibold text-slate-100">Gestion des Techniciens</h2>
+                <p className="text-slate-400">Ajouter, voir, modifier et supprimer des techniciens.</p>
+              </div>
+              <Button onClick={handleOpenAddForm} className="bg-cyan-600 hover:bg-cyan-700">
+                <PlusCircle className="mr-2 h-5 w-5" />
+                Ajouter un Technicien
+              </Button>
+            </div>
+
+            {/* Filters and Search */} 
+            <Card className="bg-slate-800/60 border-slate-700 p-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 items-end">
+                    <div className="md:col-span-2 lg:col-span-2">
+                        <Label htmlFor="search-technician" className="text-slate-400 mb-1 block">Rechercher</Label>
+                        <div className="relative">
+                            <Input 
+                                id="search-technician"
+                                type="text" 
+                                placeholder="Nom, email, spécialisation..."
+                                value={searchTerm}
+                                onChange={handleSearchChange}
+                                className="bg-slate-700 border-slate-600 pr-10"
+                            />
+                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                        </div>
+                    </div>
+                    <div>
+                        <Label htmlFor="status-filter" className="text-slate-400 mb-1 block">Statut</Label>
+                        <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
+                            <SelectTrigger className="bg-slate-700 border-slate-600">
+                                <SelectValue placeholder="Tous les statuts" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-slate-800 border-slate-700 text-slate-200">
+                                <SelectItem value="_all_" className="hover:bg-slate-700 focus:bg-slate-700">Tous</SelectItem>
+                                <SelectItem value="active" className="hover:bg-slate-700 focus:bg-slate-700">Actif</SelectItem>
+                                <SelectItem value="inactive" className="hover:bg-slate-700 focus:bg-slate-700">Inactif</SelectItem>
+                                <SelectItem value="pending_approval" className="hover:bg-slate-700 focus:bg-slate-700">En attente</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="flex space-x-2 items-end">
+                        <Button onClick={handleApplyFilters} className="w-full sm:w-auto bg-sky-600 hover:bg-sky-700">
+                            <Search className="mr-2 h-4 w-4" /> Filtrer
+                        </Button>
+                        <Button onClick={handleResetFilters} variant="outline" className="w-full sm:w-auto border-slate-600 hover:bg-slate-700">
+                            <RefreshCw className="mr-2 h-4 w-4" /> Réinitialiser
+                        </Button>
+                    </div>
+                </div>
+            </Card>
+
+            {isLoadingTechnicians && (
+              <div className="flex justify-center items-center py-10">
+                <Loader2 className="h-8 w-8 animate-spin text-cyan-500" />
+                <p className="ml-3 text-slate-400">Chargement des techniciens...</p>
+              </div>
+            )}
+            {technicianError && !isLoadingTechnicians && (
+              <div className="text-center py-10 bg-red-900/20 border border-red-700 rounded-md p-4">
+                <AlertCircle className="h-10 w-10 text-red-500 mx-auto mb-2" />
+                <p className="text-red-400">Erreur: {technicianError}</p>
+                <Button onClick={() => fetchTechnicians(currentPage, limitPerPage, searchTerm, statusFilter)} variant="outline" className="mt-4 border-red-500 text-red-400 hover:bg-red-800/30">
+                  Réessayer
+                </Button>
+              </div>
+            )}
+            {!isLoadingTechnicians && !technicianError && (
+              <TechnicianTable 
+                technicians={technicians} 
+                onEdit={handleOpenEditForm} 
+                onDelete={handleDeleteTechnician} 
+                onViewDetails={handleOpenDetails} 
+              />
+            )}
+            
+            {/* Pagination Controls */} 
+            {!isLoadingTechnicians && !technicianError && totalTechnicians > 0 && (
+                <div className="flex flex-col sm:flex-row justify-between items-center pt-4 gap-4">
+                    <p className="text-sm text-slate-400">
+                        Page {currentPage} sur {totalPages}. Total: {totalTechnicians} techniciens.
+                    </p>
+                    <div className="flex space-x-1">
+                        <Button 
+                            onClick={() => handlePageChange(1)} 
+                            disabled={currentPage === 1 || isLoadingTechnicians}
+                            variant="outline" size="icon" className="border-slate-600 hover:bg-slate-700">
+                            <ChevronsLeft className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                            onClick={() => handlePageChange(currentPage - 1)} 
+                            disabled={currentPage === 1 || isLoadingTechnicians}
+                            variant="outline" size="icon" className="border-slate-600 hover:bg-slate-700">
+                            <ChevronLeft className="h-4 w-4" />
+                        </Button>
+                        {/* Consider a more advanced pagination component for many pages */}
+                        <Button 
+                            onClick={() => handlePageChange(currentPage + 1)} 
+                            disabled={currentPage === totalPages || isLoadingTechnicians}
+                            variant="outline" size="icon" className="border-slate-600 hover:bg-slate-700">
+                            <ChevronRight className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                            onClick={() => handlePageChange(totalPages)} 
+                            disabled={currentPage === totalPages || isLoadingTechnicians}
+                            variant="outline" size="icon" className="border-slate-600 hover:bg-slate-700">
+                            <ChevronsRight className="h-4 w-4" />
+                        </Button>
+                    </div>
+                </div>
+            )}
+
+            {/* Dialogs */} 
+            <TechnicianFormDialog 
+                open={isFormDialogOpen}
+                onOpenChange={setIsFormDialogOpen}
+                onSubmit={handleFormSubmit}
+                initialData={currentTechnician}
+                isLoading={isSubmittingForm}
+            />
+            <TechnicianDetailsDialog 
+                open={isDetailsDialogOpen}
+                onOpenChange={setIsDetailsDialogOpen}
+                technician={currentTechnician}
+            />
+          </div>
+        );
       case "services":
         return <div className="text-white">Contenu de la gestion des services</div>;
       case "rapports":
@@ -261,19 +623,23 @@ export const AdminDashboard = () => {
           <Card className="bg-slate-800 border-slate-700">
             <CardHeader>
               <CardTitle>Mon Profil</CardTitle>
+              <CardDescription>Gérez vos informations personnelles et votre photo de profil.</CardDescription>
             </CardHeader>
-            <CardContent>
-              <ProfilePictureUploader 
-                userType="admin" 
-                userId={adminData.id} 
-                currentPictureUrl={profilePictureUrl} 
-                onUploadSuccess={fetchProfilePicture} 
-              />
-              <div className="mt-6 space-y-2">
-                <p><strong className="font-medium text-gray-300">Nom:</strong> {adminData.name}</p>
-                <p><strong className="font-medium text-gray-300">Prénom:</strong> {adminData.surname}</p>
-                <p><strong className="font-medium text-gray-300">Email:</strong> {adminData.email}</p>
-                {/* Add more profile details here as needed */}
+            <CardContent className="space-y-6">
+              <div className="flex flex-col items-center space-y-4">
+                <ProfilePictureUploader
+                  userType="admin"
+                  userId={adminData.id}
+                  currentPictureUrl={profilePictureUrl}
+                  onUploadSuccess={fetchProfilePicture}
+                  avatarSizeClassName="w-32 h-32 text-4xl"
+                />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-slate-100">Informations:</h3>
+                <p className="text-slate-300"><strong className="font-medium text-slate-400">Nom:</strong> {adminData.name} {adminData.surname}</p>
+                <p className="text-slate-300"><strong className="font-medium text-slate-400">Email:</strong> {adminData.email}</p>
+                {/* Add more profile fields and edit functionality here */}
               </div>
             </CardContent>
           </Card>
@@ -400,7 +766,7 @@ export const AdminDashboard = () => {
           <TabsContent value="apercu" className="h-full">
             {renderContent()}
           </TabsContent>
-          <TabsContent value="utilisateurs">
+          <TabsContent value="techniciens">
             {renderContent()}
           </TabsContent>
           <TabsContent value="services">
@@ -413,29 +779,7 @@ export const AdminDashboard = () => {
             {renderContent()}
           </TabsContent>
           <TabsContent value="profile">
-            <Card className="bg-slate-800 border-slate-700">
-              <CardHeader>
-                <CardTitle>Mon Profil</CardTitle>
-                <CardDescription>Gérez vos informations personnelles et votre photo de profil.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex flex-col items-center space-y-4">
-                  <ProfilePictureUploader
-                    userType="admin"
-                    userId={adminData.id}
-                    currentPictureUrl={profilePictureUrl}
-                    onUploadSuccess={fetchProfilePicture}
-                    avatarSizeClassName="w-32 h-32 text-4xl"
-                  />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold">Informations:</h3>
-                  <p><strong>Nom:</strong> {adminData.name} {adminData.surname}</p>
-                  <p><strong>Email:</strong> {adminData.email}</p>
-                  {/* Add more profile fields and edit functionality here */}
-                </div>
-              </CardContent>
-            </Card>
+            {renderContent()}
           </TabsContent>
         </Tabs>
       </main>
@@ -443,4 +787,4 @@ export const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard; 
+export default AdminDashboard;

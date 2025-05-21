@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Marquee3D } from "@/components/magicui/Marquee3D";
-import { fixLayoutOverflow } from "@/lib/utils";
+// import { fixLayoutOverflow } from "@/lib/utils"; // Commented out
 import { useInView } from 'react-intersection-observer';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FiMonitor, FiCpu, FiHardDrive, FiDatabase, FiShield, FiCloud } from "react-icons/fi";
@@ -83,9 +83,9 @@ export const Home = () => {
 
   useEffect(() => {
     // Apply the layout overflow fix
-    if (rootRef.current) {
-      fixLayoutOverflow(rootRef.current);
-    }
+    // if (rootRef.current) { // Commented out
+    //   fixLayoutOverflow(rootRef.current); // Commented out
+    // }
     
     // Additional fix to ensure there's no overflow on the body
     document.body.style.overflowX = 'hidden';

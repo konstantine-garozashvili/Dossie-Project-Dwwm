@@ -43,10 +43,8 @@ profileRouter.get('/picture/:userType/:userId', async (c) => {
         userId: profilePicture.user_id,
         userType: profilePicture.user_type,
         publicId: profilePicture.cloudinary_public_id,
-        url: profilePicture.cloudinary_url,
-        secureUrl: profilePicture.cloudinary_secure_url,
-        createdAt: profilePicture.created_at,
-        updatedAt: profilePicture.updated_at
+        url: profilePicture.cloudinary_secure_url,
+        secureUrl: profilePicture.cloudinary_secure_url
       }
     });
   } catch (error) {
@@ -118,20 +116,16 @@ profileRouter.post('/picture/:userType/:userId', async (c) => {
     // Upload new image to Cloudinary
     const cloudinaryResult = await uploadImage(imageData);
     
-    const now = new Date().toISOString();
-    
     // Insert or update profile picture record
     if (existingPicture) {
       // Update existing record
       db.prepare(`
         UPDATE profile_pictures 
-        SET cloudinary_public_id = ?, cloudinary_url = ?, cloudinary_secure_url = ?, updated_at = ?
+        SET cloudinary_public_id = ?, cloudinary_secure_url = ?
         WHERE user_id = ? AND user_type = ?
       `).run(
         cloudinaryResult.public_id,
-        cloudinaryResult.url,
         cloudinaryResult.secure_url,
-        now,
         userId,
         userType
       );
@@ -139,16 +133,13 @@ profileRouter.post('/picture/:userType/:userId', async (c) => {
       // Insert new record
       db.prepare(`
         INSERT INTO profile_pictures (
-          user_id, user_type, cloudinary_public_id, cloudinary_url, cloudinary_secure_url, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+          user_id, user_type, cloudinary_public_id, cloudinary_secure_url
+        ) VALUES (?, ?, ?, ?)
       `).run(
         userId,
         userType,
         cloudinaryResult.public_id,
-        cloudinaryResult.url,
-        cloudinaryResult.secure_url,
-        now,
-        now
+        cloudinaryResult.secure_url
       );
     }
     
@@ -159,7 +150,7 @@ profileRouter.post('/picture/:userType/:userId', async (c) => {
         userId,
         userType,
         publicId: cloudinaryResult.public_id,
-        url: cloudinaryResult.url,
+        url: cloudinaryResult.secure_url,
         secureUrl: cloudinaryResult.secure_url
       }
     });
