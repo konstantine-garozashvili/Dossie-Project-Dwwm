@@ -37,6 +37,8 @@ import { Input } from '@/components/ui/input';
 import ProfilePictureUploader from "@/components/ProfilePictureUploader";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import BottomDockNavigation from '@/components/SidebarNavigation';
+import CollapsibleSidebar from '@/components/CollapsibleSidebar';
+import useResponsive from '@/hooks/useResponsive';
 import { PROFILE_ENDPOINTS } from '@/config/api';
 
 // Define pageTitles mapping here for better organization
@@ -60,6 +62,8 @@ export const AdminDashboard = () => {
     surname: ''
   });
   const [profilePictureUrl, setProfilePictureUrl] = useState('');
+  const isSmallScreen = useResponsive(); // Hook for responsive behavior
+  const [sidebarOpen, setSidebarOpen] = useState(false); // State for sidebar
 
   useEffect(() => {
     const storedAdminInfo = localStorage.getItem('adminInfo');
@@ -141,6 +145,8 @@ export const AdminDashboard = () => {
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminInfo');
+    setAdminData({ id: null, email: '', name: '', surname: '' }); // Clear admin data
+    setProfilePictureUrl(''); // Clear profile picture
     navigate('/adminlog');
   };
 
@@ -286,151 +292,153 @@ export const AdminDashboard = () => {
     );
   }
 
+  const currentTitle = pageTitles[activeTab] || "Tableau de Bord";
+
   return (
-    <div className="min-h-screen flex flex-col bg-slate-950 text-white">
-      {/* Main content area - flex-1 to take available space, pb-20 for bottom dock */}
-      <div 
-        className="flex-1 flex flex-col pb-20" // Added pb-20, removed margin logic for sidebar
-      >
-        {/* Header - Hamburger menu button removed */}
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-800 bg-slate-900/80 px-4 backdrop-blur-sm sm:px-6">
-          <div className="flex items-center">
-            {/* Hamburger button removed */}
-            {/* <Button
+    <div className="min-h-screen bg-slate-900 text-white flex flex-col">
+      {/* Navigation: Render based on screen size */}
+      {isSmallScreen ? (
+        <CollapsibleSidebar
+          userType="admin"
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+          handleLogout={handleLogout}
+        />
+      ) : (
+        <BottomDockNavigation
+          userType="admin"
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          handleLogout={handleLogout}
+        />
+      )}
+
+      {/* Header */}
+      <header className={`sticky top-0 z-30 bg-slate-800/80 backdrop-blur-md shadow-lg border-b border-slate-700 flex items-center justify-between p-4 h-20
+                         ${isSmallScreen && sidebarOpen ? 'ml-0' : 'ml-0'} 
+                         ${!isSmallScreen ? 'mb-0' : ''}
+                         transition-all duration-300 ease-in-out`}>
+        <div className="flex items-center">
+          {isSmallScreen && (
+            <Button
               variant="ghost"
               size="icon"
-              className="lg:hidden mr-2 text-white hover:bg-slate-700"
-              onClick={toggleSidebar} // toggleSidebar is removed
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="mr-4 text-slate-300 hover:text-cyan-400"
             >
               {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </Button> */}
-            <h1 className="text-xl font-semibold">{pageTitles[activeTab] || "Tableau de Bord"}</h1>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            {/* ... (Search, Bell, User Dropdown remain the same) ... */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <Input
-                type="search"
-                placeholder="Rechercher..."
-                className="w-full rounded-md bg-slate-800 pl-10 pr-4 py-2 text-sm focus:ring-cyan-500 focus:border-cyan-500 border-slate-700"
-              />
-            </div>
-            <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white">
-              <Bell className="h-5 w-5" />
             </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src={profilePictureUrl} alt="Admin Profile" />
-                    <AvatarFallback>{((adminData?.name?.[0] || '') + (adminData?.surname?.[0] || '')).toUpperCase() || 'AD'}</AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56 bg-slate-800 border-slate-700 text-white" align="end" forceMount>
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">{adminData.name} {adminData.surname}</p>
-                    <p className="text-xs leading-none text-gray-400">{adminData.email}</p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator className="bg-slate-700" />
-                <DropdownMenuItem 
-                  className="hover:bg-slate-700 focus:bg-slate-700 cursor-pointer"
-                  onClick={() => setActiveTab('profile')}
-                >
-                  <User className="mr-2 h-4 w-4" />
-                  <span>Mon Profil</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  className="hover:bg-slate-700 focus:bg-slate-700 cursor-pointer"
-                  onClick={() => setActiveTab('parametres')}
-                >
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Paramètres</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator className="bg-slate-700"/>
-                <DropdownMenuItem 
-                  className="text-red-400 hover:bg-red-900/30 focus:bg-red-900/30 focus:text-red-300 hover:text-red-300 cursor-pointer"
-                  onClick={handleLogout}
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Déconnexion</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </header>
+          )}
+          <h1 className="text-xl md:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+            {currentTitle}
+          </h1>
+        </div>
+        
+        <div className="flex items-center space-x-4">
+          <Input 
+            type="search" 
+            placeholder="Rechercher..." 
+            className="hidden md:block bg-slate-700 border-slate-600 placeholder-slate-400 text-sm w-64" 
+          />
+          <Button variant="ghost" size="icon" className="text-slate-300 hover:text-cyan-400">
+            <Bell className="h-6 w-6" />
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                <Avatar className="h-9 w-9 border-2 border-transparent hover:border-cyan-400 transition-colors">
+                  <AvatarImage src={profilePictureUrl} alt={adminData.name || "Admin"} />
+                  <AvatarFallback>
+                    {adminData.name ? adminData.name.charAt(0).toUpperCase() : 'A'}
+                    {adminData.surname ? adminData.surname.charAt(0).toUpperCase() : 'D'}
+                  </AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 bg-slate-800 border-slate-700 text-slate-200" align="end" forceMount>
+              <DropdownMenuLabel className="font-normal">
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">{adminData.name} {adminData.surname}</p>
+                  <p className="text-xs leading-none text-slate-400">{adminData.email}</p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-slate-700" />
+              <DropdownMenuItem 
+                className="hover:bg-slate-700/70 focus:bg-slate-700/70 cursor-pointer"
+                onClick={() => setActiveTab('profile')}
+              >
+                <User className="mr-2 h-4 w-4" />
+                <span>Profil</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="hover:bg-slate-700/70 focus:bg-slate-700/70 cursor-pointer"
+                onClick={() => setActiveTab('parametres')}
+              >
+                <Settings className="mr-2 h-4 w-4" />
+                <span>Paramètres</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-slate-700" />
+              <DropdownMenuItem 
+                className="text-red-400 hover:!text-red-300 hover:!bg-red-900/30 focus:bg-red-900/30 cursor-pointer"
+                onClick={handleLogout}
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Déconnexion</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </header>
 
-        {/* Main content based on activeTab */}
-        <main className="flex-1 p-4 sm:p-6 overflow-y-auto">
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsContent value="apercu" className="mt-0">
-              {renderStatsCards()}
-              {renderRecentRequests()}
-            </TabsContent>
-            <TabsContent value="utilisateurs" className="mt-0">
-              {/* Placeholder - Replace with actual component */}
-              <Card className="bg-slate-800 border-slate-700">
-                <CardHeader><CardTitle>Gestion des Utilisateurs</CardTitle></CardHeader>
-                <CardContent><p>Contenu pour la gestion des utilisateurs...</p></CardContent>
-              </Card>
-            </TabsContent>
-            <TabsContent value="services" className="mt-0">
-               {/* Placeholder - Replace with actual component */}
-              <Card className="bg-slate-800 border-slate-700">
-                <CardHeader><CardTitle>Gestion des Services</CardTitle></CardHeader>
-                <CardContent><p>Contenu pour la gestion des services...</p></CardContent>
-              </Card>
-            </TabsContent>
-            <TabsContent value="rapports" className="mt-0">
-              {/* Placeholder - Replace with actual component */}
-              <Card className="bg-slate-800 border-slate-700">
-                <CardHeader><CardTitle>Rapports et Analyses</CardTitle></CardHeader>
-                <CardContent><p>Contenu pour les rapports et analyses...</p></CardContent>
-              </Card>
-            </TabsContent>
-            <TabsContent value="parametres" className="mt-0">
-              {/* Placeholder - Replace with actual component */}
-              <Card className="bg-slate-800 border-slate-700">
-                <CardHeader><CardTitle>Paramètres du Compte</CardTitle></CardHeader>
-                <CardContent><p>Contenu pour les paramètres du compte...</p></CardContent>
-              </Card>
-            </TabsContent>
-            <TabsContent value="profile" className="mt-0">
-              <Card className="bg-slate-800 border-slate-700">
-                <CardHeader>
-                  <CardTitle>Mon Profil</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ProfilePictureUploader 
-                    userType="admin" 
-                    userId={adminData.id} 
-                    currentPictureUrl={profilePictureUrl} 
-                    onUploadSuccess={fetchProfilePicture} 
+      {/* Main Content Area */}
+      <main className={`flex-grow p-4 sm:p-6 transition-all duration-300 ease-in-out
+                       ${isSmallScreen ? 'ml-0' : 'pb-20'}
+                       ${isSmallScreen ? 'pt-4' : 'pt-6'}`}> 
+        <Tabs value={activeTab} className="h-full">
+          <TabsContent value="apercu" className="h-full">
+            {renderContent()}
+          </TabsContent>
+          <TabsContent value="utilisateurs">
+            {renderContent()}
+          </TabsContent>
+          <TabsContent value="services">
+            {renderContent()}
+          </TabsContent>
+          <TabsContent value="rapports">
+            {renderContent()}
+          </TabsContent>
+          <TabsContent value="parametres">
+            {renderContent()}
+          </TabsContent>
+          <TabsContent value="profile">
+            <Card className="bg-slate-800 border-slate-700">
+              <CardHeader>
+                <CardTitle>Mon Profil</CardTitle>
+                <CardDescription>Gérez vos informations personnelles et votre photo de profil.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="flex flex-col items-center space-y-4">
+                  <ProfilePictureUploader
+                    userType="admin"
+                    userId={adminData.id}
+                    currentPictureUrl={profilePictureUrl}
+                    onUploadSuccess={fetchProfilePicture}
+                    avatarSizeClassName="w-32 h-32 text-4xl"
                   />
-                  <div className="mt-6 space-y-2">
-                    <p><strong className="font-medium text-gray-300">Nom:</strong> {adminData.name}</p>
-                    <p><strong className="font-medium text-gray-300">Prénom:</strong> {adminData.surname}</p>
-                    <p><strong className="font-medium text-gray-300">Email:</strong> {adminData.email}</p>
-                    {/* Add more profile details here as needed */}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </main>
-      </div>
-
-      {/* Bottom Dock Navigation */}
-      <BottomDockNavigation 
-        userType="admin"
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        handleLogout={handleLogout}
-      />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold">Informations:</h3>
+                  <p><strong>Nom:</strong> {adminData.name} {adminData.surname}</p>
+                  <p><strong>Email:</strong> {adminData.email}</p>
+                  {/* Add more profile fields and edit functionality here */}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </main>
     </div>
   );
 };

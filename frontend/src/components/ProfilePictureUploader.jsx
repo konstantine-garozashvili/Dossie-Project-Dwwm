@@ -16,6 +16,7 @@ const UI_AVATARS_BASE = 'https://ui-avatars.com/api/?background=0D8ABC&color=fff
  * @param {string} props.currentPictureUrl - Current profile picture URL
  * @param {Function} props.onUploadSuccess - Callback when profile picture changes
  * @param {string} props.className - Additional classes for component
+ * @param {string} props.avatarSizeClassName - Additional classes for Avatar and AvatarFallback
  */
 const ProfilePictureUploader = ({ 
   userType, 
@@ -23,6 +24,7 @@ const ProfilePictureUploader = ({
   currentPictureUrl, // Changed from name to currentPictureUrl for direct control from parent
   onUploadSuccess,   // Parent should handle fetching/updating logic
   className = '',
+  avatarSizeClassName = 'h-32 w-32 text-3xl' // Default size for profile page
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -155,9 +157,9 @@ const ProfilePictureUploader = ({
 
   return (
     <div className={`flex flex-col items-center space-y-4 ${className}`}>
-      <Avatar className="h-32 w-32 border-2 border-slate-700 shadow-md">
+      <Avatar className={`border-2 border-slate-700 shadow-md ${avatarSizeClassName}`}>
         <AvatarImage src={displayPicture} alt="Photo de profil" />
-        <AvatarFallback className="text-3xl bg-slate-800 text-slate-400">
+        <AvatarFallback className={`bg-slate-800 text-slate-400 ${avatarSizeClassName.includes('text-4xl') ? 'text-4xl' : 'text-3xl'}`}>
           {isLoading ? <Loader2 className="h-10 w-10 animate-spin" /> : initials}
         </AvatarFallback>
       </Avatar>
