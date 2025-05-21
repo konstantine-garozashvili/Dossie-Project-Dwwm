@@ -1,4 +1,4 @@
-import { getDatabase } from '../db/index.js';
+import { getDatabase } from '../db/init-db.js';
 
 /**
  * Service Request model for handling database operations related to service requests

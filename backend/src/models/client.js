@@ -1,4 +1,4 @@
-import { getDatabase } from '../db/index.js';
+import { getDatabase } from '../db/init-db.js';
 
 /**
  * Client model for handling database operations related to clients and their contacts

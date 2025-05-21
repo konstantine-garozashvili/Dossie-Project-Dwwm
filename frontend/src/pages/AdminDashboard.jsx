@@ -118,60 +118,181 @@ export const AdminDashboard = () => {
               {sidebarOpen && <div className="ml-2 text-xl font-semibold">Admin</div>}
             </div>
             
-            <nav className="px-3">
-              <ul className="space-y-1">
-                <li>
-                  <Button 
-                    variant="ghost" 
-                    className={`w-full justify-start ${activeTab === 'apercu' ? 'bg-slate-800' : ''}`}
-                    onClick={() => setActiveTab('apercu')}
+            <Tabs defaultValue="apercu" className="w-full">
+              <nav className="px-3">
+                <TabsList className="flex flex-col space-y-1 w-full bg-transparent">
+                  <TabsTrigger 
+                    value="apercu"
+                    className="w-full justify-start data-[state=active]:bg-slate-800"
                   >
                     <Home className="mr-3 h-5 w-5" />
                     {sidebarOpen && <span>Aperçu</span>}
-                  </Button>
-                </li>
-                <li>
-                  <Button 
-                    variant="ghost"
-                    className={`w-full justify-start ${activeTab === 'utilisateurs' ? 'bg-slate-800' : ''}`}
-                    onClick={() => setActiveTab('utilisateurs')}
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="utilisateurs"
+                    className="w-full justify-start data-[state=active]:bg-slate-800"
                   >
                     <Users className="mr-3 h-5 w-5" />
                     {sidebarOpen && <span>Utilisateurs</span>}
-                  </Button>
-                </li>
-                <li>
-                  <Button 
-                    variant="ghost"
-                    className={`w-full justify-start ${activeTab === 'services' ? 'bg-slate-800' : ''}`}
-                    onClick={() => setActiveTab('services')}
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="services"
+                    className="w-full justify-start data-[state=active]:bg-slate-800"
                   >
                     <Server className="mr-3 h-5 w-5" />
                     {sidebarOpen && <span>Services</span>}
-                  </Button>
-                </li>
-                <li>
-                  <Button 
-                    variant="ghost"
-                    className={`w-full justify-start ${activeTab === 'rapports' ? 'bg-slate-800' : ''}`}
-                    onClick={() => setActiveTab('rapports')}
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="rapports"
+                    className="w-full justify-start data-[state=active]:bg-slate-800"
                   >
                     <LineChart className="mr-3 h-5 w-5" />
                     {sidebarOpen && <span>Rapports</span>}
-                  </Button>
-                </li>
-                <li>
-                  <Button 
-                    variant="ghost"
-                    className={`w-full justify-start ${activeTab === 'parametres' ? 'bg-slate-800' : ''}`}
-                    onClick={() => setActiveTab('parametres')}
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="parametres"
+                    className="w-full justify-start data-[state=active]:bg-slate-800"
                   >
                     <Settings className="mr-3 h-5 w-5" />
                     {sidebarOpen && <span>Paramètres</span>}
-                  </Button>
-                </li>
-              </ul>
-            </nav>
+                  </TabsTrigger>
+                </TabsList>
+              </nav>
+
+              <TabsContent value="apercu">
+                <div className="space-y-6">
+                  {/* Statistiques */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {statsData.map((stat, index) => (
+                      <Card key={index} className="bg-slate-800 border-slate-700">
+                        <CardContent className="p-6">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <p className="text-sm font-medium text-gray-400">{stat.title}</p>
+                              <h3 className="text-2xl font-bold mt-1">{stat.value}</h3>
+                              <p className="text-xs text-green-400 mt-2">{stat.change} depuis le mois dernier</p>
+                            </div>
+                            <div className="p-3 rounded-full bg-cyan-500/20 text-cyan-400">
+                              {stat.icon}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+
+                  {/* Demandes récentes */}
+                  <Card className="bg-slate-800 border-slate-700">
+                    <CardHeader>
+                      <CardTitle>Demandes récentes</CardTitle>
+                      <CardDescription>Liste des dernières demandes de service</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="overflow-x-auto">
+                        <table className="w-full">
+                          <thead>
+                            <tr className="border-b border-slate-700">
+                              <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">ID</th>
+                              <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Client</th>
+                              <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Service</th>
+                              <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Date</th>
+                              <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Statut</th>
+                              <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {recentRequests.map((request) => (
+                              <tr key={request.id} className="border-b border-slate-700 hover:bg-slate-700/30">
+                                <td className="px-4 py-3 text-sm">{request.id}</td>
+                                <td className="px-4 py-3">{request.user}</td>
+                                <td className="px-4 py-3 text-sm">{request.service}</td>
+                                <td className="px-4 py-3 text-sm">{request.date}</td>
+                                <td className="px-4 py-3">
+                                  <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getStatusColor(request.status)}`}>
+                                    {request.status}
+                                  </span>
+                                </td>
+                                <td className="px-4 py-3">
+                                  <Button size="sm" variant="ghost">Voir</Button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+              <TabsContent value="utilisateurs">
+                <Card className="bg-slate-800 border-slate-700">
+                  <CardHeader>
+                    <CardTitle>Gestion des Utilisateurs</CardTitle>
+                    <CardDescription>Cette section sera développée ultérieurement</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="p-8 text-center">
+                      <Users className="h-16 w-16 text-gray-500 mx-auto mb-4" />
+                      <h3 className="text-xl font-medium mb-2">Module en développement</h3>
+                      <p className="text-gray-400">
+                        La gestion des utilisateurs sera disponible dans une prochaine mise à jour.
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              <TabsContent value="services">
+                <Card className="bg-slate-800 border-slate-700">
+                  <CardHeader>
+                    <CardTitle>Gestion des Services</CardTitle>
+                    <CardDescription>Cette section sera développée ultérieurement</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="p-8 text-center">
+                      <Server className="h-16 w-16 text-gray-500 mx-auto mb-4" />
+                      <h3 className="text-xl font-medium mb-2">Module en développement</h3>
+                      <p className="text-gray-400">
+                        La gestion des services sera disponible dans une prochaine mise à jour.
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              <TabsContent value="rapports">
+                <Card className="bg-slate-800 border-slate-700">
+                  <CardHeader>
+                    <CardTitle>Rapports & Statistiques</CardTitle>
+                    <CardDescription>Cette section sera développée ultérieurement</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="p-8 text-center">
+                      <LineChart className="h-16 w-16 text-gray-500 mx-auto mb-4" />
+                      <h3 className="text-xl font-medium mb-2">Module en développement</h3>
+                      <p className="text-gray-400">
+                        Les rapports et statistiques seront disponibles dans une prochaine mise à jour.
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              <TabsContent value="parametres">
+                <Card className="bg-slate-800 border-slate-700">
+                  <CardHeader>
+                    <CardTitle>Paramètres du Système</CardTitle>
+                    <CardDescription>Cette section sera développée ultérieurement</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="p-8 text-center">
+                      <Settings className="h-16 w-16 text-gray-500 mx-auto mb-4" />
+                      <h3 className="text-xl font-medium mb-2">Module en développement</h3>
+                      <p className="text-gray-400">
+                        Les paramètres du système seront disponibles dans une prochaine mise à jour.
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
           </div>
           
           <div className="px-3">

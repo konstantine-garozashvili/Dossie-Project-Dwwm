@@ -8,23 +8,20 @@ import { motion } from "framer-motion";
 import { AlertCircle } from "lucide-react";
 
 export const AdminLogin = () => {
-  const [username, setUsername] = useState('');
+  const [mail, setMail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const executeLogin = async (currentMail, currentPassword) => {
     setError('');
     setIsLoading(true);
 
     // Dans une implémentation réelle, envoyez ces données à une API
     try {
-      // Simuler une vérification de connexion pour la démo frontend
       setTimeout(() => {
-        // Pour le frontend uniquement, accepter un identifiant de test
-        if (username === 'admin@it13.com' && password === 'admin123') {
+        if (currentMail === 'admin@it13.com' && currentPassword === 'admin123') {
           localStorage.setItem('adminToken', 'demo-token-12345');
           navigate('/dashboardadmin');
         } else {
@@ -36,6 +33,19 @@ export const AdminLogin = () => {
       setError('Une erreur est survenue. Veuillez réessayer plus tard.');
       setIsLoading(false);
     }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await executeLogin(mail, password);
+  };
+
+  const handleQuickLogin = async () => {
+    const testMail = 'admin@it13.com';
+    const testPassword = 'admin123';
+    setMail(testMail);
+    setPassword(testPassword);
+    await executeLogin(testMail, testPassword);
   };
 
   return (
@@ -53,7 +63,7 @@ export const AdminLogin = () => {
           </CardHeader>
           
           <CardContent className="pt-6">
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} aria-label="Admin login form">
               {error && (
                 <div className="mb-6 p-3 bg-red-950/50 border border-red-800 rounded-md flex items-start">
                   <AlertCircle className="w-5 h-5 text-red-400 mr-2 mt-0.5" />
@@ -63,13 +73,13 @@ export const AdminLogin = () => {
               
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="username">Nom d'utilisateur</Label>
+                  <Label htmlFor="mail">Adresse mail</Label>
                   <Input
-                    id="username"
+                    id="mail"
                     type="email"
                     placeholder="admin@it13.com"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    value={mail}
+                    onChange={(e) => setMail(e.target.value)}
                     className="bg-slate-800 border-slate-700"
                     required
                   />
@@ -99,6 +109,16 @@ export const AdminLogin = () => {
               >
                 {isLoading ? 'Connexion en cours...' : 'Se connecter'}
               </Button>
+
+              <Button 
+                type="button"
+                variant="outline"
+                className="w-full mt-4 border-cyan-500 text-cyan-500 hover:bg-cyan-500/10 hover:text-cyan-400"
+                onClick={handleQuickLogin}
+                disabled={isLoading}
+              >
+                Quick Login (Test)
+              </Button>
             </form>
           </CardContent>
           
@@ -113,4 +133,4 @@ export const AdminLogin = () => {
   );
 };
 
-export default AdminLogin; 
+export default AdminLogin;
