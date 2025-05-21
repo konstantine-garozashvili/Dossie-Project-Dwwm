@@ -9,7 +9,7 @@ import {
   CardFooter
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { 
   Users, 
   Settings, 
@@ -34,6 +34,7 @@ import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import ProfilePictureUploader from "@/components/ProfilePictureUploader";
+import SidebarNavigation from '@/components/SidebarNavigation';
 
 export const TechnicianDashboard = () => {
   const navigate = useNavigate();
@@ -248,95 +249,30 @@ export const TechnicianDashboard = () => {
     );
   }
 
+  const pageTitles = {
+    taches: "Mes Tâches",
+    calendrier: "Calendrier",
+    inventaire: "Inventaire",
+    parametres: "Paramètres",
+    profile: "Mon Profil",
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 text-white">
-      {/* Barre latérale */}
-      <motion.aside 
-        className={`fixed top-0 left-0 z-40 h-full bg-slate-900 shadow-xl transition-all duration-300 ease-in-out 
-                   ${sidebarOpen ? 'w-64' : 'w-0 lg:w-20'} overflow-hidden`}
-        initial={isSmallScreen ? { x: -260 } : { x: 0 }}
-        animate={sidebarOpen ? { x: 0 } : isSmallScreen ? { x: -260 } : { x: 0 }}
-      >
-        <div className="h-full flex flex-col justify-between py-5">
-          <div>
-            <div className={`flex items-center px-6 mb-8 ${!sidebarOpen && 'lg:justify-center'}`}>
-              <div className="text-2xl font-bold text-cyan-400">IT13</div>
-              {sidebarOpen && <div className="ml-2 text-xl font-semibold">Technicien</div>}
-            </div>
-            
-            <nav className="px-3">
-              <ul className="space-y-1">
-                <li>
-                  <Button 
-                    variant="ghost" 
-                    className={`w-full justify-start ${activeTab === 'taches' ? 'bg-slate-800' : ''}`}
-                    onClick={() => setActiveTab('taches')}
-                  >
-                    <List className="mr-3 h-5 w-5" />
-                    {sidebarOpen && <span>Mes Tâches</span>}
-                  </Button>
-                </li>
-                <li>
-                  <Button 
-                    variant="ghost"
-                    className={`w-full justify-start ${activeTab === 'calendrier' ? 'bg-slate-800' : ''}`}
-                    onClick={() => setActiveTab('calendrier')}
-                  >
-                    <Calendar className="mr-3 h-5 w-5" />
-                    {sidebarOpen && <span>Calendrier</span>}
-                  </Button>
-                </li>
-                <li>
-                  <Button 
-                    variant="ghost"
-                    className={`w-full justify-start ${activeTab === 'inventaire' ? 'bg-slate-800' : ''}`}
-                    onClick={() => setActiveTab('inventaire')}
-                  >
-                    <Wrench className="mr-3 h-5 w-5" />
-                    {sidebarOpen && <span>Inventaire</span>}
-                  </Button>
-                </li>
-                <li>
-                  <Button 
-                    variant="ghost"
-                    className={`w-full justify-start ${activeTab === 'parametres' ? 'bg-slate-800' : ''}`}
-                    onClick={() => setActiveTab('parametres')}
-                  >
-                    <Settings className="mr-3 h-5 w-5" />
-                    {sidebarOpen && <span>Paramètres</span>}
-                  </Button>
-                </li>
-                <li>
-                  <Button 
-                    variant="ghost" 
-                    className={`w-full justify-start ${activeTab === 'profile' ? 'bg-slate-800' : ''}`}
-                    onClick={() => setActiveTab('profile')}
-                  >
-                    <User className="mr-3 h-5 w-5" />
-                    {sidebarOpen && <span>Mon Profil</span>}
-                  </Button>
-                </li>
-              </ul>
-            </nav>
-          </div>
-          
-          <div className="px-3">
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-red-900/20"
-              onClick={handleLogout}
-            >
-              <LogOut className="mr-3 h-5 w-5" />
-              {sidebarOpen && <span>Déconnexion</span>}
-            </Button>
-          </div>
-        </div>
-      </motion.aside>
+      <SidebarNavigation
+        userType="technician"
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        sidebarOpen={sidebarOpen}
+        isSmallScreen={isSmallScreen}
+        handleLogout={handleLogout}
+      />
 
-      {/* Contenu principal */}
+      {/* Main content */}
       <div className={`transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-20'}`}>
-        {/* Barre de navigation supérieure */}
+        {/* Header */}
         <header className="sticky top-0 z-30 bg-slate-900/80 backdrop-blur-sm border-b border-slate-800 px-4 h-16 flex justify-between items-center">
+          {/* Mobile menu toggle */}
           <Button 
             variant="ghost" 
             size="icon" 
@@ -346,16 +282,12 @@ export const TechnicianDashboard = () => {
             {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
 
+          {/* Page title - hidden on mobile */}
           <div className="hidden lg:block">
-            <h1 className="text-xl font-semibold">
-              {activeTab === 'taches' && "Mes Tâches"}
-              {activeTab === 'calendrier' && "Calendrier"}
-              {activeTab === 'inventaire' && "Inventaire"}
-              {activeTab === 'parametres' && "Paramètres"}
-              {activeTab === 'profile' && "Mon Profil"}
-            </h1>
+             <h1 className="text-xl font-semibold">{pageTitles[activeTab] || 'Technician Dashboard'}</h1>
           </div>
           
+          {/* Right side header items (Search, Bell, Avatar) remain the same */}
           <div className="flex items-center gap-2">
             <div className="relative hidden md:block">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -364,12 +296,10 @@ export const TechnicianDashboard = () => {
                 className="pl-9 bg-slate-800 border-slate-700 w-60" 
               />
             </div>
-            
             <Button variant="ghost" size="icon" className="relative">
               <Bell className="h-5 w-5" />
               <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-cyan-500"></span>
             </Button>
-            
             <div className="flex items-center space-x-3">
               <Avatar className="h-8 w-8 bg-slate-700">
                 <AvatarImage 
@@ -388,7 +318,7 @@ export const TechnicianDashboard = () => {
           </div>
         </header>
 
-        {/* Contenu du tableau de bord */}
+        {/* Main content area */}
         <main className="p-4 md:p-6">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsContent value="taches" className="mt-0">

@@ -1,26 +1,24 @@
-/**
- * API configuration
- */
+// This file contains configuration for API endpoints.
 
-// Base API URL - Use environment variable or fallback to localhost in development
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const API_BASE_URL = '/api'; // Using relative path for proxy
 
-// Auth endpoints
 export const AUTH_ENDPOINTS = {
-  TECHNICIAN_LOGIN: `${API_BASE_URL}/auth/technician/login`,
   ADMIN_LOGIN: `${API_BASE_URL}/auth/admin/login`,
+  TECHNICIAN_LOGIN: `${API_BASE_URL}/auth/technician/login`,
+  // Add other auth-related endpoints here if needed
 };
 
-// Data endpoints
-export const ENDPOINTS = {
-  TECHNICIANS: `${API_BASE_URL}/technicians`,
-  CLIENTS: `${API_BASE_URL}/clients`,
-  SERVICE_REQUESTS: `${API_BASE_URL}/service-requests`,
-  // Add more endpoints as needed
+export const PROFILE_ENDPOINTS = {
+  GET_PICTURE: (userType, userId) => `${API_BASE_URL}/profile/picture/${userType}/${userId}`,
+  UPLOAD_PICTURE: (userType, userId) => `${API_BASE_URL}/profile/picture/${userType}/${userId}`,
+  DELETE_PICTURE: (userType, userId) => `${API_BASE_URL}/profile/picture/${userType}/${userId}`,
+  // Add other profile-related endpoints here if needed
 };
 
-export default {
-  API_BASE_URL,
-  AUTH_ENDPOINTS,
-  ENDPOINTS,
-}; 
+// Add other endpoint categories as needed, for example:
+// export const SERVICE_REQUEST_ENDPOINTS = {
+//   GET_ALL: `${API_BASE_URL}/service-requests`,
+//   CREATE: `${API_BASE_URL}/service-requests`,
+// };
+
+console.log('Loaded frontend/src/config/api.js'); 
