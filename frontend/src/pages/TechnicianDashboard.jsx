@@ -26,12 +26,14 @@ import {
   Clock,
   ArrowRight,
   FileText,
-  Star
+  Star,
+  User
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import ProfilePictureUploader from "@/components/ProfilePictureUploader";
 
 export const TechnicianDashboard = () => {
   const navigate = useNavigate();
@@ -40,17 +42,92 @@ export const TechnicianDashboard = () => {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  // Add technician data state
+  const [technicianData, setTechnicianData] = useState({
+    id: null,
+    email: '',
+    name: ''
+  });
+  // Initialize with a name-based default avatar to prevent blank display
+  const [profilePictureUrl, setProfilePictureUrl] = useState(
+    `https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=Tech&size=256`
+  );
+
+  // Load technician info from localStorage
+  useEffect(() => {
+    const storedTechInfo = localStorage.getItem('technicianInfo');
+    if (storedTechInfo) {
+      try {
+        const parsedData = JSON.parse(storedTechInfo);
+        setTechnicianData(parsedData);
+      } catch (err) {
+        console.error('Error parsing technician info:', err);
+      }
+    }
+  }, []);
+
+  // Fetch profile picture
+  useEffect(() => {
+    if (technicianData.id) {
+      fetchProfilePicture();
+    }
+  }, [technicianData.id]);
+
+  const fetchProfilePicture = async () => {
+    // Always set a default avatar immediately to ensure something is displayed
+    const defaultAvatar = `https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=${encodeURIComponent(technicianData.name || 'User')}`;
+    setProfilePictureUrl(defaultAvatar);
+    
+    // If no ID, don't proceed with API fetch
+    if (!technicianData.id) return;
+    
+    try {
+      // Make API request with proper headers
+      const response = await fetch(`/api/profile/picture/technician/${technicianData.id}`, {
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+
+      // Handle 404 errors silently, without trying to parse JSON
+      if (response.status === 404) {
+        // Just keep using the default avatar we already set
+        return;
+      }
+      
+      // Check if we got a JSON response
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+          setProfilePictureUrl(data.profilePicture.secureUrl);
+        } else if (data.defaultUrl) {
+          setProfilePictureUrl(data.defaultUrl);
+        }
+        // If we get here with an error but no defaultUrl, we'll keep using the default avatar we set earlier
+      }
+      // If not JSON response, we'll keep using the default avatar we set earlier
+    } catch (err) {
+      // Silently handle errors - we've already set a default avatar
+      // No need to log or show errors when profile picture can't be fetched
+    }
+  };
+
   // Vérifier l'authentification
   useEffect(() => {
-    const token = localStorage.getItem('techToken');
-    if (!token) {
+    const token = localStorage.getItem('technicianToken');
+    const techInfo = localStorage.getItem('technicianInfo');
+    
+    if (!token || !techInfo) {
       navigate('/techlog');
-    } else {
-      // Simuler le chargement des données
-      setTimeout(() => {
-        setLoading(false);
-      }, 800);
+      return;
     }
+    
+    // Simuler le chargement des données
+    setTimeout(() => {
+      setLoading(false);
+    }, 800);
   }, [navigate]);
 
   // Gestion de la taille d'écran pour le responsive
@@ -72,7 +149,8 @@ export const TechnicianDashboard = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('techToken');
+    localStorage.removeItem('technicianToken');
+    localStorage.removeItem('technicianInfo');
     navigate('/techlog');
   };
 
@@ -228,6 +306,16 @@ export const TechnicianDashboard = () => {
                     {sidebarOpen && <span>Paramètres</span>}
                   </Button>
                 </li>
+                <li>
+                  <Button 
+                    variant="ghost" 
+                    className={`w-full justify-start ${activeTab === 'profile' ? 'bg-slate-800' : ''}`}
+                    onClick={() => setActiveTab('profile')}
+                  >
+                    <User className="mr-3 h-5 w-5" />
+                    {sidebarOpen && <span>Mon Profil</span>}
+                  </Button>
+                </li>
               </ul>
             </nav>
           </div>
@@ -264,6 +352,7 @@ export const TechnicianDashboard = () => {
               {activeTab === 'calendrier' && "Calendrier"}
               {activeTab === 'inventaire' && "Inventaire"}
               {activeTab === 'parametres' && "Paramètres"}
+              {activeTab === 'profile' && "Mon Profil"}
             </h1>
           </div>
           
@@ -283,12 +372,17 @@ export const TechnicianDashboard = () => {
             
             <div className="flex items-center space-x-3">
               <Avatar className="h-8 w-8 bg-slate-700">
-                <AvatarImage src="https://randomuser.me/api/portraits/men/32.jpg" />
-                <AvatarFallback>TD</AvatarFallback>
+                <AvatarImage 
+                  src={profilePictureUrl} 
+                  alt="Photo de profil" 
+                />
+                <AvatarFallback className="bg-slate-700 text-xl">
+                  {technicianData.name ? technicianData.name.substring(0, 2).toUpperCase() : 'TT'}
+                </AvatarFallback>
               </Avatar>
               <div className="hidden md:block">
-                <div className="text-sm font-medium">Thomas Dubois</div>
-                <div className="text-xs text-gray-400">tech@it13.com</div>
+                <div className="text-sm font-medium">{technicianData.name}</div>
+                <div className="text-xs text-gray-400">{technicianData.email}</div>
               </div>
             </div>
           </div>
@@ -457,6 +551,57 @@ export const TechnicianDashboard = () => {
                   </div>
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            <TabsContent value="profile" className="mt-0">
+              <div className="p-4 lg:p-8">
+                <h2 className="text-2xl font-bold mb-6">Mon Profil</h2>
+                
+                <div className="bg-slate-800 rounded-lg p-6 md:p-8 border border-slate-700">
+                  <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
+                    <ProfilePictureUploader 
+                      userType="technician"
+                      userId={technicianData.id}
+                      name={technicianData.name}
+                      onProfilePictureChange={(url) => setProfilePictureUrl(url)}
+                    />
+                    
+                    <div className="flex flex-col gap-6 flex-1">
+                      <div>
+                        <h3 className="text-xl font-semibold mb-4">Informations personnelles</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-400 mb-1">Nom complet</label>
+                            <div className="bg-slate-700 p-3 rounded-md">{technicianData.name}</div>
+                          </div>
+                          <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-400 mb-1">Email</label>
+                            <div className="bg-slate-700 p-3 rounded-md">{technicianData.email}</div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <h3 className="text-xl font-semibold mb-4">Compétences techniques</h3>
+                        <div className="flex flex-wrap gap-2">
+                          <Badge className="bg-slate-700">Réparation PC</Badge>
+                          <Badge className="bg-slate-700">Installation Windows</Badge>
+                          <Badge className="bg-slate-700">Récupération de données</Badge>
+                          <Badge className="bg-slate-700">Configuration réseau</Badge>
+                          <Badge className="bg-slate-700">Dépannage matériel</Badge>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <h3 className="text-xl font-semibold mb-4">Sécurité</h3>
+                        <Button className="bg-cyan-600 hover:bg-cyan-700">
+                          Changer le mot de passe
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </TabsContent>
           </Tabs>
         </main>

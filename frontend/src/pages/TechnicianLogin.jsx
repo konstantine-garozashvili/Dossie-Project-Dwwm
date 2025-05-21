@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { AlertCircle } from "lucide-react";
+import { AUTH_ENDPOINTS } from "@/config/api";
 
 export const TechnicianLogin = () => {
   const [email, setEmail] = useState('');
@@ -14,28 +15,55 @@ export const TechnicianLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const executeLogin = async (currentEmail, currentPassword) => {
     setError('');
     setIsLoading(true);
 
-    // Dans une implémentation réelle, envoyez ces données à une API
     try {
-      // Simuler une vérification de connexion pour la démo frontend
-      setTimeout(() => {
-        // Pour le frontend uniquement, accepter un identifiant de test
-        if (email === 'tech@it13.com' && password === 'tech123') {
-          localStorage.setItem('techToken', 'tech-token-12345');
-          navigate('/dashboardtech');
-        } else {
-          setError('Identifiants incorrects. Veuillez réessayer.');
-        }
-        setIsLoading(false);
-      }, 1000);
+      const response = await fetch(AUTH_ENDPOINTS.TECHNICIAN_LOGIN, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: currentEmail,
+          password: currentPassword
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // Save token and user info to localStorage
+        localStorage.setItem('technicianToken', data.token);
+        localStorage.setItem('technicianInfo', JSON.stringify({
+          id: data.technician.id,
+          email: data.technician.email,
+          name: data.technician.name
+        }));
+        navigate('/dashboardtech');
+      } else {
+        setError(data.message || 'Une erreur est survenue lors de la connexion');
+      }
     } catch (err) {
-      setError('Une erreur est survenue. Veuillez réessayer plus tard.');
+      setError('Erreur de connexion au serveur');
+      console.error('Login error:', err);
+    } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await executeLogin(email, password);
+  };
+
+  const handleQuickLogin = async () => {
+    const testEmail = 'tech@example.com';
+    const testPassword = 'password123';
+    setEmail(testEmail);
+    setPassword(testPassword);
+    await executeLogin(testEmail, testPassword);
   };
 
   return (
@@ -53,7 +81,7 @@ export const TechnicianLogin = () => {
           </CardHeader>
           
           <CardContent className="pt-6">
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} aria-label="Technician login form" data-testid="login-form">
               {error && (
                 <div className="mb-6 p-3 bg-red-950/50 border border-red-800 rounded-md flex items-start">
                   <AlertCircle className="w-5 h-5 text-red-400 mr-2 mt-0.5" />
@@ -63,7 +91,7 @@ export const TechnicianLogin = () => {
               
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Adresse email</Label>
+                  <Label htmlFor="email">Adresse mail</Label>
                   <Input
                     id="email"
                     type="email"
@@ -72,6 +100,7 @@ export const TechnicianLogin = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     className="bg-slate-800 border-slate-700"
                     required
+                    data-testid="email-input"
                   />
                 </div>
                 
@@ -88,6 +117,7 @@ export const TechnicianLogin = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     className="bg-slate-800 border-slate-700"
                     required
+                    data-testid="password-input"
                   />
                 </div>
               </div>
@@ -96,8 +126,20 @@ export const TechnicianLogin = () => {
                 type="submit"
                 className="w-full mt-6 bg-cyan-500 hover:bg-cyan-600"
                 disabled={isLoading}
+                data-testid="login-button"
               >
                 {isLoading ? 'Connexion en cours...' : 'Se connecter'}
+              </Button>
+
+              <Button 
+                type="button"
+                variant="outline"
+                className="w-full mt-4 border-cyan-500 text-cyan-500 hover:bg-cyan-500/10 hover:text-cyan-400"
+                onClick={handleQuickLogin}
+                disabled={isLoading}
+                data-testid="quick-login-button"
+              >
+                Connexion rapide (Test)
               </Button>
             </form>
           </CardContent>

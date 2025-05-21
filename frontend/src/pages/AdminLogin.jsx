@@ -6,46 +6,64 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { AlertCircle } from "lucide-react";
+import { AUTH_ENDPOINTS } from "@/config/api";
 
 export const AdminLogin = () => {
-  const [mail, setMail] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const executeLogin = async (currentMail, currentPassword) => {
+  const executeLogin = async (currentEmail, currentPassword) => {
     setError('');
     setIsLoading(true);
 
-    // Dans une implémentation réelle, envoyez ces données à une API
     try {
-      setTimeout(() => {
-        if (currentMail === 'admin@it13.com' && currentPassword === 'admin123') {
-          localStorage.setItem('adminToken', 'demo-token-12345');
-          navigate('/dashboardadmin');
-        } else {
-          setError('Identifiants incorrects. Veuillez réessayer.');
-        }
-        setIsLoading(false);
-      }, 1000);
+      const response = await fetch(AUTH_ENDPOINTS.ADMIN_LOGIN, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: currentEmail,
+          password: currentPassword
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        localStorage.setItem('adminToken', data.token);
+        localStorage.setItem('adminInfo', JSON.stringify({
+          id: data.admin.id,
+          email: data.admin.email,
+          name: data.admin.name,
+          surname: data.admin.surname
+        }));
+        navigate('/dashboardadmin');
+      } else {
+        setError(data.message || 'Identifiants incorrects. Veuillez réessayer.');
+      }
     } catch (err) {
       setError('Une erreur est survenue. Veuillez réessayer plus tard.');
+      console.error('Login error:', err);
+    } finally {
       setIsLoading(false);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await executeLogin(mail, password);
+    await executeLogin(email, password);
   };
 
   const handleQuickLogin = async () => {
-    const testMail = 'admin@it13.com';
+    const testEmail = 'admin@it13.com';
     const testPassword = 'admin123';
-    setMail(testMail);
+    setEmail(testEmail);
     setPassword(testPassword);
-    await executeLogin(testMail, testPassword);
+    await executeLogin(testEmail, testPassword);
   };
 
   return (
@@ -73,13 +91,13 @@ export const AdminLogin = () => {
               
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="mail">Adresse mail</Label>
+                  <Label htmlFor="email">Adresse mail</Label>
                   <Input
-                    id="mail"
+                    id="email"
                     type="email"
                     placeholder="admin@it13.com"
-                    value={mail}
-                    onChange={(e) => setMail(e.target.value)}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     className="bg-slate-800 border-slate-700"
                     required
                   />
@@ -117,7 +135,7 @@ export const AdminLogin = () => {
                 onClick={handleQuickLogin}
                 disabled={isLoading}
               >
-                Quick Login (Test)
+                Connexion rapide (Test)
               </Button>
             </form>
           </CardContent>

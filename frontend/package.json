@@ -12,6 +12,8 @@
         "coverage": "vitest run --coverage"
     },
     "dependencies": {
+        "@radix-ui/react-alert-dialog": "^1.1.14",
+        "@radix-ui/react-label": "^2.1.7",
         "@radix-ui/react-popover": "^1.1.11",
         "@radix-ui/react-tabs": "^1.1.12",
         "clsx": "^2.1.1",
@@ -24,7 +26,7 @@
         "react-icons": "^5.5.0",
         "react-intersection-observer": "^9.16.0",
         "react-router-dom": "^6.22.3",
-        "tailwind-merge": "^3.2.0",
+        "tailwind-merge": "^3.3.0",
         "toaster": "^0.1.2"
     },
     "devDependencies": {
@@ -33,6 +35,8 @@
         "@vitejs/plugin-react": "^4.4.1",
         "@vitest/ui": "^3.1.4",
         "autoprefixer": "^10.4.21",
+        "express": "^5.1.0",
+        "http-proxy-middleware": "^3.0.5",
         "jsdom": "^26.1.0",
         "postcss": "^8.5.3",
         "tailwindcss": "^3.4.17",
