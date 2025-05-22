@@ -3,104 +3,91 @@
 @tailwind utilities;
 
 @layer base {
-  :root, [data-theme="amethyst-haze"] {
+  :root {
+    /* Define base theme colors for amethyst theme */
     --color-amethyst-300: #c898f0;
     --color-amethyst-400: #a878f0;
     --color-amethyst-500: #9868e0;
     --color-amethyst-600: #7848b8;
     --color-amethyst-700: #482888;
 
-    --color-gold-accent: #EFBF04; /* Example Accent from Figma suggestion */
+    --color-gold-accent: #EFBF04; /* Gold accent color */
 
-    --color-neutral-50: #f9fafb;  /* Tailwind gray-50 */
-    --color-neutral-100: #f3f4f6; /* Tailwind gray-100 */
-    --color-neutral-200: #e5e7eb; /* Tailwind gray-200 */
-    --color-neutral-300: #d1d5db; /* Tailwind gray-300 */
-    --color-neutral-400: #9ca3af; /* Tailwind gray-400 */
-    --color-neutral-500: #6b7280; /* Tailwind gray-500 */
-    --color-neutral-600: #4b5563; /* Tailwind gray-600 */
-    --color-neutral-700: #374151; /* Tailwind gray-700 */
-    --color-neutral-800: #1f2937; /* Tailwind gray-800 */
-    --color-neutral-900: #111827; /* Tailwind gray-900 */
+    /* Neutral colors for light theme */
+    --color-neutral-50: #f9fafb;
+    --color-neutral-100: #f3f4f6;
+    --color-neutral-200: #e5e7eb;
+    --color-neutral-300: #d1d5db;
+    --color-neutral-400: #9ca3af;
+    --color-neutral-500: #6b7280;
+    --color-neutral-600: #4b5563;
+    --color-neutral-700: #374151;
+    --color-neutral-800: #1f2937;
+    --color-neutral-900: #111827;
 
-    /* Shadcn UI compatible variables - Light Theme (Amethyst Haze) */
-    --background: var(--color-neutral-100);
-    --foreground: var(--color-neutral-800);
-
-    --card: var(--color-neutral-50);
-    --card-foreground: var(--color-neutral-800);
-
-    --popover: var(--color-neutral-50);
-    --popover-foreground: var(--color-neutral-800);
-
-    --primary: var(--color-amethyst-500);
-    --primary-foreground: var(--color-neutral-50);
-
-    --secondary: var(--color-amethyst-600);
-    --secondary-foreground: var(--color-neutral-50);
-
-    --muted: var(--color-neutral-200);
-    --muted-foreground: var(--color-neutral-500);
-
-    --accent: var(--color-gold-accent);
-    --accent-foreground: var(--color-neutral-900); /* Assuming gold is light enough for dark text */
-
-    --destructive: #ef4444; /* Tailwind red-500 */
-    --destructive-foreground: var(--color-neutral-50);
-
-    --border: var(--color-neutral-300);
-    --input: var(--color-neutral-300); /* border for inputs */
-    --ring: var(--color-amethyst-400); /* focus ring */
-
-    --radius: 0.5rem; /* Default radius from Shadcn */
+    /* Light theme variables */
+    --background: 210 40% 98%; /* Light background */
+    --foreground: 222.2 47.4% 11.2%; /* Dark text */
+    
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47.4% 11.2%;
+    
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 47.4% 11.2%;
+    
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    
+    --primary: 270 75% 60%; /* Amethyst primary */
+    --primary-foreground: 210 40% 98%;
+    
+    --secondary: 270 55% 50%; /* Darker amethyst */
+    --secondary-foreground: 210 40% 98%;
+    
+    --accent: 47 95% 48%; /* Gold accent */
+    --accent-foreground: 222.2 47.4% 11.2%;
+    
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 210 40% 98%;
+    
+    --ring: 270 75% 60%; /* Amethyst ring */
+    
+    --radius: 0.5rem;
   }
 
-  .dark, [data-theme="dark"] { /* Assuming your dark mode toggle adds a 'dark' class to html/body */
-    --color-slate-50: #f8fafc;
-    --color-slate-100: #f1f5f9;
-    --color-slate-200: #e2e8f0;
-    --color-slate-300: #cbd5e1;
-    --color-slate-400: #94a3b8;
-    --color-slate-500: #64748b;
-    --color-slate-600: #475569;
-    --color-slate-700: #334155;
-    --color-slate-800: #1e293b; /* Existing dark bg */
-    --color-slate-850: #182231; /* Slightly darker for cards/dialogs if needed */
-    --color-slate-900: #0f172a;
-
-    --color-cyan-400: #22d3ee; /* Existing primary-like color */
-    --color-cyan-600: #0891b2;
+  .dark {
+    /* Dark theme variables */
+    --background: 222.2 84% 4.9%; /* Dark background */
+    --foreground: 210 40% 98%; /* Light text */
     
-    /* Shadcn UI compatible variables - Dark Theme */
-    --background: var(--color-slate-900);
-    --foreground: var(--color-slate-200);
-
-    --card: var(--color-slate-850);
-    --card-foreground: var(--color-slate-200);
-
-    --popover: var(--color-slate-800);
-    --popover-foreground: var(--color-slate-200);
-
-    --primary: var(--color-cyan-400);
-    --primary-foreground: var(--color-slate-900);
-
-    --secondary: var(--color-cyan-600);
-    --secondary-foreground: var(--color-slate-100);
-
-    --muted: var(--color-slate-700);
-    --muted-foreground: var(--color-slate-400);
-
-    --accent: var(--color-gold-accent); /* Gold can work on dark too */
-    --accent-foreground: var(--color-slate-900);
-
-    --destructive: #ef4444; /* Tailwind red-500 */
-    --destructive-foreground: var(--color-slate-100);
-
-    --border: var(--color-slate-700);
-    --input: var(--color-slate-700);
-    --ring: var(--color-cyan-400); /* focus ring for dark */
-
-    /* --radius is same as light */
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    
+    --card: 222.2 84% 9.9%; /* Slightly lighter than background */
+    --card-foreground: 210 40% 98%;
+    
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    
+    --primary: 184 100% 52%; /* Cyan primary for dark */
+    --primary-foreground: 222.2 47.4% 11.2%;
+    
+    --secondary: 186 91% 35%; /* Darker cyan */
+    --secondary-foreground: 210 40% 98%;
+    
+    --accent: 47 95% 48%; /* Same gold accent */
+    --accent-foreground: 222.2 47.4% 11.2%;
+    
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+    
+    --ring: 184 100% 52%; /* Cyan ring */
   }
 }
 

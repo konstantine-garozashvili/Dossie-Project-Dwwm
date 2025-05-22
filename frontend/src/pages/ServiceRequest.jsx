@@ -15,6 +15,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { ThemeToggleButton } from "@/components/ThemeToggleButton";
+import { useTheme } from "@/context/ThemeProvider";
 
 // Types d'appareils
 const deviceTypes = [
@@ -65,6 +67,7 @@ export const ServiceRequest = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [step, setStep] = useState(1);
+  const { theme } = useTheme();
   const [formData, setFormData] = useState({
     serviceTypes: [],
     deviceTypes: [],
@@ -250,16 +253,18 @@ export const ServiceRequest = () => {
   };
   
   return (
-    <div className="min-h-screen bg-slate-950 text-white py-20 px-4">
+    <div className="min-h-screen bg-background text-foreground py-20 px-4">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-10">
-          <Badge className="mb-4 px-3 py-1 bg-cyan-500/20 text-cyan-400 border-cyan-500 inline-flex w-auto">
+          <Badge className="mb-4 px-3 py-1 bg-primary/20 text-primary border-primary inline-flex w-auto">
             Demande de Service
           </Badge>
-          <h1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-300">
+          <h1 
+            className={`text-4xl font-bold mb-4 ${theme === 'dark' ? 'text-transparent bg-gradient-to-r from-primary to-secondary bg-clip-text' : 'text-primary'}`}
+          >
             Planifiez Votre Réparation Informatique
           </h1>
-          <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Décrivez votre problème, et nos techniciens experts vous aideront à remettre votre appareil en état de marche.
           </p>
         </div>
@@ -271,11 +276,11 @@ export const ServiceRequest = () => {
               <div key={num} className="flex flex-col items-center">
                 <div 
                   className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium mb-2
-                    ${step >= num ? 'bg-cyan-500 text-white' : 'bg-gray-700 text-gray-400'}`}
+                    ${step >= num ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}
                 >
                   {step > num ? <Check className="w-5 h-5" /> : num}
                 </div>
-                <div className={`text-sm ${step >= num ? 'text-gray-200' : 'text-gray-500'}`}>
+                <div className={`text-sm ${step >= num ? 'text-foreground' : 'text-muted-foreground'}`}>
                   {num === 1 ? 'Type de Service' : 
                    num === 2 ? 'Détails de l\'Appareil' : 
                    num === 3 ? 'Planification' : 
@@ -286,15 +291,15 @@ export const ServiceRequest = () => {
             ))}
           </div>
           <div className="relative mt-2">
-            <div className="absolute h-1 w-full bg-gray-700"></div>
+            <div className="absolute h-1 w-full bg-muted"></div>
             <div 
-              className="absolute h-1 bg-cyan-500 transition-all duration-500"
+              className="absolute h-1 bg-primary transition-all duration-500"
               style={{ width: `${(step - 1) * 25}%` }}
             ></div>
           </div>
         </div>
         
-        <Card className="bg-slate-800 border-slate-700 shadow-xl">
+        <Card className="bg-card border-border shadow-xl">
           <CardContent className="pt-6">
             <form onSubmit={handleSubmit}>
             
@@ -307,8 +312,8 @@ export const ServiceRequest = () => {
                 className={step === 1 ? "block" : "hidden"}
               >
                 <div className="mb-6 space-y-2">
-                  <h2 className="text-xl font-semibold text-cyan-400">De quels services avez-vous besoin ?</h2>
-                  <p className="text-gray-400">Sélectionnez tous les services qui s'appliquent à votre problème</p>
+                  <h2 className="text-xl font-semibold text-primary">De quels services avez-vous besoin ?</h2>
+                  <p className="text-muted-foreground">Sélectionnez tous les services qui s'appliquent à votre problème</p>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -317,20 +322,20 @@ export const ServiceRequest = () => {
                       key={service.id}
                       className={`border rounded-lg p-4 cursor-pointer transition-all
                         ${formData.serviceTypes.includes(service.id) 
-                          ? 'border-cyan-400 bg-cyan-500/10' 
-                          : 'border-slate-700 hover:border-slate-500'}`}
+                          ? 'border-primary bg-primary/10' 
+                          : 'border-border hover:border-muted-foreground'}`}
                       onClick={() => toggleServiceType(service.id)}
                     >
                       <div className="flex items-start">
                         <div className={`w-5 h-5 rounded-md border mr-3 mt-1 flex items-center justify-center
-                          ${formData.serviceTypes.includes(service.id) ? 'border-cyan-400 bg-cyan-500' : 'border-slate-700'}`}
+                          ${formData.serviceTypes.includes(service.id) ? 'border-primary bg-primary' : 'border-border'}`}
                         >
                           {formData.serviceTypes.includes(service.id) && 
-                            <Check className="w-3 h-3 text-white" />}
+                            <Check className="w-3 h-3 text-primary-foreground" />}
                         </div>
                         <div>
-                          <h3 className="font-medium text-white">{service.name}</h3>
-                          <p className="text-sm text-gray-400">{service.description}</p>
+                          <h3 className="font-medium text-foreground">{service.name}</h3>
+                          <p className="text-sm text-muted-foreground">{service.description}</p>
                         </div>
                       </div>
                     </div>
@@ -345,15 +350,15 @@ export const ServiceRequest = () => {
                         key={device.id}
                         className={`flex flex-col items-center justify-center p-4 border rounded-lg cursor-pointer transition-all
                           ${formData.deviceTypes.includes(device.id) 
-                            ? 'border-cyan-400 bg-cyan-500/10' 
-                            : 'border-slate-700 hover:border-slate-500'}`}
+                            ? 'border-primary bg-primary/10' 
+                            : 'border-border hover:border-muted-foreground'}`}
                         onClick={() => toggleDeviceType(device.id)}
                       >
-                        <div className="text-cyan-400 mb-2">{device.icon}</div>
+                        <div className="text-primary mb-2">{device.icon}</div>
                         <div className="text-center">{device.name}</div>
                         {formData.deviceTypes.includes(device.id) && (
-                          <div className="mt-2 bg-cyan-500 rounded-full p-1">
-                            <Check className="w-3 h-3 text-white" />
+                          <div className="mt-2 bg-primary rounded-full p-1">
+                            <Check className="w-3 h-3 text-primary-foreground" />
                           </div>
                         )}
                       </div>
@@ -371,8 +376,8 @@ export const ServiceRequest = () => {
                 className={step === 2 ? "block" : "hidden"}
               >
                 <div className="mb-6 space-y-2">
-                  <h2 className="text-xl font-semibold text-cyan-400">Parlez-nous de votre appareil</h2>
-                  <p className="text-gray-400">Plus vous fournissez de détails, mieux nous pourrons diagnostiquer votre problème</p>
+                  <h2 className="text-xl font-semibold text-primary">Parlez-nous de votre appareil</h2>
+                  <p className="text-muted-foreground">Plus vous fournissez de détails, mieux nous pourrons diagnostiquer votre problème</p>
                 </div>
                 
                 <div className="mb-6">
@@ -381,24 +386,24 @@ export const ServiceRequest = () => {
                     <div 
                       className={`flex flex-wrap gap-2 min-h-10 p-2 border rounded-md cursor-pointer ${
                         brandDropdownOpen 
-                          ? 'border-cyan-500 ring-2 ring-cyan-500/50' 
-                          : 'border-slate-700'
-                      } bg-slate-900`}
+                          ? 'border-primary ring-2 ring-primary/50' 
+                          : 'border-border'
+                      } bg-background`}
                       onClick={() => setBrandDropdownOpen(!brandDropdownOpen)}
                     >
                       {formData.deviceDetails.makes.length === 0 ? (
-                        <div className="text-gray-400 py-1">Sélectionnez une ou plusieurs marques</div>
+                        <div className="text-muted-foreground py-1">Sélectionnez une ou plusieurs marques</div>
                       ) : (
                         <>
                           {formData.deviceDetails.makes.map(brand => (
                             <Badge 
                               key={brand} 
-                              className="bg-cyan-500/20 text-cyan-400 flex items-center gap-1"
+                              className="bg-primary/20 text-primary flex items-center gap-1"
                             >
                               {brand}
                               <button 
                                 type="button" 
-                                className="ml-1 hover:text-white"
+                                className="ml-1 hover:text-primary"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   removeBrand(brand);
@@ -416,12 +421,12 @@ export const ServiceRequest = () => {
                     </div>
                     
                     {brandDropdownOpen && (
-                      <div className="absolute z-10 mt-1 w-full rounded-md border border-slate-700 bg-slate-800 shadow-lg">
+                      <div className="absolute z-10 mt-1 w-full rounded-md border border-border bg-background shadow-lg">
                         <div className="p-2">
                           <Input
                             type="text"
                             placeholder="Rechercher des marques..."
-                            className="bg-slate-900 border-slate-700"
+                            className="bg-background border-border"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onClick={(e) => e.stopPropagation()}
@@ -433,8 +438,8 @@ export const ServiceRequest = () => {
                             .map(brand => (
                               <div
                                 key={brand}
-                                className={`flex items-center px-2 py-1.5 cursor-pointer rounded hover:bg-slate-700 ${
-                                  formData.deviceDetails.makes.includes(brand) ? 'bg-cyan-500/20' : ''
+                                className={`flex items-center px-2 py-1.5 cursor-pointer rounded hover:bg-border ${
+                                  formData.deviceDetails.makes.includes(brand) ? 'bg-primary/20' : ''
                                 }`}
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -442,10 +447,10 @@ export const ServiceRequest = () => {
                                 }}
                               >
                                 <div className={`w-5 h-5 rounded border mr-3 flex items-center justify-center
-                                  ${formData.deviceDetails.makes.includes(brand) ? 'border-cyan-400 bg-cyan-500' : 'border-slate-700'}`}
+                                  ${formData.deviceDetails.makes.includes(brand) ? 'border-primary bg-primary' : 'border-border'}`}
                                 >
                                   {formData.deviceDetails.makes.includes(brand) && 
-                                    <Check className="w-3 h-3 text-white" />}
+                                    <Check className="w-3 h-3 text-primary-foreground" />}
                                 </div>
                                 <span>{brand}</span>
                               </div>
@@ -461,13 +466,13 @@ export const ServiceRequest = () => {
                       <Input
                         id="other-brand"
                         placeholder="Entrez le nom de la marque"
-                        className="bg-slate-900 border-slate-700 mt-1"
+                        className="bg-background border-border mt-1"
                         value={formData.deviceDetails.otherMake}
                         onChange={(e) => updateFormData('deviceDetails', 'otherMake', e.target.value)}
                       />
                     </div>
                   )}
-                  <p className="text-sm text-slate-400 mt-2">
+                  <p className="text-sm text-muted-foreground mt-2">
                     Vous pouvez sélectionner plusieurs marques si nécessaire
                   </p>
                 </div>
@@ -477,7 +482,7 @@ export const ServiceRequest = () => {
                   <Input
                     id="device-model"
                     placeholder="ex: MacBook Pro, XPS 13"
-                    className="bg-slate-900 border-slate-700"
+                    className="bg-background border-border"
                     value={formData.deviceDetails.model}
                     onChange={(e) => updateFormData('deviceDetails', 'model', e.target.value)}
                   />
@@ -487,7 +492,7 @@ export const ServiceRequest = () => {
                   <Label htmlFor="operating-system">Système d'exploitation</Label>
                   <select
                     id="operating-system"
-                    className="w-full h-10 rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white ring-offset-slate-700 focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
+                    className="w-full h-10 rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground ring-offset-border focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
                     value={formData.deviceDetails.operatingSystem}
                     onChange={(e) => updateFormData('deviceDetails', 'operatingSystem', e.target.value)}
                   >
@@ -503,7 +508,7 @@ export const ServiceRequest = () => {
                   <Input
                     id="purchase-date"
                     type="date"
-                    className="bg-slate-900 border-slate-700"
+                    className="bg-background border-border"
                     value={formData.deviceDetails.purchaseDate}
                     onChange={(e) => updateFormData('deviceDetails', 'purchaseDate', e.target.value)}
                   />
@@ -514,7 +519,7 @@ export const ServiceRequest = () => {
                   <Textarea
                     id="problem-description"
                     placeholder="Veuillez fournir autant de détails que possible sur le problème que vous rencontrez..."
-                    className="bg-slate-900 border-slate-700 min-h-[150px]"
+                    className="bg-background border-border min-h-[150px]"
                     value={formData.deviceDetails.problemDescription}
                     onChange={(e) => updateFormData('deviceDetails', 'problemDescription', e.target.value)}
                   />
@@ -530,15 +535,15 @@ export const ServiceRequest = () => {
                 className={step === 3 ? "block" : "hidden"}
               >
                 <div className="mb-6 space-y-2">
-                  <h2 className="text-xl font-semibold text-cyan-400">Planifiez votre service</h2>
-                  <p className="text-gray-400">Choisissez une date et une heure qui vous conviennent pour que notre technicien puisse vous aider</p>
+                  <h2 className="text-xl font-semibold text-primary">Planifiez votre service</h2>
+                  <p className="text-muted-foreground">Choisissez une date et une heure qui vous conviennent pour que notre technicien puisse vous aider</p>
                 </div>
                 
                 <div className="mb-8">
                   <Label className="block mb-3">Sélectionnez une date</Label>
                   <Input
                     type="date"
-                    className="bg-slate-900 border-slate-700 w-full max-w-sm"
+                    className="bg-background border-border w-full max-w-sm"
                     value={formData.schedulingDetails.date ? format(formData.schedulingDetails.date, "yyyy-MM-dd") : ""}
                     onChange={(e) => {
                       const date = e.target.value ? new Date(e.target.value) : null;
@@ -584,7 +589,7 @@ export const ServiceRequest = () => {
                     min={format(new Date(), "yyyy-MM-dd")}
                     max={format(new Date(new Date().setDate(new Date().getDate() + 30)), "yyyy-MM-dd")}
                   />
-                  <p className="text-sm text-slate-400 mt-2">
+                  <p className="text-sm text-muted-foreground mt-2">
                     * Sélectionnez une date dans les 30 prochains jours. Les dimanches ne sont pas disponibles.
                   </p>
                   
@@ -595,30 +600,30 @@ export const ServiceRequest = () => {
                         key={index}
                         className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-all
                           ${formData.schedulingDetails.timeSlot === slot 
-                            ? 'border-cyan-400 bg-cyan-500/10' 
-                            : 'border-slate-700 hover:border-slate-500'}`}
+                            ? 'border-primary bg-primary/10' 
+                            : 'border-border hover:border-muted-foreground'}`}
                         onClick={() => updateFormData('schedulingDetails', 'timeSlot', slot)}
                       >
-                        <div className="text-cyan-400">
+                        <div className="text-primary">
                           <Clock className="h-5 w-5" />
                         </div>
                         <span>{slot}</span>
                         {formData.schedulingDetails.timeSlot === slot && (
-                          <Check className="h-5 w-5 ml-auto text-cyan-400" />
+                          <Check className="h-5 w-5 ml-auto text-primary" />
                         )}
                       </div>
                     ))}
                   </div>
                   
-                  <div className="p-4 border border-cyan-800/30 bg-cyan-900/10 rounded-lg">
-                    <h3 className="text-cyan-400 font-medium mb-2 flex items-center">
+                  <div className="p-4 border border-primary/30 bg-primary/10 rounded-lg">
+                    <h3 className="text-primary font-medium mb-2 flex items-center">
                       <Info className="h-5 w-5 mr-2" />
                       Informations sur le rendez-vous
                     </h3>
-                    <p className="text-gray-300 text-sm mb-2">
+                    <p className="text-foreground text-sm mb-2">
                       Notre technicien arrivera pendant le créneau horaire que vous avez sélectionné. Les visites de service durent généralement 1 à 2 heures selon la complexité du problème.
                     </p>
-                    <p className="text-gray-300 text-sm">
+                    <p className="text-foreground text-sm">
                       Si vous devez reporter, veuillez nous contacter au moins 24 heures à l'avance.
                     </p>
                   </div>
@@ -634,8 +639,8 @@ export const ServiceRequest = () => {
                 className={step === 4 ? "block" : "hidden"}
               >
                 <div className="mb-6 space-y-2">
-                  <h2 className="text-xl font-semibold text-cyan-400">Vos informations</h2>
-                  <p className="text-gray-400">Indiquez-nous comment vous contacter et où le service est nécessaire</p>
+                  <h2 className="text-xl font-semibold text-primary">Vos informations</h2>
+                  <p className="text-muted-foreground">Indiquez-nous comment vous contacter et où le service est nécessaire</p>
                 </div>
                 
                 <div className="mb-6">
@@ -649,7 +654,7 @@ export const ServiceRequest = () => {
                         value="individual"
                         checked={formData.clientType === "individual"}
                         onChange={() => updateFormData(null, 'clientType', 'individual')}
-                        className="h-4 w-4 text-cyan-500"
+                        className="h-4 w-4 text-primary"
                       />
                       <Label htmlFor="individual">Particulier</Label>
                     </div>
@@ -661,7 +666,7 @@ export const ServiceRequest = () => {
                         value="business"
                         checked={formData.clientType === "business"}
                         onChange={() => updateFormData(null, 'clientType', 'business')}
-                        className="h-4 w-4 text-cyan-500"
+                        className="h-4 w-4 text-primary"
                       />
                       <Label htmlFor="business">Entreprise</Label>
                     </div>
@@ -674,7 +679,7 @@ export const ServiceRequest = () => {
                     <Input
                       id="full-name"
                       placeholder="Votre nom complet"
-                      className="bg-slate-900 border-slate-700"
+                      className="bg-background border-border"
                       value={formData.contactInfo.fullName}
                       onChange={(e) => updateFormData('contactInfo', 'fullName', e.target.value)}
                     />
@@ -686,7 +691,7 @@ export const ServiceRequest = () => {
                       <Input
                         id="business-name"
                         placeholder="Nom de votre entreprise"
-                        className="bg-slate-900 border-slate-700"
+                        className="bg-background border-border"
                         value={formData.contactInfo.businessName}
                         onChange={(e) => updateFormData('contactInfo', 'businessName', e.target.value)}
                       />
@@ -701,7 +706,7 @@ export const ServiceRequest = () => {
                       id="email"
                       type="email"
                       placeholder="votre.email@exemple.com"
-                      className="bg-slate-900 border-slate-700"
+                      className="bg-background border-border"
                       value={formData.contactInfo.email}
                       onChange={(e) => updateFormData('contactInfo', 'email', e.target.value)}
                     />
@@ -712,7 +717,7 @@ export const ServiceRequest = () => {
                     <Input
                       id="phone"
                       placeholder="Votre numéro de téléphone"
-                      className="bg-slate-900 border-slate-700"
+                      className="bg-background border-border"
                       value={formData.contactInfo.phone}
                       onChange={(e) => updateFormData('contactInfo', 'phone', e.target.value)}
                     />
@@ -730,7 +735,7 @@ export const ServiceRequest = () => {
                         value="email"
                         checked={formData.contactInfo.preferredContact === "email"}
                         onChange={() => updateFormData('contactInfo', 'preferredContact', 'email')}
-                        className="h-4 w-4 text-cyan-500"
+                        className="h-4 w-4 text-primary"
                       />
                       <Label htmlFor="contact-email">Email</Label>
                     </div>
@@ -742,7 +747,7 @@ export const ServiceRequest = () => {
                         value="phone"
                         checked={formData.contactInfo.preferredContact === "phone"}
                         onChange={() => updateFormData('contactInfo', 'preferredContact', 'phone')}
-                        className="h-4 w-4 text-cyan-500"
+                        className="h-4 w-4 text-primary"
                       />
                       <Label htmlFor="contact-phone">Téléphone</Label>
                     </div>
@@ -754,14 +759,14 @@ export const ServiceRequest = () => {
                   <Textarea
                     id="address"
                     placeholder="Entrez l'adresse où le service est nécessaire"
-                    className="bg-slate-900 border-slate-700"
+                    className="bg-background border-border"
                     value={formData.contactInfo.address}
                     onChange={(e) => updateFormData('contactInfo', 'address', e.target.value)}
                   />
                 </div>
 
-                <div className="mt-6 text-gray-400">
-                  <p>En soumettant cette demande, vous acceptez nos <a href="#" className="text-cyan-400 underline">Conditions d'utilisation</a> et notre <a href="#" className="text-cyan-400 underline">Politique de confidentialité</a>.</p>
+                <div className="mt-6 text-muted-foreground">
+                  <p>En soumettant cette demande, vous acceptez nos <a href="#" className="text-primary underline">Conditions d'utilisation</a> et notre <a href="#" className="text-primary underline">Politique de confidentialité</a>.</p>
                 </div>
               </motion.div>
               
@@ -774,19 +779,19 @@ export const ServiceRequest = () => {
                 className={step === 5 ? "block" : "hidden"}
               >
                 <div className="mb-6 space-y-2">
-                  <h2 className="text-xl font-semibold text-cyan-400">Vérifiez votre demande</h2>
-                  <p className="text-gray-400">Veuillez vérifier toutes les informations avant de soumettre</p>
+                  <h2 className="text-xl font-semibold text-primary">Vérifiez votre demande</h2>
+                  <p className="text-muted-foreground">Veuillez vérifier toutes les informations avant de soumettre</p>
                 </div>
                 
                 <div className="space-y-6">
-                  <div className="border border-slate-700 rounded-lg p-4">
-                    <h3 className="font-medium text-lg text-cyan-400 mb-2">Détails du service</h3>
+                  <div className="border border-border rounded-lg p-4">
+                    <h3 className="font-medium text-lg text-primary mb-2">Détails du service</h3>
                     <div>
-                      <span className="text-gray-400">Types de services :</span>
+                      <span className="text-muted-foreground">Types de services :</span>
                       <div className="mt-1 flex flex-wrap gap-2">
                         {formData.serviceTypes.length > 0 ? (
                           formData.serviceTypes.map(serviceId => (
-                            <Badge key={serviceId} className="bg-cyan-500/20 text-cyan-400 border-cyan-500">
+                            <Badge key={serviceId} className="bg-primary/20 text-primary border-primary">
                               {serviceTypes.find(s => s.id === serviceId)?.name}
                             </Badge>
                           ))
@@ -796,11 +801,11 @@ export const ServiceRequest = () => {
                       </div>
                     </div>
                     <div className="mt-2">
-                      <span className="text-gray-400">Types d'appareils :</span>
+                      <span className="text-muted-foreground">Types d'appareils :</span>
                       <div className="mt-1 flex flex-wrap gap-2">
                         {formData.deviceTypes.length > 0 ? (
                           formData.deviceTypes.map(deviceId => (
-                            <Badge key={deviceId} className="bg-cyan-500/20 text-cyan-400 border-cyan-500">
+                            <Badge key={deviceId} className="bg-primary/20 text-primary border-primary">
                               {deviceTypes.find(d => d.id === deviceId)?.name}
                             </Badge>
                           ))
@@ -811,15 +816,15 @@ export const ServiceRequest = () => {
                     </div>
                   </div>
                   
-                  <div className="border border-slate-700 rounded-lg p-4">
-                    <h3 className="font-medium text-lg text-cyan-400 mb-2">Informations sur l'appareil</h3>
+                  <div className="border border-border rounded-lg p-4">
+                    <h3 className="font-medium text-lg text-primary mb-2">Informations sur l'appareil</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2">
                       <div>
-                        <span className="text-gray-400">Marque :</span>
+                        <span className="text-muted-foreground">Marque :</span>
                         <div className="flex flex-wrap gap-1 mt-1">
                           {formData.deviceDetails.makes.length > 0 ? (
                             formData.deviceDetails.makes.map(brand => (
-                              <Badge key={brand} className="bg-cyan-500/20 text-cyan-400 border-cyan-500">
+                              <Badge key={brand} className="bg-primary/20 text-primary border-primary">
                                 {brand === "Autre" ? formData.deviceDetails.otherMake || "Autre" : brand}
                               </Badge>
                             ))
@@ -829,70 +834,70 @@ export const ServiceRequest = () => {
                         </div>
                       </div>
                       <div>
-                        <span className="text-gray-400">Modèle :</span>
+                        <span className="text-muted-foreground">Modèle :</span>
                         <p>{formData.deviceDetails.model || 'Non fourni'}</p>
                       </div>
                       <div>
-                        <span className="text-gray-400">Système d'exploitation :</span>
+                        <span className="text-muted-foreground">Système d'exploitation :</span>
                         <p>{formData.deviceDetails.operatingSystem || 'Non sélectionné'}</p>
                       </div>
                       <div>
-                        <span className="text-gray-400">Date d'achat :</span>
+                        <span className="text-muted-foreground">Date d'achat :</span>
                         <p>{formData.deviceDetails.purchaseDate || 'Non fourni'}</p>
                       </div>
                     </div>
                     <div className="mt-2">
-                      <span className="text-gray-400">Description du problème :</span>
+                      <span className="text-muted-foreground">Description du problème :</span>
                       <p className="mt-1">{formData.deviceDetails.problemDescription || 'Non fourni'}</p>
                     </div>
                   </div>
                   
-                  <div className="border border-slate-700 rounded-lg p-4">
-                    <h3 className="font-medium text-lg text-cyan-400 mb-2">Détails du rendez-vous</h3>
+                  <div className="border border-border rounded-lg p-4">
+                    <h3 className="font-medium text-lg text-primary mb-2">Détails du rendez-vous</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2">
                       <div>
-                        <span className="text-gray-400">Date de service :</span>
+                        <span className="text-muted-foreground">Date de service :</span>
                         <p>{formData.schedulingDetails.date ? format(formData.schedulingDetails.date, "PPP") : 'Non sélectionné'}</p>
                       </div>
                       <div>
-                        <span className="text-gray-400">Créneau horaire :</span>
+                        <span className="text-muted-foreground">Créneau horaire :</span>
                         <p>{formData.schedulingDetails.timeSlot || 'Non sélectionné'}</p>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="border border-slate-700 rounded-lg p-4">
-                    <h3 className="font-medium text-lg text-cyan-400 mb-2">Informations de contact</h3>
+                  <div className="border border-border rounded-lg p-4">
+                    <h3 className="font-medium text-lg text-primary mb-2">Informations de contact</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2">
                       <div>
-                        <span className="text-gray-400">Type de client :</span>
+                        <span className="text-muted-foreground">Type de client :</span>
                         <p className="capitalize">{formData.clientType === "individual" ? "Particulier" : "Entreprise"}</p>
                       </div>
                       {formData.clientType === "business" && (
                         <div>
-                          <span className="text-gray-400">Nom de l'entreprise :</span>
+                          <span className="text-muted-foreground">Nom de l'entreprise :</span>
                           <p>{formData.contactInfo.businessName || 'Non fourni'}</p>
                         </div>
                       )}
                       <div>
-                        <span className="text-gray-400">Nom complet :</span>
+                        <span className="text-muted-foreground">Nom complet :</span>
                         <p>{formData.contactInfo.fullName || 'Non fourni'}</p>
                       </div>
                       <div>
-                        <span className="text-gray-400">Email :</span>
+                        <span className="text-muted-foreground">Email :</span>
                         <p>{formData.contactInfo.email || 'Non fourni'}</p>
                       </div>
                       <div>
-                        <span className="text-gray-400">Téléphone :</span>
+                        <span className="text-muted-foreground">Téléphone :</span>
                         <p>{formData.contactInfo.phone || 'Non fourni'}</p>
                       </div>
                       <div>
-                        <span className="text-gray-400">Contact préféré :</span>
+                        <span className="text-muted-foreground">Contact préféré :</span>
                         <p className="capitalize">{formData.contactInfo.preferredContact === "email" ? "Email" : "Téléphone"}</p>
                       </div>
                     </div>
                     <div className="mt-2">
-                      <span className="text-gray-400">Adresse de service :</span>
+                      <span className="text-muted-foreground">Adresse de service :</span>
                       <p className="mt-1">{formData.contactInfo.address || 'Non fourni'}</p>
                     </div>
                   </div>

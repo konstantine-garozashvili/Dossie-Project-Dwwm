@@ -57,6 +57,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { ThemeToggleButton } from '@/components/ThemeToggleButton';
 
 // Admin specific components
 import TechnicianTable from '@/components/admin/TechnicianTable';
@@ -67,6 +68,7 @@ import TechnicianDetailsDialog from '@/components/admin/TechnicianDetailsDialog'
 const pageTitles = {
   apercu: "Tableau de Bord",
   techniciens: "Gestion des Techniciens",
+  clients: "Gestion des Clients",
   services: "Gestion des Services",
   rapports: "Rapports et Analyses",
   parametres: "Paramètres du Compte",
@@ -111,21 +113,18 @@ export const AdminDashboard = () => {
       try {
         const parsedData = JSON.parse(storedAdminInfo);
         setAdminData(parsedData);
-        // Set initial avatar based on fetched name
         setProfilePictureUrl(
-          `https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=${encodeURIComponent((parsedData.name || 'A') + ' ' + (parsedData.surname || 'D'))}&size=256`
+          `https://ui-avatars.com/api/?name=${encodeURIComponent((parsedData.name || 'A') + ' ' + (parsedData.surname || 'D'))}&background=random&color=fff&size=128`
         );
       } catch (err) {
         console.error('Error parsing admin info:', err);
-        // Fallback if parsing fails
         setProfilePictureUrl(
-          `https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=Admin+User&size=256`
+          `https://ui-avatars.com/api/?name=Admin+User&background=random&color=fff&size=128`
         );
       }
     } else {
-      // Fallback if no adminInfo in localStorage
       setProfilePictureUrl(
-        `https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=Admin+User&size=256`
+        `https://ui-avatars.com/api/?name=Admin+User&background=random&color=fff&size=128`
       );
     }
   }, []);
@@ -137,8 +136,8 @@ export const AdminDashboard = () => {
   }, [adminData]);
 
   const fetchProfilePicture = async () => {
-    const uiAvatarUrl = `https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=${encodeURIComponent((adminData?.name || 'A') + ' ' + (adminData?.surname || 'D'))}&size=256`;
-    setProfilePictureUrl(uiAvatarUrl); // Set UI Avatars URL immediately
+    const uiAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent((adminData?.name || 'A') + ' ' + (adminData?.surname || 'D'))}&background=random&color=fff&size=128`;
+    setProfilePictureUrl(uiAvatarUrl); 
 
     if (!adminData.id) return;
 
@@ -147,37 +146,35 @@ export const AdminDashboard = () => {
         headers: { 'Accept': 'application/json' }
       });
       if (response.status === 404) {
-        return; // Keep UI Avatars URL
+        return; 
       }
       const contentType = response.headers.get('content-type');
       if (contentType && contentType.includes('application/json')) {
         const data = await response.json();
         if (response.ok && data.success && data.profilePicture?.secureUrl) {
           if (data.profilePicture.secureUrl.includes('fake-cloudinary.com')) {
-            setProfilePictureUrl(uiAvatarUrl); // Revert to UI Avatars if fake URL detected
+            setProfilePictureUrl(uiAvatarUrl); 
           } else {
             setProfilePictureUrl(data.profilePicture.secureUrl);
           }
         } else if (data.defaultUrl) {
           if (data.defaultUrl.includes('fake-cloudinary.com')) {
-            setProfilePictureUrl(uiAvatarUrl); // Revert to UI Avatars if fake URL detected
+            setProfilePictureUrl(uiAvatarUrl);
           } else {
             setProfilePictureUrl(data.defaultUrl);
           }
         }
-        // If no valid URL and no default, uiAvatarUrl is already set
       }
     } catch (err) {
-      // Keep UI Avatars URL on error, already set
+        // Keep UI Avatars URL on error
     }
   };
-
+  
   useEffect(() => {
     const token = localStorage.getItem('adminToken');
     if (!token) {
       navigate('/adminlog');
     } else {
-      // Simulate loading
       setTimeout(() => setLoading(false), 500);
     }
   }, [navigate]);
@@ -185,606 +182,470 @@ export const AdminDashboard = () => {
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminInfo');
-    setAdminData({ id: null, email: '', name: '', surname: '' }); // Clear admin data
-    setProfilePictureUrl(''); // Clear profile picture
+    setAdminData({ id: null, email: '', name: '', surname: '' });
+    setProfilePictureUrl(''); 
     navigate('/adminlog');
   };
 
-  // Placeholder data (keep as is, or integrate with backend later)
+  // Placeholder data
   const statsData = [
-    { title: "Utilisateurs", value: "246", change: "+12%", icon: <Users className="h-5 w-5" /> },
-    { title: "Techniciens", value: "38", change: "+5%", icon: <Server className="h-5 w-5" /> },
-    { title: "Services", value: "152", change: "+24%", icon: <List className="h-5 w-5" /> },
-    { title: "Rendez-vous", value: "57", change: "+9%", icon: <Calendar className="h-5 w-5" /> },
+    { title: "Utilisateurs", value: "246", change: "+12%", icon: <Users className="h-5 w-5 text-primary" /> },
+    { title: "Techniciens", value: "38", change: "+5%", icon: <Server className="h-5 w-5 text-primary" /> },
+    { title: "Services", value: "152", change: "+24%", icon: <List className="h-5 w-5 text-primary" /> },
+    { title: "Rendez-vous", value: "57", change: "+9%", icon: <Calendar className="h-5 w-5 text-primary" /> },
   ];
 
   const recentRequests = [
     { id: 1, user: "Martin Dupont", service: "Réparation PC", date: "15/05/2023", status: "En attente" },
     { id: 2, user: "Sophie Martin", service: "Récupération de données", date: "14/05/2023", status: "Terminé" },
     { id: 3, user: "Jean Boucher", service: "Installation Windows", date: "12/05/2023", status: "En cours" },
-    { id: 4, user: "Marie Lefort", service: "Dépannage réseau", date: "10/05/2023", status: "Terminé" },
-    { id: 5, user: "Paul Ricard", service: "Mise à niveau RAM", date: "09/05/2023", status: "Terminé" },
   ];
 
-  const getStatusColor = (status) => {
+  const getStatusRequestColor = (status) => {
     switch (status) {
-      case "En attente": return "bg-yellow-500/20 text-yellow-400";
-      case "En cours": return "bg-blue-500/20 text-blue-400";
-      case "Terminé": return "bg-green-500/20 text-green-400";
-      default: return "bg-gray-500/20 text-gray-400";
+      case "En attente": return "bg-yellow-500/20 text-yellow-500"; // Adjusted for better visibility on potentially light/dark backgrounds
+      case "En cours": return "bg-blue-500/20 text-blue-500";
+      case "Terminé": return "bg-green-500/20 text-green-500";
+      default: return "bg-muted text-muted-foreground";
     }
   };
+  
+  // Individual render functions for each tab
+  const renderOverviewTab = () => (
+    <>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {statsData.map((stat, index) => (
+          <Card key={index} className="bg-card border-border text-card-foreground">
+            <CardContent className="p-4 sm:p-6">
+                        <div className="flex justify-between items-start">
+                          <div>
+                  <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
+                  <h3 className="text-xl sm:text-2xl font-bold mt-1 text-foreground">{stat.value}</h3>
+                  <p className="text-xs text-green-500 mt-2">{stat.change} depuis le mois dernier</p>
+                          </div>
+                <div className="p-3 rounded-full bg-primary/20 text-primary">
+                            {stat.icon}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+      <Card className="bg-card border-border text-card-foreground mt-6">
+                  <CardHeader>
+          <CardTitle className="text-foreground">Demandes récentes</CardTitle>
+          <CardDescription className="text-muted-foreground">Liste des dernières demandes de service</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                <tr className="border-b border-border">
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">ID</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Client</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Service</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Date</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Statut</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {recentRequests.map((request) => (
+                  <tr key={request.id} className="border-b border-border hover:bg-muted/50">
+                    <td className="px-4 py-3 text-sm text-foreground">{request.id}</td>
+                    <td className="px-4 py-3 text-foreground">{request.user}</td>
+                    <td className="px-4 py-3 text-sm text-foreground">{request.service}</td>
+                    <td className="px-4 py-3 text-sm text-foreground">{request.date}</td>
+                              <td className="px-4 py-3">
+                      <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getStatusRequestColor(request.status)}`}>
+                                  {request.status}
+                                </span>
+                              </td>
+                              <td className="px-4 py-3">
+                      <Button size="sm" variant="ghost" className="text-primary hover:text-primary/80">Voir</Button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </CardContent>
+                </Card>
+    </>
+  );
 
-  const renderStatsCards = () => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {statsData.map((stat, index) => (
-        <Card key={index} className="bg-slate-800 border-slate-700">
-          <CardContent className="p-4 sm:p-6">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-sm font-medium text-gray-400">{stat.title}</p>
-                <h3 className="text-xl sm:text-2xl font-bold mt-1">{stat.value}</h3>
-                <p className="text-xs text-green-400 mt-2">{stat.change} depuis le mois dernier</p>
+  const renderTechniciansTab = () => (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div>
+          <h2 className="text-2xl font-semibold text-foreground">Gestion des Techniciens</h2>
+          <p className="text-muted-foreground">Ajouter, voir, modifier et supprimer des techniciens.</p>
+        </div>
+        <Button onClick={handleOpenAddForm} className="bg-primary text-primary-foreground hover:bg-primary/90">
+          <PlusCircle className="mr-2 h-5 w-5" />
+          Ajouter un Technicien
+        </Button>
+      </div>
+
+      <Card className="bg-card border-border text-card-foreground p-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 items-end">
+              <div className="md:col-span-2 lg:col-span-2">
+                  <Label htmlFor="search-technician" className="text-muted-foreground mb-1 block">Rechercher</Label>
+                  <div className="relative">
+                      <Input 
+                          id="search-technician"
+                          type="text" 
+                          placeholder="Nom, email, spécialisation..."
+                          value={searchTerm}
+                          onChange={handleSearchChange}
+                          className="bg-input border-border pr-10 text-foreground placeholder:text-muted-foreground"
+                      />
+                      <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  </div>
               </div>
-              <div className="p-3 rounded-full bg-cyan-500/20 text-cyan-400">
-                {stat.icon}
+              <div>
+                  <Label htmlFor="status-filter" className="text-muted-foreground mb-1 block">Statut</Label>
+                  <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
+                      <SelectTrigger className="bg-input border-border text-foreground">
+                          <SelectValue placeholder="Tous les statuts" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover border-border text-popover-foreground">
+                          <SelectItem value="_all_">Tous</SelectItem>
+                          <SelectItem value="active">Actif</SelectItem>
+                          <SelectItem value="inactive">Inactif</SelectItem>
+                          <SelectItem value="pending_approval">En attente</SelectItem>
+                      </SelectContent>
+                  </Select>
+              </div>
+              <div className="flex space-x-2 items-end">
+                  <Button onClick={handleApplyFilters} className="w-full sm:w-auto bg-secondary text-secondary-foreground hover:bg-secondary/90">
+                      <Search className="mr-2 h-4 w-4" /> Filtrer
+                  </Button>
+                  <Button onClick={handleResetFilters} variant="outline" className="w-full sm:w-auto border-border hover:bg-muted">
+                      <RefreshCw className="mr-2 h-4 w-4" /> Réinitialiser
+                  </Button>
               </div>
             </div>
-          </CardContent>
         </Card>
-      ))}
+
+      {isLoadingTechnicians && (
+        <div className="flex justify-center items-center py-10">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="ml-3 text-muted-foreground">Chargement des techniciens...</p>
+        </div>
+      )}
+      {technicianError && !isLoadingTechnicians && (
+        <div className="text-center py-10 bg-destructive/10 border border-destructive rounded-md p-4">
+          <AlertCircle className="h-10 w-10 text-destructive mx-auto mb-2" />
+          <p className="text-destructive-foreground">Erreur: {technicianError}</p>
+          <Button onClick={() => fetchTechnicians(currentPage, limitPerPage, searchTerm, statusFilter)} variant="outline" className="mt-4 border-destructive text-destructive-foreground hover:bg-destructive/20">
+            Réessayer
+          </Button>
+        </div>
+      )}
+      {!isLoadingTechnicians && !technicianError && (
+        <TechnicianTable 
+          technicians={technicians} 
+          onEdit={handleOpenEditForm} 
+          onDelete={handleDeleteTechnician} 
+          onViewDetails={handleOpenDetails} 
+        />
+      )}
+      
+      {!isLoadingTechnicians && !technicianError && totalTechnicians > 0 && (
+          <div className="flex flex-col sm:flex-row justify-between items-center pt-4 gap-4">
+              <p className="text-sm text-muted-foreground">
+                  Page {currentPage} sur {totalPages}. Total: {totalTechnicians} techniciens.
+              </p>
+              <div className="flex space-x-1">
+                  <Button 
+                      onClick={() => handlePageChange(1)} 
+                      disabled={currentPage === 1 || isLoadingTechnicians}
+                      variant="outline" size="icon" className="border-border hover:bg-muted">
+                      <ChevronsLeft className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                      onClick={() => handlePageChange(currentPage - 1)} 
+                      disabled={currentPage === 1 || isLoadingTechnicians}
+                      variant="outline" size="icon" className="border-border hover:bg-muted">
+                      <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                      onClick={() => handlePageChange(currentPage + 1)} 
+                      disabled={currentPage === totalPages || isLoadingTechnicians}
+                      variant="outline" size="icon" className="border-border hover:bg-muted">
+                      <ChevronRight className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                      onClick={() => handlePageChange(totalPages)} 
+                      disabled={currentPage === totalPages || isLoadingTechnicians}
+                      variant="outline" size="icon" className="border-border hover:bg-muted">
+                      <ChevronsRight className="h-4 w-4" />
+                  </Button>
+              </div>
+            </div>
+      )}
+
+      <TechnicianFormDialog 
+          open={isFormDialogOpen}
+          onOpenChange={setIsFormDialogOpen}
+          onSubmit={handleFormSubmit}
+          initialData={currentTechnician}
+          isLoading={isSubmittingForm}
+      />
+      <TechnicianDetailsDialog 
+          open={isDetailsDialogOpen}
+          onOpenChange={setIsDetailsDialogOpen}
+          technician={currentTechnician}
+      />
     </div>
   );
 
-  const renderRecentRequests = () => (
-    <Card className="bg-slate-800 border-slate-700 mt-6">
+  const renderClientsTab = () => (
+    <Card className="bg-card border-border text-card-foreground">
       <CardHeader>
-        <CardTitle>Demandes récentes</CardTitle>
-        <CardDescription>Liste des dernières demandes de service</CardDescription>
+        <CardTitle className="text-foreground">Gestion des Clients</CardTitle>
+        <CardDescription className="text-muted-foreground">Gérer les informations et les comptes clients.</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-slate-700">
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">ID</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Client</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Service</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Date</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Statut</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentRequests.map((request) => (
-                <tr key={request.id} className="border-b border-slate-700 hover:bg-slate-700/30">
-                  <td className="px-4 py-3 text-sm">{request.id}</td>
-                  <td className="px-4 py-3">{request.user}</td>
-                  <td className="px-4 py-3 text-sm">{request.service}</td>
-                  <td className="px-4 py-3 text-sm">{request.date}</td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-flex px-2 py-1 text-xs rounded-full ${getStatusColor(request.status)}`}>
-                      {request.status}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <Button size="sm" variant="ghost">Voir</Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <p className="text-muted-foreground">Contenu de la gestion des clients à venir.</p>
+      </CardContent>
+    </Card>
+  );
+  
+  const renderServicesTab = () => (
+    <Card className="bg-card border-border text-card-foreground">
+      <CardHeader>
+        <CardTitle className="text-foreground">Gestion des Services</CardTitle>
+        <CardDescription className="text-muted-foreground">Configurer les types de services, tarifs, etc.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p className="text-muted-foreground">Contenu de la gestion des services à venir.</p>
       </CardContent>
     </Card>
   );
 
-  // Fetch technicians function
-  const fetchTechnicians = async (page = currentPage, limit = limitPerPage, search = searchTerm, status = statusFilter) => {
-    setIsLoadingTechnicians(true);
-    setTechnicianError(null);
-    const adminToken = localStorage.getItem('adminToken');
-    if (!adminToken) {
-      toast({ title: "Erreur d'authentification", description: "Veuillez vous reconnecter.", variant: "destructive" });
-      setIsLoadingTechnicians(false);
-      navigate('/adminlog');
-      return;
-    }
+  const renderReportsTab = () => (
+    <Card className="bg-card border-border text-card-foreground">
+      <CardHeader>
+        <CardTitle className="text-foreground">Rapports et Analyses</CardTitle>
+        <CardDescription className="text-muted-foreground">Visualiser les données de performance et les tendances.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p className="text-muted-foreground">Contenu des rapports à venir.</p>
+      </CardContent>
+    </Card>
+  );
 
-    try {
-      const queryParams = new URLSearchParams({
-        page: page.toString(),
-        limit: limit.toString(),
-      });
-      if (search) queryParams.append('search', search);
-      if (status && status !== '_all_') queryParams.append('status', status);
+  const renderSettingsTab = () => (
+    <Card className="bg-card border-border text-card-foreground">
+                <CardHeader>
+        <CardTitle className="text-foreground">Paramètres du Compte</CardTitle>
+        <CardDescription className="text-muted-foreground">Gérer les paramètres généraux du compte administrateur.</CardDescription>
+                </CardHeader>
+                <CardContent>
+        <p className="text-muted-foreground">Contenu des paramètres du compte à venir.</p>
+      </CardContent>
+    </Card>
+  );
 
-      const response = await fetch(`/api/admin/technicians?${queryParams.toString()}`, {
-        headers: {
-          'Authorization': `Bearer ${adminToken}`,
-          'Accept': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: "Erreur lors de la récupération des techniciens." }));
-        throw new Error(errorData.message || `HTTP error ${response.status}`);
-      }
-      const data = await response.json();
-      if (data.success) {
-        setTechnicians(data.technicians || []);
-        setCurrentPage(data.pagination.page);
-        setTotalPages(data.pagination.totalPages);
-        setTotalTechnicians(data.pagination.total);
-      } else {
-        throw new Error(data.message || "Échec de la récupération des techniciens.");
-      }
-    } catch (err) {
-      console.error("Fetch technicians error:", err);
-      setTechnicianError(err.message);
-      setTechnicians([]); // Clear data on error
-      toast({ title: "Erreur", description: err.message, variant: "destructive" });
-    } finally {
-      setIsLoadingTechnicians(false);
-    }
-  };
-
-  // useEffect for initial fetch when 'techniciens' tab is active
-  useEffect(() => {
-    if (activeTab === 'techniciens') {
-      fetchTechnicians(1, limitPerPage, '', ''); // Reset to page 1 and clear filters on tab switch
-    } else {
-      // Clear technician data and reset pagination when navigating away from the tab
-      setTechnicians([]);
-      setCurrentPage(1);
-      setTotalPages(1);
-      setTotalTechnicians(0);
-      setSearchTerm('');
-      setStatusFilter('');
-      setTechnicianError(null);
-    }
-  }, [activeTab]); // Only re-run if activeTab changes
-
-  // Handlers for Technicians CRUD
-  const handleOpenAddForm = () => {
-    setCurrentTechnician(null); // Clear any existing data for "Add" mode
-    setIsFormDialogOpen(true);
-  };
-
-  const handleOpenEditForm = (technician) => {
-    setCurrentTechnician(technician);
-    setIsFormDialogOpen(true);
-  };
-
-  const handleOpenDetails = (technician) => {
-    setCurrentTechnician(technician);
-    setIsDetailsDialogOpen(true);
-  };
-
-  const handleFormSubmit = async (formData) => {
-    setIsSubmittingForm(true);
-    setTechnicianError(null);
-    const adminToken = localStorage.getItem('adminToken');
-
-    const method = currentTechnician ? 'PUT' : 'POST';
-    const url = currentTechnician 
-      ? `/api/admin/technicians/${currentTechnician.id}` 
-      : '/api/admin/technicians';
-
-    try {
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${adminToken}`,
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok || !result.success) {
-        throw new Error(result.message || (currentTechnician ? "Erreur lors de la mise à jour du technicien." : "Erreur lors de la création du technicien."));
-      }
-
-      toast({
-        title: currentTechnician ? "Technicien Mis à Jour" : "Technicien Ajouté",
-        description: `Le technicien ${formData.name} ${formData.surname} a été ${currentTechnician ? 'mis à jour' : 'ajouté'} avec succès.`,
-        variant: "success",
-      });
-      setIsFormDialogOpen(false);
-      fetchTechnicians(currentPage); // Refresh the list, stay on current page if possible
-    } catch (err) {
-      console.error("Submit technician error:", err);
-      setTechnicianError(err.message);
-      toast({ title: "Erreur de Soumission", description: err.message, variant: "destructive" });
-    } finally {
-      setIsSubmittingForm(false);
-    }
-  };
-
-  const handleDeleteTechnician = async (technicianId) => {
-    if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce technicien ? Cette action est irréversible.")) {
-      return;
-    }
-    setIsLoadingTechnicians(true); // Can use a specific loading state or general table loading
-    setTechnicianError(null);
-    const adminToken = localStorage.getItem('adminToken');
-
-    try {
-      const response = await fetch(`/api/admin/technicians/${technicianId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${adminToken}`,
-          'Accept': 'application/json'
-        }
-      });
-      const result = await response.json();
-      if (!response.ok || !result.success) {
-        throw new Error(result.message || "Erreur lors de la suppression du technicien.");
-      }
-      toast({
-        title: "Technicien Supprimé",
-        description: result.message || "Le technicien a été supprimé avec succès.",
-        variant: "success",
-      });
-      // If current page becomes empty after deletion, try to go to previous page or first page
-      if (technicians.length === 1 && currentPage > 1) {
-        fetchTechnicians(currentPage - 1);
-      } else {
-        fetchTechnicians(currentPage);
-      }
-    } catch (err) {
-      console.error("Delete technician error:", err);
-      setTechnicianError(err.message);
-      toast({ title: "Erreur de Suppression", description: err.message, variant: "destructive" });
-    } finally {
-      setIsLoadingTechnicians(false);
-    }
-  };
-  
-  // Pagination and Filter Handlers
-  const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value);
-  };
-
-  const handleStatusFilterChange = (value) => {
-    setStatusFilter(value);
-  };
-
-  const handleApplyFilters = () => {
-    setCurrentPage(1); // Reset to page 1 when applying new filters
-    fetchTechnicians(1, limitPerPage, searchTerm, statusFilter);
-  };
-
-  const handleResetFilters = () => {
-    setSearchTerm('');
-    setStatusFilter('');
-    setCurrentPage(1);
-    fetchTechnicians(1, limitPerPage, '', '');
-  };
-
-  const handlePageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= totalPages) {
-      setCurrentPage(newPage);
-      fetchTechnicians(newPage, limitPerPage, searchTerm, statusFilter);
-    }
-  };
-
-  const renderContent = () => {
-    switch (activeTab) {
-      case "apercu":
-        return (
-          <>
-            {renderStatsCards()}
-            {renderRecentRequests()}
-          </>
-        );
-      case "techniciens":
-        return (
-          <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-              <div>
-                <h2 className="text-2xl font-semibold text-slate-100">Gestion des Techniciens</h2>
-                <p className="text-slate-400">Ajouter, voir, modifier et supprimer des techniciens.</p>
-              </div>
-              <Button onClick={handleOpenAddForm} className="bg-cyan-600 hover:bg-cyan-700">
-                <PlusCircle className="mr-2 h-5 w-5" />
-                Ajouter un Technicien
-              </Button>
-            </div>
-
-            {/* Filters and Search */} 
-            <Card className="bg-slate-800/60 border-slate-700 p-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 items-end">
-                    <div className="md:col-span-2 lg:col-span-2">
-                        <Label htmlFor="search-technician" className="text-slate-400 mb-1 block">Rechercher</Label>
-                        <div className="relative">
-                            <Input 
-                                id="search-technician"
-                                type="text" 
-                                placeholder="Nom, email, spécialisation..."
-                                value={searchTerm}
-                                onChange={handleSearchChange}
-                                className="bg-slate-700 border-slate-600 pr-10"
-                            />
-                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-                        </div>
-                    </div>
-                    <div>
-                        <Label htmlFor="status-filter" className="text-slate-400 mb-1 block">Statut</Label>
-                        <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
-                            <SelectTrigger className="bg-slate-700 border-slate-600">
-                                <SelectValue placeholder="Tous les statuts" />
-                            </SelectTrigger>
-                            <SelectContent className="bg-slate-800 border-slate-700 text-slate-200">
-                                <SelectItem value="_all_" className="hover:bg-slate-700 focus:bg-slate-700">Tous</SelectItem>
-                                <SelectItem value="active" className="hover:bg-slate-700 focus:bg-slate-700">Actif</SelectItem>
-                                <SelectItem value="inactive" className="hover:bg-slate-700 focus:bg-slate-700">Inactif</SelectItem>
-                                <SelectItem value="pending_approval" className="hover:bg-slate-700 focus:bg-slate-700">En attente</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="flex space-x-2 items-end">
-                        <Button onClick={handleApplyFilters} className="w-full sm:w-auto bg-sky-600 hover:bg-sky-700">
-                            <Search className="mr-2 h-4 w-4" /> Filtrer
-                        </Button>
-                        <Button onClick={handleResetFilters} variant="outline" className="w-full sm:w-auto border-slate-600 hover:bg-slate-700">
-                            <RefreshCw className="mr-2 h-4 w-4" /> Réinitialiser
-                        </Button>
-                    </div>
-                </div>
-            </Card>
-
-            {isLoadingTechnicians && (
-              <div className="flex justify-center items-center py-10">
-                <Loader2 className="h-8 w-8 animate-spin text-cyan-500" />
-                <p className="ml-3 text-slate-400">Chargement des techniciens...</p>
-              </div>
-            )}
-            {technicianError && !isLoadingTechnicians && (
-              <div className="text-center py-10 bg-red-900/20 border border-red-700 rounded-md p-4">
-                <AlertCircle className="h-10 w-10 text-red-500 mx-auto mb-2" />
-                <p className="text-red-400">Erreur: {technicianError}</p>
-                <Button onClick={() => fetchTechnicians(currentPage, limitPerPage, searchTerm, statusFilter)} variant="outline" className="mt-4 border-red-500 text-red-400 hover:bg-red-800/30">
-                  Réessayer
-                </Button>
-              </div>
-            )}
-            {!isLoadingTechnicians && !technicianError && (
-              <TechnicianTable 
-                technicians={technicians} 
-                onEdit={handleOpenEditForm} 
-                onDelete={handleDeleteTechnician} 
-                onViewDetails={handleOpenDetails} 
-              />
-            )}
-            
-            {/* Pagination Controls */} 
-            {!isLoadingTechnicians && !technicianError && totalTechnicians > 0 && (
-                <div className="flex flex-col sm:flex-row justify-between items-center pt-4 gap-4">
-                    <p className="text-sm text-slate-400">
-                        Page {currentPage} sur {totalPages}. Total: {totalTechnicians} techniciens.
-                    </p>
-                    <div className="flex space-x-1">
-                        <Button 
-                            onClick={() => handlePageChange(1)} 
-                            disabled={currentPage === 1 || isLoadingTechnicians}
-                            variant="outline" size="icon" className="border-slate-600 hover:bg-slate-700">
-                            <ChevronsLeft className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                            onClick={() => handlePageChange(currentPage - 1)} 
-                            disabled={currentPage === 1 || isLoadingTechnicians}
-                            variant="outline" size="icon" className="border-slate-600 hover:bg-slate-700">
-                            <ChevronLeft className="h-4 w-4" />
-                        </Button>
-                        {/* Consider a more advanced pagination component for many pages */}
-                        <Button 
-                            onClick={() => handlePageChange(currentPage + 1)} 
-                            disabled={currentPage === totalPages || isLoadingTechnicians}
-                            variant="outline" size="icon" className="border-slate-600 hover:bg-slate-700">
-                            <ChevronRight className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                            onClick={() => handlePageChange(totalPages)} 
-                            disabled={currentPage === totalPages || isLoadingTechnicians}
-                            variant="outline" size="icon" className="border-slate-600 hover:bg-slate-700">
-                            <ChevronsRight className="h-4 w-4" />
-                        </Button>
-                    </div>
-                </div>
-            )}
-
-            {/* Dialogs */} 
-            <TechnicianFormDialog 
-                open={isFormDialogOpen}
-                onOpenChange={setIsFormDialogOpen}
-                onSubmit={handleFormSubmit}
-                initialData={currentTechnician}
-                isLoading={isSubmittingForm}
-            />
-            <TechnicianDetailsDialog 
-                open={isDetailsDialogOpen}
-                onOpenChange={setIsDetailsDialogOpen}
-                technician={currentTechnician}
-            />
-          </div>
-        );
-      case "services":
-        return <div className="text-white">Contenu de la gestion des services</div>;
-      case "rapports":
-        return <div className="text-white">Contenu des rapports et analyses</div>;
-      case "parametres":
-        return <div className="text-white">Contenu des paramètres du compte</div>;
-      case "profile":
-        return (
-          <Card className="bg-slate-800 border-slate-700">
-            <CardHeader>
-              <CardTitle>Mon Profil</CardTitle>
-              <CardDescription>Gérez vos informations personnelles et votre photo de profil.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex flex-col items-center space-y-4">
-                <ProfilePictureUploader
-                  userType="admin"
-                  userId={adminData.id}
-                  currentPictureUrl={profilePictureUrl}
-                  onUploadSuccess={fetchProfilePicture}
-                  avatarSizeClassName="w-32 h-32 text-4xl"
-                />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-slate-100">Informations:</h3>
-                <p className="text-slate-300"><strong className="font-medium text-slate-400">Nom:</strong> {adminData.name} {adminData.surname}</p>
-                <p className="text-slate-300"><strong className="font-medium text-slate-400">Email:</strong> {adminData.email}</p>
-                {/* Add more profile fields and edit functionality here */}
-              </div>
-            </CardContent>
-          </Card>
-        );
-      default:
-        return null;
-    }
-  };
+  const renderProfileTab = () => (
+    <Card className="bg-card border-border text-card-foreground">
+      <CardHeader>
+        <CardTitle className="text-foreground">Mon Profil</CardTitle>
+        <CardDescription className="text-muted-foreground">Gérez vos informations personnelles et votre photo de profil.</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="flex flex-col items-center space-y-4">
+          <ProfilePictureUploader
+            userType="admin"
+            userId={adminData.id}
+            currentPictureUrl={profilePictureUrl}
+            onUploadSuccess={fetchProfilePicture}
+            avatarSizeClassName="w-32 h-32 text-4xl"
+          />
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold text-foreground">Informations:</h3>
+          <p className="text-muted-foreground"><strong className="font-medium text-foreground">Nom:</strong> {adminData.name} {adminData.surname}</p>
+          <p className="text-muted-foreground"><strong className="font-medium text-foreground">Email:</strong> {adminData.email}</p>
+                  </div>
+                </CardContent>
+              </Card>
+  );
   
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950 text-white">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500"></div>
+      <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
         <p className="ml-4 text-lg">Chargement...</p>
       </div>
     );
   }
 
-  const currentTitle = pageTitles[activeTab] || "Tableau de Bord";
+  // Helper function to combine navigation and closing sidebar
+  const setActiveTabAndCloseSidebar = (tab) => {
+    setActiveTab(tab);
+    if (isSmallScreen && sidebarOpen) { // Only close if small screen and sidebar is open
+      setSidebarOpen(false);
+    }
+  };
+  
+  const navigationItems = [
+    { name: 'Aperçu', icon: Home, tab: 'apercu' },
+    { name: 'Techniciens', icon: Users, tab: 'techniciens' },
+    { name: 'Clients', icon: Users, tab: 'clients' }, // Assuming 'Clients' is a desired tab
+    { name: 'Services', icon: List, tab: 'services' },
+    { name: 'Rapports', icon: LineChart, tab: 'rapports' },
+  ];
 
-  return (
-    <div className="min-h-screen bg-slate-900 text-white flex flex-col">
-      {/* Navigation: Render based on screen size */}
-      {isSmallScreen ? (
-        <CollapsibleSidebar
-          userType="admin"
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          sidebarOpen={sidebarOpen}
-          setSidebarOpen={setSidebarOpen}
-          handleLogout={handleLogout}
-        />
-      ) : (
-        <BottomDockNavigation
-          userType="admin"
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          handleLogout={handleLogout}
-        />
-      )}
-
-      {/* Header */}
-      <header className={`sticky top-0 z-30 bg-slate-800/80 backdrop-blur-md shadow-lg border-b border-slate-700 flex items-center justify-between p-4 h-20
-                         ${isSmallScreen && sidebarOpen ? 'ml-0' : 'ml-0'} 
-                         ${!isSmallScreen ? 'mb-0' : ''}
-                         transition-all duration-300 ease-in-out`}>
-        <div className="flex items-center">
-          {isSmallScreen && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="mr-4 text-slate-300 hover:text-cyan-400"
-            >
-              {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </Button>
-          )}
-          <h1 className="text-xl md:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
-            {currentTitle}
-          </h1>
-        </div>
-        
-        <div className="flex items-center space-x-4">
-          <Input 
+  const Header = () => (
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background/80 backdrop-blur-md px-4 sm:px-6">
+      <div className="flex items-center">
+        {isSmallScreen && (
+          <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(!sidebarOpen)} className="mr-2 text-foreground hover:bg-muted">
+            {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </Button>
+        )}
+        <h1 className="text-xl font-semibold text-foreground">{pageTitles[activeTab] || "Tableau de Bord"}</h1>
+      </div>
+      <div className="flex items-center space-x-2 sm:space-x-4">
+        <Input 
             type="search" 
             placeholder="Rechercher..." 
-            className="hidden md:block bg-slate-700 border-slate-600 placeholder-slate-400 text-sm w-64" 
-          />
-          <Button variant="ghost" size="icon" className="text-slate-300 hover:text-cyan-400">
-            <Bell className="h-6 w-6" />
-          </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                <Avatar className="h-9 w-9 border-2 border-transparent hover:border-cyan-400 transition-colors">
-                  <AvatarImage src={profilePictureUrl} alt={adminData.name || "Admin"} />
-                  <AvatarFallback>
-                    {adminData.name ? adminData.name.charAt(0).toUpperCase() : 'A'}
-                    {adminData.surname ? adminData.surname.charAt(0).toUpperCase() : 'D'}
-                  </AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 bg-slate-800 border-slate-700 text-slate-200" align="end" forceMount>
-              <DropdownMenuLabel className="font-normal">
-                <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">{adminData.name} {adminData.surname}</p>
-                  <p className="text-xs leading-none text-slate-400">{adminData.email}</p>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator className="bg-slate-700" />
-              <DropdownMenuItem 
-                className="hover:bg-slate-700/70 focus:bg-slate-700/70 cursor-pointer"
-                onClick={() => setActiveTab('profile')}
-              >
-                <User className="mr-2 h-4 w-4" />
-                <span>Profil</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                className="hover:bg-slate-700/70 focus:bg-slate-700/70 cursor-pointer"
-                onClick={() => setActiveTab('parametres')}
-              >
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Paramètres</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-slate-700" />
-              <DropdownMenuItem 
-                className="text-red-400 hover:!text-red-300 hover:!bg-red-900/30 focus:bg-red-900/30 cursor-pointer"
-                onClick={handleLogout}
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Déconnexion</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </header>
+            className="hidden md:block bg-input border-border placeholder:text-muted-foreground text-sm w-64" 
+        />
+        <ThemeToggleButton />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="rounded-full text-foreground hover:bg-muted">
+              <Bell className="h-5 w-5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-80 bg-popover border-border text-popover-foreground">
+            <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-border" />
+            <div className="p-4 text-sm text-muted-foreground">
+              Aucune nouvelle notification.
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+              <Avatar className="h-9 w-9 border-2 border-transparent hover:border-primary transition-colors">
+                <AvatarImage src={profilePictureUrl} alt={`${adminData.name} ${adminData.surname}`} />
+                <AvatarFallback className="bg-muted text-muted-foreground">
+                   {`${(adminData.name || 'A').charAt(0)}${(adminData.surname || 'D').charAt(0)}`}
+                </AvatarFallback>
+              </Avatar>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56 bg-popover border-border text-popover-foreground">
+            <DropdownMenuLabel>
+              <p className="font-medium text-foreground">{`${adminData.name || ''} ${adminData.surname || ''}`.trim() || "Admin"}</p>
+              <p className="text-xs text-muted-foreground">{adminData.email}</p>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-border" />
+            <DropdownMenuItem onClick={() => setActiveTabAndCloseSidebar('profile')} className="hover:!bg-muted focus:!bg-muted cursor-pointer">
+              <User className="mr-2 h-4 w-4" />
+              <span>Profil</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setActiveTabAndCloseSidebar('parametres')} className="hover:!bg-muted focus:!bg-muted cursor-pointer">
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Paramètres</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="bg-border" />
+            <DropdownMenuItem onClick={handleLogout} className="text-destructive hover:!bg-destructive/10 hover:!text-destructive focus:!bg-destructive/10 focus:!text-destructive cursor-pointer">
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Déconnexion</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </header>
+  );
 
-      {/* Main Content Area */}
-      <main className={`flex-grow p-4 sm:p-6 transition-all duration-300 ease-in-out
-                       ${isSmallScreen ? 'ml-0' : 'pb-20'}
-                       ${isSmallScreen ? 'pt-4' : 'pt-6'}`}> 
-        <Tabs value={activeTab} className="h-full">
-          <TabsContent value="apercu" className="h-full">
-            {renderContent()}
-          </TabsContent>
-          <TabsContent value="techniciens">
-            {renderContent()}
-          </TabsContent>
-          <TabsContent value="services">
-            {renderContent()}
-          </TabsContent>
-          <TabsContent value="rapports">
-            {renderContent()}
-          </TabsContent>
-          <TabsContent value="parametres">
-            {renderContent()}
-          </TabsContent>
-          <TabsContent value="profile">
-            {renderContent()}
-          </TabsContent>
-        </Tabs>
-      </main>
+  return (
+    <div className={`flex h-screen bg-background text-foreground ${isSmallScreen && sidebarOpen ? 'overflow-hidden' : ''}`}>
+      {/* Sidebar: Render based on screen size and open state */}
+      {!isSmallScreen && 
+        <CollapsibleSidebar 
+            userType="admin"
+            navigationItems={navigationItems} 
+            onNavigate={setActiveTabAndCloseSidebar} 
+            currentTab={activeTab}
+            profilePictureUrl={profilePictureUrl}
+            userName={`${adminData.name || ''} ${adminData.surname || ''}`.trim()}
+            userEmail={adminData.email}
+            onLogoutClick={handleLogout}
+            onProfileClick={() => setActiveTabAndCloseSidebar('profile')}
+            onSettingsClick={() => setActiveTabAndCloseSidebar('parametres')}
+        />
+      }
+      {isSmallScreen && sidebarOpen && (
+        <motion.div
+          initial={{ x: "-100%" }}
+          animate={{ x: 0 }}
+          exit={{ x: "-100%" }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          className="fixed inset-0 z-50 flex" // Increased z-index for sidebar
+        >
+          <CollapsibleSidebar 
+            userType="admin"
+            navigationItems={navigationItems} 
+            onNavigate={setActiveTabAndCloseSidebar} 
+            currentTab={activeTab}
+            profilePictureUrl={profilePictureUrl}
+            userName={`${adminData.name || ''} ${adminData.surname || ''}`.trim()}
+            userEmail={adminData.email}
+            onLogoutClick={handleLogout}
+            onProfileClick={() => setActiveTabAndCloseSidebar('profile')}
+            onSettingsClick={() => setActiveTabAndCloseSidebar('parametres')}
+            onClose={() => setSidebarOpen(false)} // Pass close handler
+          />
+          <div className="fixed inset-0 bg-black/60 z-40" onClick={() => setSidebarOpen(false)}></div>
+        </motion.div>
+      )}
+
+      <div className="flex flex-1 flex-col overflow-y-auto">
+        <Header />
+        <main className="flex-1 p-4 sm:p-6 space-y-6">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
+            <TabsContent value="apercu" className="mt-0">
+              {renderOverviewTab()} 
+            </TabsContent>
+            <TabsContent value="techniciens" className="mt-0">
+              {renderTechniciansTab()}
+            </TabsContent>
+            <TabsContent value="clients" className="mt-0">
+               {renderClientsTab()}
+            </TabsContent>
+            <TabsContent value="services" className="mt-0">
+               {renderServicesTab()}
+            </TabsContent>
+            <TabsContent value="rapports" className="mt-0">
+               {renderReportsTab()}
+            </TabsContent>
+            <TabsContent value="parametres" className="mt-0">
+               {renderSettingsTab()}
+            </TabsContent>
+            <TabsContent value="profile" className="mt-0">
+              {renderProfileTab()}
+            </TabsContent>
+          </Tabs>
+        </main>
+        {isSmallScreen && !sidebarOpen && ( // Ensure BottomDock is only for small screens when sidebar is closed
+          <BottomDockNavigation 
+            userType="admin"
+            items={navigationItems} 
+            onNavigate={setActiveTabAndCloseSidebar} 
+            currentTab={activeTab} 
+          />
+        )}
+      </div>
     </div>
   );
 };
 
-export default AdminDashboard;
+export default AdminDashboard; 

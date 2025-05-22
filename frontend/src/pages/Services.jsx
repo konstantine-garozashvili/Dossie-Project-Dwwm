@@ -273,41 +273,39 @@ export const Services = () => {
   // Get the current selected service
   const currentService = servicesData.find(service => service.id === selectedTab);
   
-  // Color mapping for services
+  // Color mapping for services - updated to use theme variables
   const colorMap = {
-    blue: "from-blue-500 to-blue-700 border-blue-400 text-blue-400 bg-blue-500/10",
-    cyan: "from-cyan-500 to-cyan-700 border-cyan-400 text-cyan-400 bg-cyan-500/10",
-    green: "from-emerald-500 to-emerald-700 border-emerald-400 text-emerald-400 bg-emerald-500/10",
-    red: "from-rose-500 to-rose-700 border-rose-400 text-rose-400 bg-rose-500/10",
-    purple: "from-purple-500 to-purple-700 border-purple-400 text-purple-400 bg-purple-500/10",
-    amber: "from-amber-500 to-amber-700 border-amber-400 text-amber-400 bg-amber-500/10",
+    blue: "bg-primary text-primary-foreground",
+    cyan: "bg-primary text-primary-foreground",
+    green: "bg-primary text-primary-foreground",
+    red: "bg-primary text-primary-foreground",
+    purple: "bg-primary text-primary-foreground",
+    amber: "bg-primary text-primary-foreground",
   };
 
-  // Helper function to get color classes
-  const getColorClasses = (service, type) => {
-    const color = service.color || "blue";
-    
+  // Helper function to get color classes - simplified to use theme variables
+  const getColorClasses = (service, type) => {    
     if (type === "badge") {
-      return `bg-${color}-500/20 text-${color}-400 border-${color}-500`;
+      return "bg-primary/20 text-primary border-primary";
     }
     
     if (type === "gradient") {
-      return `from-${color}-400 to-${color}-300`;
+      return "from-primary to-accent";
     }
     
     if (type === "button") {
-      return `bg-${color}-500 hover:bg-${color}-600`;
+      return "bg-primary hover:bg-primary/90";
     }
     
     if (type === "icon") {
-      return `text-${color}-400`;
+      return "text-primary";
     }
     
     return "";
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900 text-white py-12 md:py-20 px-4 overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground py-12 md:py-20 px-4 overflow-hidden">
       <div className="max-w-7xl mx-auto">
         {/* Hero Section with enhanced animations */}
         <motion.div 
@@ -317,23 +315,23 @@ export const Services = () => {
           transition={{ duration: 0.7 }}
           className="text-center mb-16"
         >
-          <Badge className="mb-4 px-3 py-1 bg-cyan-500/20 text-cyan-400 border-cyan-500 inline-flex w-auto">
+          <Badge className="mb-4 px-3 py-1 bg-primary/20 text-primary border-primary inline-flex w-auto">
             Solutions Professionnelles
           </Badge>
           
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-300">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary/80 to-accent">
             Services de Réparation<br className="hidden sm:inline" /> d'Ordinateurs
           </h1>
           
-          <p className="text-lg sm:text-xl text-gray-400 max-w-3xl mx-auto">
+          <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto">
             De la réparation matérielle aux problèmes logiciels, nos techniciens experts offrent une gamme complète de services pour maintenir votre technologie en parfait état de fonctionnement.
           </p>
           
           <div className="flex flex-wrap justify-center gap-4 mt-8">
-            <Button className="bg-cyan-500 hover:bg-cyan-600 text-white" size="lg" asChild>
+            <Button className="bg-primary text-primary-foreground hover:bg-primary/90" size="lg" asChild>
               <Link to="/service-request">Demander une réparation</Link>
             </Button>
-            <Button variant="outline" className="border-cyan-400 text-cyan-400 hover:bg-cyan-400/10" size="lg">
+            <Button variant="outline" className="border-primary text-primary hover:bg-primary/10" size="lg">
               <Link to="/#contact">Nous contacter</Link>
             </Button>
           </div>
@@ -349,35 +347,35 @@ export const Services = () => {
         >
           <motion.div 
             variants={itemVariants}
-            className="group bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-6 border border-slate-700 shadow-lg hover:shadow-cyan-900/20 hover:-translate-y-1 transition-all duration-300"
+            className="group bg-card rounded-xl p-6 border border-border shadow-lg hover:shadow-primary/20 hover:-translate-y-1 transition-all duration-300"
           >
-            <div className="w-14 h-14 rounded-full bg-cyan-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-              <Zap className="w-7 h-7 text-cyan-400" />
+            <div className="w-14 h-14 rounded-full bg-primary/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+              <Zap className="w-7 h-7 text-primary" />
             </div>
-            <h3 className="text-xl font-semibold mb-2 group-hover:text-cyan-400 transition-colors">Délai de Réparation Rapide</h3>
-            <p className="text-gray-400">La plupart des réparations sont effectuées dans un délai de 24 à 48 heures, avec un service le jour même disponible pour les urgences.</p>
+            <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">Délai de Réparation Rapide</h3>
+            <p className="text-muted-foreground">La plupart des réparations sont effectuées dans un délai de 24 à 48 heures, avec un service le jour même disponible pour les urgences.</p>
           </motion.div>
           
           <motion.div 
             variants={itemVariants}
-            className="group bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-6 border border-slate-700 shadow-lg hover:shadow-cyan-900/20 hover:-translate-y-1 transition-all duration-300"
+            className="group bg-card rounded-xl p-6 border border-border shadow-lg hover:shadow-primary/20 hover:-translate-y-1 transition-all duration-300"
           >
-            <div className="w-14 h-14 rounded-full bg-cyan-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-              <Shield className="w-7 h-7 text-cyan-400" />
+            <div className="w-14 h-14 rounded-full bg-primary/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+              <Shield className="w-7 h-7 text-primary" />
             </div>
-            <h3 className="text-xl font-semibold mb-2 group-hover:text-cyan-400 transition-colors">Garantie de Qualité</h3>
-            <p className="text-gray-400">Toutes les réparations sont couvertes par notre garantie de 90 jours. Si le problème revient, nous le réparerons sans frais supplémentaires.</p>
+            <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">Garantie de Qualité</h3>
+            <p className="text-muted-foreground">Toutes les réparations sont couvertes par notre garantie de 90 jours. Si le problème revient, nous le réparerons sans frais supplémentaires.</p>
           </motion.div>
           
           <motion.div 
             variants={itemVariants}
-            className="group bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-6 border border-slate-700 shadow-lg hover:shadow-cyan-900/20 hover:-translate-y-1 transition-all duration-300"
+            className="group bg-card rounded-xl p-6 border border-border shadow-lg hover:shadow-primary/20 hover:-translate-y-1 transition-all duration-300"
           >
-            <div className="w-14 h-14 rounded-full bg-cyan-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-              <Check className="w-7 h-7 text-cyan-400" />
+            <div className="w-14 h-14 rounded-full bg-primary/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+              <Check className="w-7 h-7 text-primary" />
             </div>
-            <h3 className="text-xl font-semibold mb-2 group-hover:text-cyan-400 transition-colors">Techniciens Certifiés</h3>
-            <p className="text-gray-400">Nos techniciens experts sont certifiés et possèdent des années d'expérience dans la résolution de problèmes informatiques complexes.</p>
+            <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">Techniciens Certifiés</h3>
+            <p className="text-muted-foreground">Nos techniciens experts sont certifiés et possèdent des années d'expérience dans la résolution de problèmes informatiques complexes.</p>
           </motion.div>
         </motion.div>
 
@@ -390,15 +388,15 @@ export const Services = () => {
           className="mb-16"
         >
           <div className="mb-16">
-            <div className="sticky top-16 z-20 bg-slate-950/90 backdrop-blur-sm pt-4 pb-2 -mx-4 px-4">
+            <div className="sticky top-16 z-20 bg-background/90 backdrop-blur-sm pt-4 pb-2 -mx-4 px-4">
               <div className="relative mb-8 overflow-x-auto pb-2 no-scrollbar">
-                <div className="inline-flex min-w-full md:w-auto bg-slate-800/50 rounded-full p-1">
+                <div className="inline-flex min-w-full md:w-auto bg-card/50 rounded-full p-1">
                   {servicesData.map(service => (
                     <button 
                       key={service.id} 
                       onClick={() => handleTabChange(service.id)}
                       className={`rounded-full transition-all duration-300 px-4 py-2 inline-flex items-center justify-center ${
-                        selectedTab === service.id ? `text-white bg-gradient-to-r ${colorMap[service.color]}` : 'text-gray-400 hover:text-gray-300'
+                        selectedTab === service.id ? `text-foreground bg-primary` : 'text-muted-foreground hover:text-foreground'
                       }`}
                     >
                       <span className="hidden md:inline mr-2">{service.icon}</span>
@@ -433,13 +431,13 @@ export const Services = () => {
                               alt={service.title} 
                               className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent"></div>
+                            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-transparent"></div>
                             <div className="absolute bottom-0 left-0 p-6 md:p-8">
-                              <Badge className={`mb-3 px-3 py-1 ${getColorClasses(service, "badge")} inline-flex w-auto`}>
+                              <Badge className="mb-3 px-3 py-1 bg-primary/20 text-primary border-primary inline-flex w-auto">
                                 {service.tagline}
                               </Badge>
                               <div className="flex items-center space-x-3">
-                                <div className={`w-12 h-12 rounded-full bg-${service.color}-500/20 flex items-center justify-center`}>
+                                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
                                   {service.icon}
                                 </div>
                                 <h2 className="text-2xl md:text-3xl font-bold">{service.title}</h2>
@@ -448,12 +446,12 @@ export const Services = () => {
                           </motion.div>
                           
                           <div className="mb-8">
-                            <h3 className={`text-xl font-semibold mb-3 text-${service.color}-400`}>Description</h3>
-                            <p className="text-gray-300 text-lg">{service.description}</p>
+                            <h3 className="text-xl font-semibold mb-3 text-primary">Description</h3>
+                            <p className="text-foreground text-lg">{service.description}</p>
                           </div>
                           
                           <div className="mb-6">
-                            <h3 className={`text-xl font-semibold mb-4 text-${service.color}-400`}>Caractéristiques</h3>
+                            <h3 className="text-xl font-semibold mb-4 text-primary">Caractéristiques</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                               {service.features.map((feature, idx) => (
                                 <motion.div 
@@ -463,10 +461,10 @@ export const Services = () => {
                                   transition={{ delay: idx * 0.05 + 0.2 }}
                                   className="flex items-start"
                                 >
-                                  <div className={`h-6 w-6 rounded-full bg-${service.color}-500/20 flex-shrink-0 flex items-center justify-center mr-3 mt-0.5`}>
-                                    <Check className={`h-3.5 w-3.5 text-${service.color}-400`} />
+                                  <div className="h-6 w-6 rounded-full bg-primary/20 flex-shrink-0 flex items-center justify-center mr-3 mt-0.5">
+                                    <Check className="h-3.5 w-3.5 text-primary" />
                                   </div>
-                                  <span className="text-gray-300">{feature}</span>
+                                  <span className="text-foreground">{feature}</span>
                                 </motion.div>
                               ))}
                             </div>
@@ -474,10 +472,10 @@ export const Services = () => {
                         </div>
                         
                         <div className="lg:col-span-2 space-y-6">
-                          <Card className="bg-slate-800/50 border-slate-700 shadow-xl backdrop-blur-sm overflow-hidden">
+                          <Card className="bg-card border-border shadow-xl backdrop-blur-sm overflow-hidden">
                             <CardHeader className="relative pb-0">
-                              <div className="absolute top-0 right-0 h-24 w-24 -mr-6 -mt-6 blur-3xl rounded-full opacity-20 bg-gradient-to-br from-cyan-400 to-blue-500"></div>
-                              <CardTitle className={`text-xl text-${service.color}-400`}>Tarification</CardTitle>
+                              <div className="absolute top-0 right-0 h-24 w-24 -mr-6 -mt-6 blur-3xl rounded-full opacity-20 bg-gradient-to-br from-primary to-accent"></div>
+                              <CardTitle className="text-xl text-primary">Tarification</CardTitle>
                               <CardDescription>Prix transparents sans frais cachés</CardDescription>
                             </CardHeader>
                             <CardContent className="pt-6">
@@ -485,12 +483,12 @@ export const Services = () => {
                                 {service.pricing.map((item, idx) => (
                                   <div 
                                     key={idx} 
-                                    className={`flex justify-between py-3 px-3 rounded-lg ${item.popular ? `bg-${service.color}-500/10 border border-${service.color}-500/20` : 'border-b border-slate-700'}`}
+                                    className={`flex justify-between py-3 px-3 rounded-lg ${item.popular ? 'bg-primary/10 border border-primary/20' : 'border-b border-border'}`}
                                   >
                                     <div className="flex items-center">
                                       <span className="font-medium">{item.name}</span>
                                       {item.popular && (
-                                        <Badge className="ml-2 bg-cyan-500/20 text-cyan-400 border-cyan-500">
+                                        <Badge className="ml-2 bg-primary/20 text-primary border-primary">
                                           Populaire
                                         </Badge>
                                       )}
@@ -500,34 +498,34 @@ export const Services = () => {
                                 ))}
                               </div>
                             </CardContent>
-                            <CardFooter className="text-sm text-gray-400 border-t border-slate-700/50 mt-2">
+                            <CardFooter className="text-sm text-muted-foreground border-t border-border mt-2">
                               Tous les prix sont des estimations de départ. Les prix finaux peuvent varier en fonction de la marque, du modèle et de l'état de l'appareil.
                             </CardFooter>
                           </Card>
                           
-                          <Card className="bg-slate-800/50 border-slate-700 shadow-xl backdrop-blur-sm">
+                          <Card className="bg-card border-border shadow-xl backdrop-blur-sm">
                             <CardHeader>
-                              <CardTitle className={`text-xl text-${service.color}-400`}>Délai d'Exécution</CardTitle>
+                              <CardTitle className="text-xl text-primary">Délai d'Exécution</CardTitle>
                             </CardHeader>
                             <CardContent>
                               <div className="flex items-center mb-4">
-                                <Clock className={`w-5 h-5 text-${service.color}-400 mr-2`} />
+                                <Clock className="w-5 h-5 text-primary mr-2" />
                                 <span>{service.turnaround}</span>
                               </div>
-                              <p className="text-gray-400 text-sm">
+                              <p className="text-muted-foreground text-sm">
                                 Nous savons que votre technologie est importante. Nous nous efforçons de terminer toutes les réparations aussi rapidement que possible tout en garantissant un travail de qualité.
                               </p>
                             </CardContent>
                           </Card>
                           
                           <div className="pt-4">
-                            <Button className={`w-full mb-3 bg-${service.color}-500 hover:bg-${service.color}-600`} size="lg" asChild>
+                            <Button className="w-full mb-3 bg-primary text-primary-foreground hover:bg-primary/90" size="lg" asChild>
                               <Link to="/service-request" className="flex items-center justify-center">
                                 Planifier une réparation
                                 <ChevronRight className="ml-1 h-4 w-4" />
                               </Link>
                             </Button>
-                            <Button variant="outline" className={`w-full border-${service.color}-400 text-${service.color}-400 hover:bg-${service.color}-400/10`}>
+                            <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary/10">
                               Demander un devis
                             </Button>
                           </div>
@@ -547,54 +545,54 @@ export const Services = () => {
           initial="hidden"
           animate={chooseUsInView ? "visible" : "hidden"}
           variants={containerVariants}
-          className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-8 md:p-10 mb-16 border border-slate-700 shadow-xl"
+          className="bg-card rounded-2xl p-8 md:p-10 mb-16 border border-border shadow-xl"
         >
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-300">
+            <h2 className="text-3xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary/80 to-accent">
               Pourquoi Choisir IT13?
             </h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               Avec des milliers de clients satisfaits, voici pourquoi vous devriez nous confier vos besoins en réparation informatique.
             </p>
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <motion.div variants={itemVariants} className="bg-slate-800/50 rounded-lg p-6 border border-slate-700 hover:border-cyan-500/50 hover:shadow-lg hover:shadow-cyan-500/10 transition-all duration-300">
-              <div className="w-12 h-12 rounded-full bg-cyan-500/20 flex items-center justify-center mb-4">
-                <Star className="w-6 h-6 text-cyan-400" />
+            <motion.div variants={itemVariants} className="bg-card/80 rounded-lg p-6 border border-border hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300">
+              <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mb-4">
+                <Star className="w-6 h-6 text-primary" />
               </div>
               <h3 className="text-lg font-semibold mb-2">Techniciens Experts</h3>
-              <p className="text-gray-400">Professionnels certifiés avec des années d'expérience en réparation informatique.</p>
+              <p className="text-muted-foreground">Professionnels certifiés avec des années d'expérience en réparation informatique.</p>
             </motion.div>
             
-            <motion.div variants={itemVariants} className="bg-slate-800/50 rounded-lg p-6 border border-slate-700 hover:border-cyan-500/50 hover:shadow-lg hover:shadow-cyan-500/10 transition-all duration-300">
-              <div className="w-12 h-12 rounded-full bg-cyan-500/20 flex items-center justify-center mb-4">
-                <Zap className="w-6 h-6 text-cyan-400" />
+            <motion.div variants={itemVariants} className="bg-card/80 rounded-lg p-6 border border-border hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300">
+              <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mb-4">
+                <Zap className="w-6 h-6 text-primary" />
               </div>
               <h3 className="text-lg font-semibold mb-2">Délai Rapide</h3>
-              <p className="text-gray-400">Service rapide sans compromettre la qualité des réparations.</p>
+              <p className="text-muted-foreground">Service rapide sans compromettre la qualité des réparations.</p>
             </motion.div>
             
-            <motion.div variants={itemVariants} className="bg-slate-800/50 rounded-lg p-6 border border-slate-700 hover:border-cyan-500/50 hover:shadow-lg hover:shadow-cyan-500/10 transition-all duration-300">
-              <div className="w-12 h-12 rounded-full bg-cyan-500/20 flex items-center justify-center mb-4">
-                <Check className="w-6 h-6 text-cyan-400" />
+            <motion.div variants={itemVariants} className="bg-card/80 rounded-lg p-6 border border-border hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300">
+              <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mb-4">
+                <Check className="w-6 h-6 text-primary" />
               </div>
               <h3 className="text-lg font-semibold mb-2">Prix Transparents</h3>
-              <p className="text-gray-400">Pas de frais cachés ou de surprises sur votre facture finale.</p>
+              <p className="text-muted-foreground">Pas de frais cachés ou de surprises sur votre facture finale.</p>
             </motion.div>
             
-            <motion.div variants={itemVariants} className="bg-slate-800/50 rounded-lg p-6 border border-slate-700 hover:border-cyan-500/50 hover:shadow-lg hover:shadow-cyan-500/10 transition-all duration-300">
-              <div className="w-12 h-12 rounded-full bg-cyan-500/20 flex items-center justify-center mb-4">
-                <Shield className="w-6 h-6 text-cyan-400" />
+            <motion.div variants={itemVariants} className="bg-card/80 rounded-lg p-6 border border-border hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300">
+              <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mb-4">
+                <Shield className="w-6 h-6 text-primary" />
               </div>
               <h3 className="text-lg font-semibold mb-2">Garantie de Service</h3>
-              <p className="text-gray-400">Toutes les réparations sont couvertes par notre garantie de 90 jours.</p>
+              <p className="text-muted-foreground">Toutes les réparations sont couvertes par notre garantie de 90 jours.</p>
             </motion.div>
           </div>
         </motion.div>
         
         {/* CTA - Enhanced with better visuals and responsiveness */}
-        <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-cyan-500 rounded-2xl p-8 md:p-10 text-center">
+        <div className="relative overflow-hidden bg-gradient-to-r from-primary to-accent rounded-2xl p-8 md:p-10 text-center">
           <div className="absolute inset-0 overflow-hidden opacity-30">
             <svg className="absolute left-0 top-0 h-full" width="800" height="800" viewBox="0 0 800 800">
               <defs>
@@ -607,20 +605,20 @@ export const Services = () => {
             </svg>
           </div>
           <div className="relative z-10">
-            <h2 className="text-3xl font-bold mb-4 text-white">
+            <h2 className="text-3xl font-bold mb-4 text-primary-foreground">
               Prêt à réparer votre ordinateur?
             </h2>
-            <p className="text-xl text-white/90 max-w-3xl mx-auto mb-8">
+            <p className="text-xl text-primary-foreground/90 max-w-3xl mx-auto mb-8">
               Planifiez une réparation ou demandez un devis en ligne et nous remettrons votre technologie en état de marche en un rien de temps.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Button size="lg" className="bg-white text-cyan-600 hover:bg-gray-100 hover:shadow-lg transition-all" asChild>
+              <Button size="lg" className="bg-background text-primary hover:bg-background/90 hover:shadow-lg transition-all" asChild>
                 <Link to="/service-request" className="flex items-center justify-center">
                   Planifier une réparation maintenant
                   <ChevronRight className="ml-1 h-5 w-5" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+              <Button size="lg" variant="outline" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10">
                 Contacter le support
               </Button>
             </div>
