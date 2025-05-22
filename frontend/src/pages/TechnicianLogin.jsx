@@ -59,8 +59,8 @@ export const TechnicianLogin = () => {
   };
 
   const handleQuickLogin = async () => {
-    const testEmail = 'tech@example.com';
-    const testPassword = 'password123';
+    const testEmail = 'tech1@it13.com';
+    const testPassword = 'password1';
     setEmail(testEmail);
     setPassword(testPassword);
     await executeLogin(testEmail, testPassword);

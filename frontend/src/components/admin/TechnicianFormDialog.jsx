@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Loader2 } from 'lucide-react';
 
 const statusOptions = [
@@ -40,7 +41,7 @@ const TechnicianFormDialog = ({ open, onOpenChange, onSubmit, initialData, isLoa
 
   useEffect(() => {
     if (open) {
-      if (isEditMode) {
+      if (isEditMode && initialData) {
         setFormData({
           name: initialData.name || '',
           surname: initialData.surname || '',
@@ -48,7 +49,7 @@ const TechnicianFormDialog = ({ open, onOpenChange, onSubmit, initialData, isLoa
           phone_number: initialData.phone_number || '',
           specialization: initialData.specialization || '',
           status: initialData.status || 'active',
-          // Password is not pre-filled for editing for security
+          profile_picture_url: initialData.profile_picture_url || '',
         });
       } else {
         // Default for new technician
@@ -61,6 +62,7 @@ const TechnicianFormDialog = ({ open, onOpenChange, onSubmit, initialData, isLoa
           phone_number: '',
           specialization: '',
           status: 'pending_approval',
+          profile_picture_url: '', // Ensure it's defined for non-edit mode too
         });
       }
       setErrors({}); // Clear errors when dialog opens or initialData changes
@@ -122,92 +124,109 @@ const TechnicianFormDialog = ({ open, onOpenChange, onSubmit, initialData, isLoa
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg bg-slate-850 border-slate-700 text-slate-200">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle className="text-cyan-400">{isEditMode ? 'Modifier le Technicien' : 'Ajouter un Technicien'}</DialogTitle>
+          <DialogTitle className="text-primary">{isEditMode ? 'Modifier le Technicien' : 'Ajouter un Technicien'}</DialogTitle>
           <DialogDescription>
             {isEditMode ? 'Modifiez les informations du technicien.' : 'Remplissez les informations pour ajouter un nouveau technicien.'}
           </DialogDescription>
         </DialogHeader>
+        {isEditMode && initialData && (
+          <div className="flex justify-center my-4">
+            <Avatar className="w-24 h-24">
+              {formData.profile_picture_url ? (
+                <AvatarImage 
+                  src={formData.profile_picture_url || null}
+                  alt={`${formData.name || initialData.name} ${formData.surname || initialData.surname}`} 
+                />
+              ) : null}
+              <AvatarFallback className="text-2xl bg-muted text-muted-foreground">
+                {(initialData.name?.charAt(0) || '').toUpperCase()}
+                {(initialData.surname?.charAt(0) || '').toUpperCase()}
+                {!(initialData.name?.charAt(0)) && !(initialData.surname?.charAt(0)) && 'DG'} {/* Default Guest/Generic initials */}
+              </AvatarFallback>
+            </Avatar>
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="name" className="text-slate-400">Nom</Label>
-              <Input id="name" name="name" value={formData.name || ''} onChange={handleChange} className="bg-slate-800 border-slate-600" />
-              {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+              <Label htmlFor="name">Nom</Label>
+              <Input id="name" name="name" value={formData.name || ''} onChange={handleChange} />
+              {errors.name && <p className="text-destructive text-sm mt-1">{errors.name}</p>}
             </div>
             <div>
-              <Label htmlFor="surname" className="text-slate-400">Prénom</Label>
-              <Input id="surname" name="surname" value={formData.surname || ''} onChange={handleChange} className="bg-slate-800 border-slate-600" />
-              {errors.surname && <p className="text-red-500 text-sm mt-1">{errors.surname}</p>}
+              <Label htmlFor="surname">Prénom</Label>
+              <Input id="surname" name="surname" value={formData.surname || ''} onChange={handleChange} />
+              {errors.surname && <p className="text-destructive text-sm mt-1">{errors.surname}</p>}
             </div>
           </div>
           <div>
-            <Label htmlFor="email" className="text-slate-400">Email</Label>
-            <Input id="email" name="email" type="email" value={formData.email || ''} onChange={handleChange} className="bg-slate-800 border-slate-600" />
-            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" name="email" type="email" value={formData.email || ''} onChange={handleChange} />
+            {errors.email && <p className="text-destructive text-sm mt-1">{errors.email}</p>}
           </div>
           {!isEditMode && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="password" className="text-slate-400">Mot de passe</Label>
-                <Input id="password" name="password" type="password" value={formData.password || ''} onChange={handleChange} className="bg-slate-800 border-slate-600" />
-                {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+                <Label htmlFor="password">Mot de passe</Label>
+                <Input id="password" name="password" type="password" value={formData.password || ''} onChange={handleChange} />
+                {errors.password && <p className="text-destructive text-sm mt-1">{errors.password}</p>}
               </div>
               <div>
-                <Label htmlFor="confirmPassword" className="text-slate-400">Confirmer le mot de passe</Label>
-                <Input id="confirmPassword" name="confirmPassword" type="password" value={formData.confirmPassword || ''} onChange={handleChange} className="bg-slate-800 border-slate-600" />
-                {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
+                <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
+                <Input id="confirmPassword" name="confirmPassword" type="password" value={formData.confirmPassword || ''} onChange={handleChange} />
+                {errors.confirmPassword && <p className="text-destructive text-sm mt-1">{errors.confirmPassword}</p>}
               </div>
             </div>
           )}
           {isEditMode && (
              <div>
-                <Label htmlFor="password" className="text-slate-400">Nouveau mot de passe (laisser vide pour ne pas changer)</Label>
-                <Input id="password" name="password" type="password" value={formData.password || ''} onChange={handleChange} className="bg-slate-800 border-slate-600" placeholder="Minimum 6 caractères"/>
-                {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+                <Label htmlFor="password">Nouveau mot de passe (laisser vide pour ne pas changer)</Label>
+                <Input id="password" name="password" type="password" value={formData.password || ''} onChange={handleChange} placeholder="Minimum 6 caractères"/>
+                {errors.password && <p className="text-destructive text-sm mt-1">{errors.password}</p>}
             </div>
           )}
           <div>
-            <Label htmlFor="phone_number" className="text-slate-400">Téléphone</Label>
-            <Input id="phone_number" name="phone_number" value={formData.phone_number || ''} onChange={handleChange} className="bg-slate-800 border-slate-600" />
+            <Label htmlFor="phone_number">Téléphone</Label>
+            <Input id="phone_number" name="phone_number" value={formData.phone_number || ''} onChange={handleChange} />
             {/* Add phone validation if needed */}
           </div>
           <div>
-            <Label htmlFor="specialization" className="text-slate-400">Spécialisation</Label>
+            <Label htmlFor="specialization">Spécialisation</Label>
             <Select name="specialization" value={formData.specialization || ''} onValueChange={(value) => handleSelectChange('specialization', value)}>
-              <SelectTrigger className="w-full bg-slate-800 border-slate-600">
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Sélectionner une spécialisation" />
               </SelectTrigger>
-              <SelectContent className="bg-slate-800 border-slate-700 text-slate-200">
+              <SelectContent>
                 {specializationOptions.map(spec => (
-                  <SelectItem key={spec} value={spec} className="hover:bg-slate-700 focus:bg-slate-700">{spec}</SelectItem>
+                  <SelectItem key={spec} value={spec}>{spec}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
           <div>
-            <Label htmlFor="status" className="text-slate-400">Statut</Label>
+            <Label htmlFor="status">Statut</Label>
             <Select name="status" value={formData.status || ''} onValueChange={(value) => handleSelectChange('status', value)}>
-              <SelectTrigger className="w-full bg-slate-800 border-slate-600">
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Sélectionner un statut" />
               </SelectTrigger>
-              <SelectContent className="bg-slate-800 border-slate-700 text-slate-200">
+              <SelectContent>
                 {statusOptions.map(opt => (
-                  <SelectItem key={opt.value} value={opt.value} className="hover:bg-slate-700 focus:bg-slate-700">{opt.label}</SelectItem>
+                  <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            {errors.status && <p className="text-red-500 text-sm mt-1">{errors.status}</p>}
+            {errors.status && <p className="text-destructive text-sm mt-1">{errors.status}</p>}
           </div>
 
           <DialogFooter className="pt-4">
             <DialogClose asChild>
-              <Button type="button" variant="outline" className="border-slate-600 hover:bg-slate-700">
+              <Button type="button" variant="outline">
                 Annuler
               </Button>
             </DialogClose>
-            <Button type="submit" disabled={isLoading} className="bg-cyan-600 hover:bg-cyan-700">
+            <Button type="submit" disabled={isLoading}>
               {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : (isEditMode ? 'Enregistrer' : 'Ajouter')}
             </Button>
           </DialogFooter>

@@ -53,15 +53,6 @@ const BottomDockNavigation = ({
                 </TabsTrigger>
               );
             })}
-            <Button
-              variant="ghost"
-              className="flex flex-col items-center justify-center h-full px-2 py-2 rounded-none text-red-400 hover:text-red-300 hover:bg-red-900/30 transition-colors text-slate-300 w-full"
-              onClick={handleLogout}
-              style={{ flexGrow: 1, flexBasis: 0 }}
-            >
-              <LogOut className="h-6 w-6 mb-0.5" />
-              <span className="text-xs leading-tight">Déconnexion</span>
-            </Button>
           </TabsList>
         </Tabs>
       </div>
