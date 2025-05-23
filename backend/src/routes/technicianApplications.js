@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { TechnicianApplicationModel } from '../models/technicianApplication.js';
+import { NotificationModel } from '../models/notification.js';
 import { uploadDocument, uploadMultipleDocuments, deleteDocument, deleteMultipleDocuments } from '../utils/cloudinaryDocuments.js';
 import { validateTechnicianApplication, sanitizeApplicationData, validateDocumentFile } from '../utils/validation.js';
 
@@ -120,26 +121,47 @@ technicianApplicationsRouter.post('/', async (c) => {
       
       // Prepare application data for database
       const applicationDataForDb = {
-        ...applicationData,
-        documents: uploadedDocuments,
-        applicantId: applicantId,
-        status: 'pending', // Initial status
-        submittedAt: new Date().toISOString()
+        personal_info: applicationData.personalInfo,
+        professional_info: applicationData.professionalInfo,
+        background: applicationData.background,
+        additional_info: applicationData.additionalInfo,
+        documents: uploadedDocuments
       };
       
       // Save application to database
       console.log('Saving application to database...');
       const application = await TechnicianApplicationModel.create(applicationDataForDb);
       
-      console.log(`Application created successfully with ID: ${application.application_id}`);
+      if (!application.success) {
+        // Cleanup uploaded files if database save failed
+        await deleteMultipleDocuments(uploadedFiles);
+        return c.json({
+          success: false,
+          message: application.message,
+          errors: application.errors
+        }, 400);
+      }
+      
+      console.log(`Application created successfully with ID: ${application.applicationId}`);
+      
+      // Create notification for admins about new application
+      try {
+        // Get the full application data for notification
+        const fullApplication = await TechnicianApplicationModel.getById(application.applicationId);
+        await NotificationModel.createTechnicianApplicationNotification(fullApplication);
+        console.log('Admin notification created for new technician application');
+      } catch (notificationError) {
+        console.error('Error creating notification:', notificationError);
+        // Don't fail the application submission if notification fails
+      }
       
       return c.json({
         success: true,
         message: 'Candidature soumise avec succès',
         data: {
-          applicationId: application.application_id,
+          applicationId: application.applicationId,
           applicantId: applicantId,
-          status: application.status,
+          status: 'pending',
           documentsUploaded: {
             cv: !!uploadedDocuments.cv,
             diplomas: uploadedDocuments.diplomas.length,

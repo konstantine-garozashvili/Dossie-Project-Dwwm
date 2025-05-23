@@ -275,4 +275,81 @@ export const sanitizeApplicationData = (applicationData) => {
   }
 
   return sanitized;
+};
+
+export const validatePassword = (password) => {
+  const errors = [];
+  
+  // Minimum 8 characters
+  if (password.length < 8) {
+    errors.push('Le mot de passe doit contenir au moins 8 caractères');
+  }
+  
+  // Maximum 128 characters (security best practice)
+  if (password.length > 128) {
+    errors.push('Le mot de passe ne peut pas dépasser 128 caractères');
+  }
+  
+  // At least one uppercase letter
+  if (!/[A-Z]/.test(password)) {
+    errors.push('Le mot de passe doit contenir au moins une lettre majuscule');
+  }
+  
+  // At least one lowercase letter
+  if (!/[a-z]/.test(password)) {
+    errors.push('Le mot de passe doit contenir au moins une lettre minuscule');
+  }
+  
+  // At least one digit
+  if (!/\d/.test(password)) {
+    errors.push('Le mot de passe doit contenir au moins un chiffre');
+  }
+  
+  // At least one special character
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+    errors.push('Le mot de passe doit contenir au moins un caractère spécial (!@#$%^&*...)');
+  }
+  
+  // No common patterns
+  const commonPatterns = [
+    /123456/,
+    /password/i,
+    /azerty/i,
+    /qwerty/i,
+    /admin/i,
+    /letmein/i
+  ];
+  
+  for (const pattern of commonPatterns) {
+    if (pattern.test(password)) {
+      errors.push('Le mot de passe ne doit pas contenir de séquences communes');
+      break;
+    }
+  }
+  
+  return {
+    isValid: errors.length === 0,
+    errors
+  };
+};
+
+export const generatePasswordRegex = () => {
+  // Regex that requires:
+  // - At least 8 characters
+  // - At least one uppercase letter
+  // - At least one lowercase letter  
+  // - At least one digit
+  // - At least one special character
+  return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,128}$/;
+};
+
+export const hashPassword = async (password) => {
+  const bcrypt = await import('bcrypt');
+  const saltRounds = 12;
+  return await bcrypt.hash(password, saltRounds);
+};
+
+export const comparePassword = async (password, hashedPassword) => {
+  const bcrypt = await import('bcrypt');
+  return await bcrypt.compare(password, hashedPassword);
 }; 

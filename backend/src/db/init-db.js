@@ -61,23 +61,28 @@ export function initializeDatabase() {
   db.exec(`
     CREATE TABLE IF NOT EXISTS technicians (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      email TEXT UNIQUE NOT NULL,
-      password_hash TEXT,
       name TEXT NOT NULL,
       surname TEXT NOT NULL,
+      email TEXT UNIQUE NOT NULL,
+      password_hash TEXT NOT NULL,
       phone_number TEXT,
       specialization TEXT,
-      years_experience INTEGER,
+      years_experience INTEGER DEFAULT 0,
       certifications TEXT, -- JSON array of certifications
-      education TEXT, -- Education background
-      work_history TEXT, -- Work experience description
-      skills TEXT, -- JSON array of additional skills
+      education TEXT,
+      work_history TEXT,
+      skills TEXT, -- JSON array of skills
       languages TEXT, -- JSON array of languages
       transport_available BOOLEAN DEFAULT 0,
       location TEXT, -- JSON object with address details
       availability TEXT, -- Availability schedule
       tools_equipment TEXT, -- Tools and equipment description
       status TEXT DEFAULT 'active' CHECK(status IN ('active', 'inactive', 'pending_approval')),
+      is_temporary_password BOOLEAN DEFAULT 0, -- Flag for temporary password
+      temporary_password_expires TIMESTAMP NULL, -- Expiration time for temporary password
+      password_reset_token TEXT NULL, -- Token for password reset
+      password_reset_expires TIMESTAMP NULL, -- Expiration time for reset token
+      must_change_password BOOLEAN DEFAULT 0, -- Force password change on next login
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
@@ -106,6 +111,33 @@ export function initializeDatabase() {
   // Create index for faster status lookups
   db.exec(`
     CREATE INDEX IF NOT EXISTS idx_technician_applications_status ON technician_applications (status);
+  `);
+
+  // Create notifications table for admin notifications
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS notifications (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      type TEXT NOT NULL, -- 'technician_application', 'system', 'alert'
+      title TEXT NOT NULL,
+      message TEXT NOT NULL,
+      data TEXT, -- JSON data related to the notification
+      is_read BOOLEAN DEFAULT 0,
+      priority TEXT DEFAULT 'normal', -- 'low', 'normal', 'high', 'urgent'
+      recipient_type TEXT NOT NULL, -- 'admin', 'technician'
+      recipient_id INTEGER, -- NULL for all admins, specific ID for targeted notifications
+      related_entity_type TEXT, -- 'technician_application', 'technician', 'service_request'
+      related_entity_id INTEGER, -- ID of the related entity
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      read_at TIMESTAMP NULL
+    );
+  `);
+  console.log('Checked/created notifications table.');
+
+  // Create index for faster notification lookups
+  db.exec(`
+    CREATE INDEX IF NOT EXISTS idx_notifications_recipient ON notifications (recipient_type, recipient_id, is_read);
+    CREATE INDEX IF NOT EXISTS idx_notifications_created_at ON notifications (created_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_notifications_type ON notifications (type);
   `);
 
   // Seed default admin if not exists

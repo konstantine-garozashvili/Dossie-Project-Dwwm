@@ -38,7 +38,8 @@ import {
   ChevronsRight,
   AlertCircle,
   Loader2,
-  RefreshCw
+  RefreshCw,
+  FileText,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Input } from '@/components/ui/input';
@@ -63,11 +64,14 @@ import { useEffect as useDebugEffect } from 'react';
 import TechnicianTable from '@/components/admin/TechnicianTable';
 import TechnicianFormDialog from '@/components/admin/TechnicianFormDialog';
 import TechnicianDetailsDialog from '@/components/admin/TechnicianDetailsDialog';
+import NotificationDropdown from '@/components/admin/NotificationDropdown';
+import ApplicationManagement from '@/components/admin/ApplicationManagement';
 
 // Define pageTitles mapping here for better organization
 const pageTitles = {
   apercu: "Tableau de Bord",
   techniciens: "Gestion des Techniciens",
+  candidatures: "Gestion des Candidatures",
   clients: "Gestion des Clients",
   services: "Gestion des Services",
   rapports: "Rapports et Analyses",
@@ -364,17 +368,25 @@ export const AdminDashboard = () => {
   // Helper function to combine navigation and closing sidebar
   const setActiveTabAndCloseSidebar = (tab) => {
     setActiveTab(tab);
-    if (isSmallScreen && sidebarOpen) { // Only close if small screen and sidebar is open
       setSidebarOpen(false);
-    }
   };
   
+  // Handle notification click to navigate to applications
+  const handleNotificationApplicationClick = (applicationId) => {
+    setActiveTab('candidatures');
+    setSidebarOpen(false);
+    // You could also scroll to or highlight the specific application
+  };
+
+  // Navigation items for sidebar
   const navigationItems = [
     { name: 'Aperçu', icon: Home, tab: 'apercu' },
     { name: 'Techniciens', icon: Users, tab: 'techniciens' },
-    { name: 'Clients', icon: Users, tab: 'clients' }, // Assuming 'Clients' is a desired tab
+    { name: 'Candidatures', icon: FileText, tab: 'candidatures' },
+    { name: 'Clients', icon: Users, tab: 'clients' },
     { name: 'Services', icon: List, tab: 'services' },
     { name: 'Rapports', icon: LineChart, tab: 'rapports' },
+    { name: 'Paramètres', icon: Settings, tab: 'parametres' },
   ];
 
   const Header = () => (
@@ -389,20 +401,7 @@ export const AdminDashboard = () => {
             className="hidden md:block bg-input border-border placeholder:text-muted-foreground text-sm w-64" 
         />
         <ThemeToggleButton />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="rounded-full text-foreground hover:bg-muted">
-              <Bell className="h-5 w-5" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-80 bg-popover border-border text-popover-foreground">
-            <DropdownMenuLabel>Notifications</DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-border" />
-            <div className="p-4 text-sm text-muted-foreground">
-              Aucune nouvelle notification.
-            </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <NotificationDropdown onApplicationClick={handleNotificationApplicationClick} />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-10 w-10 rounded-full">
@@ -630,6 +629,10 @@ export const AdminDashboard = () => {
     </div>
   );
 
+  const renderCandidaturesTab = () => (
+    <ApplicationManagement />
+  );
+
   const renderClientsTab = () => (
     <Card className="bg-card border-border text-card-foreground">
       <CardHeader>
@@ -735,6 +738,9 @@ export const AdminDashboard = () => {
           <TabsContent value="techniciens" className="mt-0">
             {renderTechniciansTab()}
           </TabsContent>
+          <TabsContent value="candidatures" className="mt-0">
+            {renderCandidaturesTab()}
+          </TabsContent>
           <TabsContent value="clients" className="mt-0">
             {renderClientsTab()}
           </TabsContent>
@@ -760,6 +766,7 @@ export const AdminDashboard = () => {
             {[
               { id: 'apercu', label: 'Aperçu', icon: Home },
               { id: 'techniciens', label: 'Techniciens', icon: Users },
+              { id: 'candidatures', label: 'Candidatures', icon: FileText },
               { id: 'clients', label: 'Clients', icon: Users },
               { id: 'services', label: 'Services', icon: List },
               { id: 'rapports', label: 'Rapports', icon: LineChart },
@@ -846,6 +853,7 @@ export const AdminDashboard = () => {
               {[
                 { id: 'apercu', label: 'Aperçu', icon: Home },
                 { id: 'techniciens', label: 'Techniciens', icon: Users },
+                { id: 'candidatures', label: 'Candidatures', icon: FileText },
                 { id: 'clients', label: 'Clients', icon: Users },
                 { id: 'services', label: 'Services', icon: List },
                 { id: 'rapports', label: 'Rapports', icon: LineChart },

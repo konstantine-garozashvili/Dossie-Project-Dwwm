@@ -1,5 +1,7 @@
 import { getDatabase } from '../db/init-db.js';
-import bcrypt from 'bcryptjs';
+import { validateTechnicianApplication, sanitizeApplicationData } from '../utils/validation.js';
+import { hashPassword } from '../utils/validation.js';
+import emailService from '../utils/emailService.js';
 
 /**
  * TechnicianApplication model for handling database operations related to technician applications
@@ -11,47 +13,40 @@ export const TechnicianApplicationModel = {
    * @returns {Promise<Object>} The created application
    */
   async create(applicationData) {
-    const db = getDatabase();
-    
-    // Convert complex objects to JSON strings
-    const personalInfo = JSON.stringify(applicationData.personalInfo || {});
-    const professionalInfo = JSON.stringify(applicationData.professionalInfo || {});
-    const background = JSON.stringify(applicationData.background || {});
-    const additionalInfo = JSON.stringify(applicationData.additionalInfo || {});
-    const documents = JSON.stringify(applicationData.documents || {});
-    
-    // Insert application into database
-    const stmt = db.prepare(
-      `INSERT INTO technician_applications 
-       (personal_info, professional_info, background, additional_info, documents, status, submitted_at) 
-       VALUES (?, ?, ?, ?, ?, ?, ?)`
-    );
-    
-    const result = stmt.run(
-      personalInfo,
-      professionalInfo,
-      background,
-      additionalInfo,
-      documents,
-      applicationData.status || 'pending',
-      applicationData.submittedAt || new Date().toISOString()
-    );
-    
-    // Get the created application
-    const getStmt = db.prepare(
-      `SELECT * FROM technician_applications WHERE application_id = ?`
-    );
-    const application = getStmt.get(result.lastInsertRowid);
-    
-    // Parse JSON fields
+    try {
+      // The data is already validated and sanitized in the route
+      // applicationData structure: { personal_info, professional_info, background, additional_info, documents }
+      
+      const stmt = getDatabase().prepare(`
+        INSERT INTO technician_applications (
+          personal_info, professional_info, background, additional_info, 
+          documents, status, submitted_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+      `);
+
+      const result = stmt.run(
+        JSON.stringify(applicationData.personal_info),
+        JSON.stringify(applicationData.professional_info),
+        JSON.stringify(applicationData.background),
+        JSON.stringify(applicationData.additional_info),
+        JSON.stringify(applicationData.documents),
+        'pending',
+        new Date().toISOString()
+      );
+
+      return {
+        success: true,
+        applicationId: result.lastInsertRowid,
+        message: 'Candidature soumise avec succès'
+      };
+    } catch (error) {
+      console.error('Error creating technician application:', error);
     return {
-      ...application,
-      personal_info: JSON.parse(application.personal_info),
-      professional_info: JSON.parse(application.professional_info),
-      background: JSON.parse(application.background),
-      additional_info: JSON.parse(application.additional_info),
-      documents: JSON.parse(application.documents)
-    };
+        success: false,
+        message: 'Erreur lors de la création de la candidature',
+        error: error.message
+      };
+    }
   },
   
   /**
@@ -59,23 +54,38 @@ export const TechnicianApplicationModel = {
    * @returns {Promise<Array>} Array of applications
    */
   async getAll() {
-    const db = getDatabase();
-    
-    const stmt = db.prepare(`
-      SELECT * FROM technician_applications 
+    try {
+      const stmt = getDatabase().prepare(`
+        SELECT 
+          application_id,
+          personal_info,
+          professional_info,
+          background,
+          additional_info,
+          documents,
+          status,
+          admin_notes,
+          technician_id,
+          submitted_at,
+          updated_at
+        FROM technician_applications 
       ORDER BY submitted_at DESC
     `);
-    const applications = stmt.all();
     
-    // Parse JSON fields
-    return applications.map(application => ({
-      ...application,
-      personal_info: JSON.parse(application.personal_info),
-      professional_info: JSON.parse(application.professional_info),
-      background: JSON.parse(application.background),
-      additional_info: JSON.parse(application.additional_info),
-      documents: JSON.parse(application.documents)
+      const applications = stmt.all();
+      
+      return applications.map(app => ({
+        ...app,
+        personal_info: JSON.parse(app.personal_info),
+        professional_info: JSON.parse(app.professional_info),
+        background: JSON.parse(app.background),
+        additional_info: JSON.parse(app.additional_info),
+        documents: JSON.parse(app.documents)
     }));
+    } catch (error) {
+      console.error('Error fetching applications:', error);
+      throw error;
+    }
   },
   
   /**
@@ -84,18 +94,30 @@ export const TechnicianApplicationModel = {
    * @returns {Promise<Object>} The application
    */
   async getById(applicationId) {
-    const db = getDatabase();
-    
-    const stmt = db.prepare(
-      `SELECT * FROM technician_applications WHERE application_id = ?`
-    );
-    const application = stmt.get(applicationId);
+    try {
+      const stmt = getDatabase().prepare(`
+        SELECT 
+          application_id,
+          personal_info,
+          professional_info,
+          background,
+          additional_info,
+          documents,
+          status,
+          admin_notes,
+          technician_id,
+          submitted_at,
+          updated_at
+        FROM technician_applications 
+        WHERE application_id = ?
+      `);
+      
+      const application = stmt.get(applicationId);
     
     if (!application) {
       return null;
     }
     
-    // Parse JSON fields
     return {
       ...application,
       personal_info: JSON.parse(application.personal_info),
@@ -104,6 +126,10 @@ export const TechnicianApplicationModel = {
       additional_info: JSON.parse(application.additional_info),
       documents: JSON.parse(application.documents)
     };
+    } catch (error) {
+      console.error('Error fetching application by ID:', error);
+      throw error;
+    }
   },
   
   /**
@@ -114,32 +140,97 @@ export const TechnicianApplicationModel = {
    * @returns {Promise<Object>} The updated application
    */
   async updateStatus(applicationId, status, notes = '') {
-    const db = getDatabase();
+    try {
+      const application = await this.getById(applicationId);
+      if (!application) {
+        return {
+          success: false,
+          message: 'Candidature non trouvée'
+        };
+      }
+
+      const stmt = getDatabase().prepare(`
+        UPDATE technician_applications 
+        SET status = ?, admin_notes = ?, updated_at = CURRENT_TIMESTAMP
+        WHERE application_id = ?
+      `);
+
+      stmt.run(status, notes, applicationId);
     
-    // Check if application exists
-    const existingApplication = await this.getById(applicationId);
-    if (!existingApplication) {
-      return null;
-    }
-    
-    // Update status
-    const updateStmt = db.prepare(
-      `UPDATE technician_applications SET 
-       status = ?, 
-       admin_notes = ?, 
-       updated_at = CURRENT_TIMESTAMP 
-       WHERE application_id = ?`
-    );
-    
-    updateStmt.run(status, notes, applicationId);
-    
-    // If approved, create a new technician record
+      // Handle approval - create technician account and send email
     if (status === 'approved') {
-      await this.createTechnicianFromApplication(applicationId);
+        const result = await this.createTechnicianFromApplication(applicationId);
+        if (!result.success) {
+          return result;
     }
     
-    // Return updated application
-    return this.getById(applicationId);
+        // Send approval email with temporary password
+        const personalInfo = application.personal_info;
+        
+        // Extract name and surname from fullName
+        const fullNameParts = personalInfo.fullName.trim().split(' ');
+        const name = fullNameParts[0] || '';
+        const surname = fullNameParts.slice(1).join(' ') || '';
+        
+        const emailResult = await emailService.sendTemporaryPassword(
+          personalInfo.email,
+          name,
+          surname,
+          result.temporaryPassword
+        );
+
+        if (!emailResult.success) {
+          console.error('Failed to send approval email:', emailResult.error);
+          // Don't fail the approval process, just log the error
+        }
+
+        return {
+          success: true,
+          message: 'Candidature approuvée et compte technicien créé',
+          technicianId: result.technicianId,
+          emailSent: emailResult.success
+        };
+      }
+
+      // Handle rejection - send rejection email
+      if (status === 'rejected') {
+        const personalInfo = application.personal_info;
+        
+        // Extract name and surname from fullName
+        const fullNameParts = personalInfo.fullName.trim().split(' ');
+        const name = fullNameParts[0] || '';
+        const surname = fullNameParts.slice(1).join(' ') || '';
+        
+        const emailResult = await emailService.sendApplicationRejection(
+          personalInfo.email,
+          name,
+          surname,
+          notes
+        );
+
+        if (!emailResult.success) {
+          console.error('Failed to send rejection email:', emailResult.error);
+        }
+
+        return {
+          success: true,
+          message: 'Candidature rejetée',
+          emailSent: emailResult.success
+        };
+      }
+
+      return {
+        success: true,
+        message: 'Statut de la candidature mis à jour'
+      };
+    } catch (error) {
+      console.error('Error updating application status:', error);
+      return {
+        success: false,
+        message: 'Erreur lors de la mise à jour du statut',
+        error: error.message
+      };
+    }
   },
   
   /**
@@ -148,111 +239,92 @@ export const TechnicianApplicationModel = {
    * @returns {Promise<number>} The created technician ID
    */
   async createTechnicianFromApplication(applicationId) {
-    const db = getDatabase();
-    
-    // Get application data
+    try {
     const application = await this.getById(applicationId);
     if (!application) {
-      throw new Error('Application not found');
+        return {
+          success: false,
+          message: 'Candidature non trouvée'
+        };
     }
     
-    // Extract data from application
-    const { personal_info, professional_info, background, additional_info } = application;
+      const personalInfo = application.personal_info;
+      const professionalInfo = application.professional_info;
+      const backgroundInfo = application.background;
+      const additionalInfo = application.additional_info;
+
+      // Extract name and surname from fullName
+      const fullNameParts = personalInfo.fullName.trim().split(' ');
+      const name = fullNameParts[0] || '';
+      const surname = fullNameParts.slice(1).join(' ') || '';
+
+      // Generate temporary password
+      const temporaryPassword = emailService.generateTemporaryPassword();
+      const hashedPassword = await hashPassword(temporaryPassword);
+
+      // Calculate expiration time (24 hours from now)
+      const expirationTime = new Date();
+      expirationTime.setHours(expirationTime.getHours() + 24);
+
+      // Create technician record
+      const stmt = getDatabase().prepare(`
+        INSERT INTO technicians (
+          name, surname, email, password_hash, phone_number, specialization,
+          years_experience, certifications, education, work_history, skills,
+          languages, transport_available, location, status,
+          is_temporary_password, temporary_password_expires, must_change_password
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `);
+
+      const result = stmt.run(
+        name,
+        surname,
+        personalInfo.email,
+        hashedPassword,
+        personalInfo.phone,
+        professionalInfo.specialization,
+        parseInt(professionalInfo.yearsExperience) || 0,
+        JSON.stringify(professionalInfo.certifications || ''),
+        backgroundInfo.education || '',
+        backgroundInfo.workHistory || '',
+        JSON.stringify(additionalInfo.skills || ''),
+        JSON.stringify(additionalInfo.languages || ''),
+        additionalInfo.transportAvailable ? 1 : 0,
+        JSON.stringify({
+          address: personalInfo.location || '',
+          city: '',
+          postalCode: ''
+        }),
+        'active', // Set as active since approved
+        1, // is_temporary_password
+        expirationTime.toISOString(),
+        1  // must_change_password
+      );
+
+      const technicianId = result.lastInsertRowid;
     
-    // Generate a temporary password (should be sent to technician via email)
-    const tempPassword = Math.random().toString(36).slice(-8);
-    const saltRounds = 10;
-    const hashedPassword = bcrypt.hashSync(tempPassword, saltRounds);
-    
-    // Split full name into name and surname
-    const fullNameParts = personal_info.fullName.trim().split(' ');
-    const name = fullNameParts[0] || '';
-    const surname = fullNameParts.slice(1).join(' ') || '';
-    
-    // Prepare certifications array
-    let certifications = [];
-    if (professional_info.certifications) {
-      // Split by newlines or commas and clean up
-      certifications = professional_info.certifications
-        .split(/[\n,]+/)
-        .filter(Boolean)
-        .map(cert => cert.trim());
+      // Update application with technician_id
+      const updateStmt = getDatabase().prepare(`
+        UPDATE technician_applications 
+        SET technician_id = ? 
+        WHERE application_id = ?
+      `);
+      updateStmt.run(technicianId, applicationId);
+
+      return {
+        success: true,
+        technicianId,
+        temporaryPassword,
+        message: 'Compte technicien créé avec succès'
+      };
+    } catch (error) {
+      console.error('Error creating technician from application:', error);
+      return {
+        success: false,
+        message: 'Erreur lors de la création du compte technicien',
+        error: error.message
+      };
     }
-    
-    // Prepare skills array
-    let skills = [];
-    if (additional_info.skills) {
-      skills = additional_info.skills
-        .split(/[\n,]+/)
-        .filter(Boolean)
-        .map(skill => skill.trim());
-    }
-    
-    // Add specialization to skills if not already included
-    if (professional_info.specialization && !skills.includes(professional_info.specialization)) {
-      skills.unshift(professional_info.specialization);
-    }
-    
-    // Prepare languages array
-    let languages = [];
-    if (additional_info.languages) {
-      languages = additional_info.languages
-        .split(/[\n,]+/)
-        .filter(Boolean)
-        .map(lang => lang.trim());
-    }
-    
-    // Create location object
-    const location = {
-      address: personal_info.location,
-      city: personal_info.location, // For now, use the same value
-      postalCode: '', // Could be extracted from address if needed
-      coordinates: null // Could be geocoded later
-    };
-    
-    // Create technician
-    const insertStmt = db.prepare(
-      `INSERT INTO technicians (
-        name, surname, email, password_hash, phone_number, specialization,
-        years_experience, certifications, education, work_history, skills,
-        languages, transport_available, location, status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-    );
-    
-    const result = insertStmt.run(
-      name,
-      surname,
-      personal_info.email,
-      hashedPassword,
-      personal_info.phone,
-      professional_info.specialization,
-      parseInt(professional_info.yearsExperience) || 0,
-      JSON.stringify(certifications),
-      background.education || '',
-      background.workHistory || '',
-      JSON.stringify(skills),
-      JSON.stringify(languages),
-      additional_info.transportAvailable ? 1 : 0,
-      JSON.stringify(location),
-      'active'
-    );
-    
-    const technicianId = result.lastInsertRowid;
-    
-    // Update application with technician ID
-    const updateAppStmt = db.prepare(
-      `UPDATE technician_applications SET 
-       technician_id = ?, 
-       updated_at = CURRENT_TIMESTAMP 
-       WHERE application_id = ?`
-    );
-    
-    updateAppStmt.run(technicianId, applicationId);
-    
-    console.log(`Created technician account for ${personal_info.email} with temporary password: ${tempPassword}`);
-    console.log('TODO: Send email with login credentials to the technician');
-    
-    return technicianId;
   },
   
   /**
@@ -261,14 +333,22 @@ export const TechnicianApplicationModel = {
    * @returns {Promise<boolean>} True if deleted successfully
    */
   async delete(applicationId) {
-    const db = getDatabase();
-    
-    const stmt = db.prepare(
-      `DELETE FROM technician_applications WHERE application_id = ?`
-    );
-    
-    const result = stmt.run(applicationId);
-    return result.changes > 0;
+    try {
+      const stmt = getDatabase().prepare('DELETE FROM technician_applications WHERE application_id = ?');
+      const result = stmt.run(applicationId);
+      
+      return {
+        success: result.changes > 0,
+        message: result.changes > 0 ? 'Candidature supprimée' : 'Candidature non trouvée'
+      };
+    } catch (error) {
+      console.error('Error deleting application:', error);
+      return {
+        success: false,
+        message: 'Erreur lors de la suppression',
+        error: error.message
+      };
+    }
   },
   
   /**
@@ -277,24 +357,39 @@ export const TechnicianApplicationModel = {
    * @returns {Promise<Array>} Array of applications with the specified status
    */
   async getByStatus(status) {
-    const db = getDatabase();
-    
-    const stmt = db.prepare(`
-      SELECT * FROM technician_applications 
-      WHERE status = ?
-      ORDER BY submitted_at DESC
-    `);
-    const applications = stmt.all(status);
-    
-    // Parse JSON fields
-    return applications.map(application => ({
-      ...application,
-      personal_info: JSON.parse(application.personal_info),
-      professional_info: JSON.parse(application.professional_info),
-      background: JSON.parse(application.background),
-      additional_info: JSON.parse(application.additional_info),
-      documents: JSON.parse(application.documents)
-    }));
+    try {
+      const stmt = getDatabase().prepare(`
+        SELECT 
+          application_id,
+          personal_info,
+          professional_info,
+          background,
+          additional_info,
+          documents,
+          status,
+          admin_notes,
+          technician_id,
+          submitted_at,
+          updated_at
+        FROM technician_applications 
+        WHERE status = ?
+        ORDER BY submitted_at DESC
+      `);
+      
+      const applications = stmt.all(status);
+      
+      return applications.map(app => ({
+        ...app,
+        personal_info: JSON.parse(app.personal_info),
+        professional_info: JSON.parse(app.professional_info),
+        background: JSON.parse(app.background),
+        additional_info: JSON.parse(app.additional_info),
+        documents: JSON.parse(app.documents)
+      }));
+    } catch (error) {
+      console.error('Error fetching applications by status:', error);
+      throw error;
+    }
   },
   
   /**
@@ -302,31 +397,34 @@ export const TechnicianApplicationModel = {
    * @returns {Promise<Object>} Statistics about applications
    */
   async getStatistics() {
-    const db = getDatabase();
+    try {
+      const stmt = getDatabase().prepare(`
+        SELECT 
+          status,
+          COUNT(*) as count
+        FROM technician_applications 
+        GROUP BY status
+      `);
+      
+      const stats = stmt.all();
+      
+      const result = {
+        total: 0,
+        pending: 0,
+        approved: 0,
+        rejected: 0,
+        reviewing: 0
+      };
+      
+      stats.forEach(stat => {
+        result[stat.status] = stat.count;
+        result.total += stat.count;
+      });
     
-    const stmt = db.prepare(`
-      SELECT 
-        status,
-        COUNT(*) as count
-      FROM technician_applications 
-      GROUP BY status
-    `);
-    
-    const results = stmt.all();
-    
-    const stats = {
-      total: 0,
-      pending: 0,
-      reviewing: 0,
-      approved: 0,
-      rejected: 0
-    };
-    
-    results.forEach(row => {
-      stats[row.status] = row.count;
-      stats.total += row.count;
-    });
-    
-    return stats;
+      return result;
+    } catch (error) {
+      console.error('Error fetching application statistics:', error);
+      throw error;
+    }
   }
 }; 

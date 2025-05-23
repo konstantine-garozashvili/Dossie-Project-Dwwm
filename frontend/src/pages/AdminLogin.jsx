@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Shield } from "lucide-react";
 import { AUTH_ENDPOINTS } from "@/config/api";
 
 export const AdminLogin = () => {
@@ -67,82 +67,94 @@ export const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-950 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
-        <Card className="bg-slate-900 border-slate-800 shadow-xl">
-          <CardHeader className="text-center border-b border-slate-800 pb-6">
-            <CardTitle className="text-2xl font-bold text-white">Administration IT13</CardTitle>
-            <p className="text-gray-400 mt-2">Connectez-vous pour accéder au tableau de bord</p>
+        <Card className="bg-card border-border shadow-xl">
+          <CardHeader className="text-center border-b border-border pb-6">
+            <div className="flex justify-center mb-4">
+              <div className="p-3 bg-primary/10 rounded-full">
+                <Shield className="h-8 w-8 text-primary" />
+              </div>
+            </div>
+            <CardTitle className="text-2xl font-bold text-card-foreground">
+              Administration IT13
+            </CardTitle>
+            <p className="text-muted-foreground mt-2">
+              Accès réservé aux administrateurs
+            </p>
           </CardHeader>
           
           <CardContent className="pt-6">
-            <form onSubmit={handleSubmit} aria-label="Admin login form">
+            <form onSubmit={handleSubmit} className="space-y-4">
               {error && (
-                <div className="mb-6 p-3 bg-red-950/50 border border-red-800 rounded-md flex items-start">
-                  <AlertCircle className="w-5 h-5 text-red-400 mr-2 mt-0.5" />
-                  <span className="text-red-400 text-sm">{error}</span>
+                <div className="mb-6 p-3 bg-destructive/10 border border-destructive/20 rounded-md flex items-start">
+                  <AlertCircle className="w-5 h-5 text-destructive mr-2 mt-0.5" />
+                  <span className="text-destructive text-sm">{error}</span>
                 </div>
               )}
               
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Adresse mail</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="admin@it13.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="bg-slate-800 border-slate-700"
-                    required
-                  />
+              <div className="space-y-2">
+                <Label htmlFor="email">Email administrateur</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="admin@it13.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="bg-input border-border"
+                  required
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Mot de passe</Label>
+                  <Link 
+                    to="/forgot-password" 
+                    className="text-sm text-primary hover:text-primary/80 transition-colors"
+                  >
+                    Mot de passe oublié?
+                  </Link>
                 </div>
-                
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <Label htmlFor="password">Mot de passe</Label>
-                    <a href="#" className="text-sm text-cyan-400 hover:text-cyan-300">Mot de passe oublié?</a>
-                  </div>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="bg-slate-800 border-slate-700"
-                    required
-                  />
-                </div>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Mot de passe administrateur"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="bg-input border-border"
+                  required
+                />
               </div>
               
               <Button 
                 type="submit"
-                className="w-full mt-6 bg-cyan-500 hover:bg-cyan-600"
+                className="w-full mt-6 bg-primary hover:bg-primary/90 text-primary-foreground"
                 disabled={isLoading}
               >
-                {isLoading ? 'Connexion en cours...' : 'Se connecter'}
+                {isLoading ? 'Connexion...' : 'Se connecter'}
               </Button>
-
+              
               <Button 
                 type="button"
                 variant="outline"
-                className="w-full mt-4 border-cyan-500 text-cyan-500 hover:bg-cyan-500/10 hover:text-cyan-400"
+                className="w-full mt-4 border-primary text-primary hover:bg-primary/10"
                 onClick={handleQuickLogin}
                 disabled={isLoading}
               >
-                Connexion rapide (Test)
+                Connexion rapide (admin123)
               </Button>
             </form>
           </CardContent>
           
-          <CardFooter className="flex justify-center border-t border-slate-800 pt-6">
-            <p className="text-sm text-gray-400">
-              Ceci est une interface d'administration. <span className="text-cyan-400">Accès restreint</span>.
+          <CardFooter className="flex justify-center border-t border-border pt-6">
+            <p className="text-sm text-muted-foreground">
+              Ceci est une interface d'administration. <span className="text-primary">Accès restreint</span>.
             </p>
           </CardFooter>
         </Card>

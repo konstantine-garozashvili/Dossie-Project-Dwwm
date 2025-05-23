@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, User } from "lucide-react";
 import { AUTH_ENDPOINTS } from "@/config/api";
+import { useToast } from "@/components/ui/use-toast";
 
 export const TechnicianLogin = () => {
   const [email, setEmail] = useState('');
@@ -14,6 +15,7 @@ export const TechnicianLogin = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const executeLogin = async (currentEmail, currentPassword) => {
     setError('');
@@ -33,17 +35,75 @@ export const TechnicianLogin = () => {
 
       const data = await response.json();
 
-      if (response.ok && data.success) {
-        // Save token and user info to localStorage
+      if (data.success) {
+        // Store token and user info
         localStorage.setItem('technicianToken', data.token);
-        localStorage.setItem('technicianInfo', JSON.stringify({
-          id: data.technician.id,
-          email: data.technician.email,
-          name: data.technician.name
-        }));
-        navigate('/dashboardtech');
+        localStorage.setItem('technicianInfo', JSON.stringify(data.technician));
+        
+        // Check if password change is required
+        if (data.mustChangePassword || data.isTemporaryPassword) {
+          toast({
+            title: "Changement de mot de passe requis",
+            description: "Vous devez changer votre mot de passe temporaire",
+            variant: "default",
+          });
+          
+          navigate('/change-password?temporary=true');
+          return;
+        }
+        
+        toast({
+          title: "Connexion réussie",
+          description: "Bienvenue dans votre espace technicien !",
+          variant: "success",
+        });
+        
+        navigate('/technician-dashboard');
       } else {
-        setError(data.message || 'Une erreur est survenue lors de la connexion');
+        // Handle different error types
+        if (data.reason === 'rejected') {
+          toast({
+            title: "Compte refusé",
+            description: data.message,
+            variant: "destructive",
+          });
+          
+          // Show additional details in a separate toast
+          setTimeout(() => {
+            toast({
+              title: "Informations complémentaires",
+              description: data.details,
+              variant: "destructive",
+            });
+          }, 2000);
+        } else if (data.reason === 'pending') {
+          toast({
+            title: "Candidature en cours",
+            description: data.message,
+            variant: "default",
+          });
+          
+          setTimeout(() => {
+            toast({
+              title: "Patience requise",
+              description: data.details,
+              variant: "default",
+            });
+          }, 2000);
+        } else if (data.reason === 'inactive') {
+          toast({
+            title: "Compte désactivé",
+            description: data.message,
+            variant: "destructive",
+          });
+        } else {
+          // Generic error
+          toast({
+            title: "Erreur de connexion",
+            description: data.message || "Identifiants invalides",
+            variant: "destructive",
+          });
+        }
       }
     } catch (err) {
       setError('Erreur de connexion au serveur');
@@ -67,86 +127,77 @@ export const TechnicianLogin = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-950 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
-        <Card className="bg-slate-900 border-slate-800 shadow-xl">
-          <CardHeader className="text-center border-b border-slate-800 pb-6">
-            <CardTitle className="text-2xl font-bold text-white">Espace Technicien IT13</CardTitle>
-            <p className="text-gray-400 mt-2">Connectez-vous pour accéder à votre espace technicien</p>
+        <Card className="bg-card border-border shadow-xl">
+          <CardHeader className="text-center border-b border-border pb-6">
+            <div className="flex justify-center mb-4">
+              <div className="p-3 bg-primary/10 rounded-full">
+                <User className="h-8 w-8 text-primary" />
+              </div>
+            </div>
+            <CardTitle className="text-2xl font-bold text-card-foreground">
+              Connexion Technicien
+            </CardTitle>
+            <p className="text-muted-foreground mt-2">
+              Accédez à votre espace technicien
+            </p>
           </CardHeader>
           
           <CardContent className="pt-6">
-            <form onSubmit={handleSubmit} aria-label="Technician login form" data-testid="login-form">
-              {error && (
-                <div className="mb-6 p-3 bg-red-950/50 border border-red-800 rounded-md flex items-start">
-                  <AlertCircle className="w-5 h-5 text-red-400 mr-2 mt-0.5" />
-                  <span className="text-red-400 text-sm">{error}</span>
-                </div>
-              )}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="votre.email@exemple.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="bg-input border-border"
+                  required
+                />
+              </div>
               
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Adresse mail</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="tech@it13.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="bg-slate-800 border-slate-700"
-                    required
-                    data-testid="email-input"
-                  />
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Mot de passe</Label>
+                  <Link 
+                    to="/forgot-password" 
+                    className="text-sm text-primary hover:text-primary/80 transition-colors"
+                  >
+                    Mot de passe oublié?
+                  </Link>
                 </div>
-                
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <Label htmlFor="password">Mot de passe</Label>
-                    <a href="#" className="text-sm text-cyan-400 hover:text-cyan-300">Mot de passe oublié?</a>
-                  </div>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="bg-slate-800 border-slate-700"
-                    required
-                    data-testid="password-input"
-                  />
-                </div>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Votre mot de passe"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="bg-input border-border"
+                  required
+                />
               </div>
               
               <Button 
                 type="submit"
-                className="w-full mt-6 bg-cyan-500 hover:bg-cyan-600"
+                className="w-full mt-6 bg-primary hover:bg-primary/90 text-primary-foreground"
                 disabled={isLoading}
-                data-testid="login-button"
               >
-                {isLoading ? 'Connexion en cours...' : 'Se connecter'}
-              </Button>
-
-              <Button 
-                type="button"
-                variant="outline"
-                className="w-full mt-4 border-cyan-500 text-cyan-500 hover:bg-cyan-500/10 hover:text-cyan-400"
-                onClick={handleQuickLogin}
-                disabled={isLoading}
-                data-testid="quick-login-button"
-              >
-                Connexion rapide (Test)
+                {isLoading ? 'Connexion...' : 'Se connecter'}
               </Button>
             </form>
           </CardContent>
           
-          <CardFooter className="flex justify-center border-t border-slate-800 pt-6">
-            <p className="text-sm text-gray-400">
-              Espace réservé aux techniciens. <span className="text-cyan-400">Accès restreint</span>.
+          <CardFooter className="flex justify-center border-t border-border pt-6">
+            <p className="text-sm text-muted-foreground">
+              Espace réservé aux techniciens. <span className="text-primary">Accès restreint</span>.
             </p>
           </CardFooter>
         </Card>

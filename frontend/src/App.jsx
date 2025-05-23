@@ -11,6 +11,9 @@ import { AdminLogin } from "./pages/AdminLogin";
 import { AdminDashboard } from "./pages/AdminDashboard";
 import { TechnicianLogin } from "./pages/TechnicianLogin";
 import { TechnicianDashboard } from "./pages/TechnicianDashboard";
+import { ChangePassword } from "./pages/ChangePassword";
+import { ForgotPassword } from "./pages/ForgotPassword";
+import { ResetPassword } from "./pages/ResetPassword";
 
 function App() {
   return (
@@ -24,7 +27,10 @@ function App() {
       <Route path="/adminlog" element={<AdminLogin />} />
       <Route path="/dashboardadmin" element={<AdminDashboard />} />
       <Route path="/techlog" element={<TechnicianLogin />} />
-      <Route path="/dashboardtech" element={<TechnicianDashboard />} />
+      <Route path="/technician-dashboard" element={<TechnicianDashboard />} />
+      <Route path="/change-password" element={<ChangePassword />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
     </Routes>
   );
 }

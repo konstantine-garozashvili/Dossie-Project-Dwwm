@@ -4,6 +4,7 @@ import techniciansRouter from './technicians.js';
 import serviceRequestsRouter from './serviceRequests.js';
 import technicianApplicationsRouter from './technicianApplications.js';
 import addressRouter from './address.js';
+import notificationsRouter from './notifications.js';
 
 // Create the main API router
 const apiRouter = new Hono();
@@ -14,6 +15,7 @@ apiRouter.route('/technicians', techniciansRouter);
 apiRouter.route('/service-requests', serviceRequestsRouter);
 apiRouter.route('/technician-applications', technicianApplicationsRouter);
 apiRouter.route('/address', addressRouter);
+apiRouter.route('/notifications', notificationsRouter);
 
 // Export the router
 export default apiRouter;
