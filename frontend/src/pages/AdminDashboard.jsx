@@ -716,8 +716,6 @@ export const AdminDashboard = () => {
               { id: 'clients', label: 'Clients', icon: Users },
               { id: 'services', label: 'Services', icon: List },
               { id: 'rapports', label: 'Rapports', icon: LineChart },
-              { id: 'parametres', label: 'Paramètres', icon: Settings },
-              { id: 'profile', label: 'Mon Profil', icon: User },
             ].map((item) => {
               const IconComponent = item.icon;
               const isActive = activeTab === item.id;
@@ -804,8 +802,6 @@ export const AdminDashboard = () => {
                 { id: 'clients', label: 'Clients', icon: Users },
                 { id: 'services', label: 'Services', icon: List },
                 { id: 'rapports', label: 'Rapports', icon: LineChart },
-                { id: 'parametres', label: 'Paramètres', icon: Settings },
-                { id: 'profile', label: 'Mon Profil', icon: User },
               ].map((item) => {
                 const IconComponent = item.icon;
                 const isActive = activeTab === item.id;
