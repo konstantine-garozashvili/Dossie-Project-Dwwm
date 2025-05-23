@@ -8,8 +8,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { PhoneInput } from '@/components/ui/phone-input';
+import { AddressAutocomplete } from '@/components/ui/address-autocomplete';
 import { Laptop, Scroll, Star, Wrench, Award, Upload, X, CheckCircle, AlertCircle } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { TECHNICIAN_APPLICATION_ENDPOINTS } from '@/config/api';
 
 const specializations = [
   'Réparation Matérielle',
@@ -70,6 +73,8 @@ export const BecomeTechnician = () => {
     diplomas: '',
     motivationLetter: ''
   });
+
+  const [selectedAddressData, setSelectedAddressData] = useState(null);
 
   const validateFile = (file, type) => {
     if (!file) return '';
@@ -143,6 +148,12 @@ export const BecomeTechnician = () => {
     }));
   };
 
+  // Handle address selection
+  const handleAddressSelect = (addressData) => {
+    setSelectedAddressData(addressData);
+    updateFormData('personalInfo', 'location', addressData?.label || '');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -170,7 +181,7 @@ export const BecomeTechnician = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:8000/api/technician-applications', {
+      const response = await fetch(TECHNICIAN_APPLICATION_ENDPOINTS.SUBMIT_APPLICATION, {
         method: 'POST',
         body: formDataToSend,
       });
@@ -285,23 +296,23 @@ export const BecomeTechnician = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-foreground">Numéro de Téléphone</Label>
-                    <Input
-                      type="tel"
-                      className="bg-input border-border text-foreground placeholder:text-muted-foreground"
-                      placeholder="Entrez votre numéro de téléphone"
+                    <PhoneInput
+                      label="Numéro de Téléphone"
+                      placeholder="Entrez votre numéro (ex: 0606433652)"
                       value={formData.personalInfo.phone}
                       onChange={(e) => updateFormData('personalInfo', 'phone', e.target.value)}
                       required
+                      autoFormat={true}
+                      showValidation={true}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-foreground">Localisation</Label>
-                    <Input
-                      className="bg-input border-border text-foreground placeholder:text-muted-foreground"
-                      placeholder="Ville, Région"
+                    <AddressAutocomplete
+                      label="Localisation"
+                      placeholder="Tapez votre adresse (ex: 1 rue de la Paix, Paris)"
                       value={formData.personalInfo.location}
                       onChange={(e) => updateFormData('personalInfo', 'location', e.target.value)}
+                      onAddressSelect={handleAddressSelect}
                       required
                     />
                   </div>

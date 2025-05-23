@@ -1,16 +1,7 @@
 import { Hono } from 'hono';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import { TechnicianApplicationModel } from '../models/technicianApplication.js';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const UPLOADS_DIR = path.join(__dirname, '../../uploads/technicians');
-
-// Ensure uploads directory exists
-if (!fs.existsSync(UPLOADS_DIR)) {
-  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
-}
+import { uploadDocument, uploadMultipleDocuments, deleteDocument, deleteMultipleDocuments } from '../utils/cloudinaryDocuments.js';
+import { validateTechnicianApplication, sanitizeApplicationData, validateDocumentFile } from '../utils/validation.js';
 
 const technicianApplicationsRouter = new Hono();
 
@@ -23,76 +14,156 @@ technicianApplicationsRouter.post('/', async (c) => {
     const formData = await c.req.formData();
     
     // Extract JSON data
-    const applicationData = JSON.parse(formData.get('data'));
+    const rawApplicationData = JSON.parse(formData.get('data'));
     
-    // Create application folder using timestamp and name
+    // Validate and sanitize application data
+    const validation = validateTechnicianApplication(rawApplicationData);
+    if (!validation.isValid) {
+      return c.json({
+        success: false,
+        message: 'Données de candidature invalides',
+        errors: validation.errors
+      }, 400);
+    }
+
+    const applicationData = sanitizeApplicationData(rawApplicationData);
+    
+    // Generate unique applicant ID for file organization
     const timestamp = Date.now();
     const applicantName = applicationData.personalInfo.fullName.replace(/\s+/g, '_').toLowerCase();
-    const applicationDir = path.join(UPLOADS_DIR, `${timestamp}_${applicantName}`);
-    
-    if (!fs.existsSync(applicationDir)) {
-      fs.mkdirSync(applicationDir, { recursive: true });
-    }
+    const applicantId = `${timestamp}_${applicantName}`;
     
     // Process CV (required)
-    const cv = formData.get('cv');
-    if (!cv) {
+    const cvFile = formData.get('cv');
+    if (!cvFile) {
       return c.json({
         success: false,
         message: 'Le CV est requis'
       }, 400);
     }
     
-    // Save CV file
-    const cvFileName = `${timestamp}_cv${path.extname(cv.name)}`;
-    const cvPath = path.join(applicationDir, cvFileName);
-    const cvArrayBuffer = await cv.arrayBuffer();
-    fs.writeFileSync(cvPath, Buffer.from(cvArrayBuffer));
-    
-    // Process diplomas (optional, multiple)
-    const diplomaPaths = [];
-    for (let i = 0; formData.get(`diploma_${i}`); i++) {
-      const diploma = formData.get(`diploma_${i}`);
-      const diplomaFileName = `${timestamp}_diploma_${i}${path.extname(diploma.name)}`;
-      const diplomaPath = path.join(applicationDir, diplomaFileName);
-      const diplomaArrayBuffer = await diploma.arrayBuffer();
-      fs.writeFileSync(diplomaPath, Buffer.from(diplomaArrayBuffer));
-      diplomaPaths.push(diplomaPath);
+    // Validate CV file
+    const cvValidation = validateDocumentFile(cvFile, 'cv');
+    if (!cvValidation.isValid) {
+      return c.json({
+        success: false,
+        message: cvValidation.error
+      }, 400);
     }
     
-    // Process motivation letter (optional)
-    let motivationLetterPath = null;
-    const motivationLetter = formData.get('motivationLetter');
-    if (motivationLetter) {
-      const motivationLetterFileName = `${timestamp}_motivation_letter${path.extname(motivationLetter.name)}`;
-      motivationLetterPath = path.join(applicationDir, motivationLetterFileName);
-      const motivationLetterArrayBuffer = await motivationLetter.arrayBuffer();
-      fs.writeFileSync(motivationLetterPath, Buffer.from(motivationLetterArrayBuffer));
-    }
+    let uploadedDocuments = {};
+    let uploadedFiles = []; // Track for cleanup on error
     
-    // Prepare application data for database
-    const applicationDataForDb = {
-      ...applicationData,
-      documents: {
-        cv: cvPath,
-        diplomas: diplomaPaths,
-        motivationLetter: motivationLetterPath
-      },
-      status: 'pending', // Initial status
-      submittedAt: new Date().toISOString()
-    };
-    
-    // Save application to database
-    const application = await TechnicianApplicationModel.create(applicationDataForDb);
-    
-    return c.json({
-      success: true,
-      message: 'Candidature soumise avec succès',
-      data: {
-        applicationId: application.application_id,
-        status: application.status
+    try {
+      // Upload CV to Cloudinary
+      console.log('Uploading CV to Cloudinary...');
+      const cvBuffer = Buffer.from(await cvFile.arrayBuffer());
+      const cvUploadResult = await uploadDocument(cvBuffer, cvFile.name, 'cv', applicantId);
+      uploadedDocuments.cv = cvUploadResult;
+      uploadedFiles.push(cvUploadResult.public_id);
+      
+      // Process diplomas (optional, multiple)
+      const diplomaFiles = [];
+      for (let i = 0; formData.get(`diploma_${i}`); i++) {
+        const diplomaFile = formData.get(`diploma_${i}`);
+        
+        // Validate diploma file
+        const diplomaValidation = validateDocumentFile(diplomaFile, 'diplomas');
+        if (!diplomaValidation.isValid) {
+          // Cleanup uploaded files
+          await deleteMultipleDocuments(uploadedFiles);
+          return c.json({
+            success: false,
+            message: `Erreur diplôme ${i + 1}: ${diplomaValidation.error}`
+          }, 400);
+        }
+        
+        const diplomaBuffer = Buffer.from(await diplomaFile.arrayBuffer());
+        diplomaFiles.push({
+          buffer: diplomaBuffer,
+          name: diplomaFile.name
+        });
       }
-    }, 201);
+      
+      // Upload diplomas to Cloudinary
+      if (diplomaFiles.length > 0) {
+        console.log(`Uploading ${diplomaFiles.length} diploma(s) to Cloudinary...`);
+        const diplomaUploadResults = await uploadMultipleDocuments(diplomaFiles, 'diploma', applicantId);
+        uploadedDocuments.diplomas = diplomaUploadResults;
+        uploadedFiles.push(...diplomaUploadResults.map(result => result.public_id));
+      } else {
+        uploadedDocuments.diplomas = [];
+      }
+      
+      // Process motivation letter (optional)
+      const motivationLetterFile = formData.get('motivationLetter');
+      if (motivationLetterFile) {
+        // Validate motivation letter file
+        const motivationValidation = validateDocumentFile(motivationLetterFile, 'motivationLetter');
+        if (!motivationValidation.isValid) {
+          // Cleanup uploaded files
+          await deleteMultipleDocuments(uploadedFiles);
+          return c.json({
+            success: false,
+            message: `Erreur lettre de motivation: ${motivationValidation.error}`
+          }, 400);
+        }
+        
+        console.log('Uploading motivation letter to Cloudinary...');
+        const motivationBuffer = Buffer.from(await motivationLetterFile.arrayBuffer());
+        const motivationUploadResult = await uploadDocument(motivationBuffer, motivationLetterFile.name, 'motivation_letter', applicantId);
+        uploadedDocuments.motivationLetter = motivationUploadResult;
+        uploadedFiles.push(motivationUploadResult.public_id);
+      } else {
+        uploadedDocuments.motivationLetter = null;
+      }
+      
+      // Prepare application data for database
+      const applicationDataForDb = {
+        ...applicationData,
+        documents: uploadedDocuments,
+        applicantId: applicantId,
+        status: 'pending', // Initial status
+        submittedAt: new Date().toISOString()
+      };
+      
+      // Save application to database
+      console.log('Saving application to database...');
+      const application = await TechnicianApplicationModel.create(applicationDataForDb);
+      
+      console.log(`Application created successfully with ID: ${application.application_id}`);
+      
+      return c.json({
+        success: true,
+        message: 'Candidature soumise avec succès',
+        data: {
+          applicationId: application.application_id,
+          applicantId: applicantId,
+          status: application.status,
+          documentsUploaded: {
+            cv: !!uploadedDocuments.cv,
+            diplomas: uploadedDocuments.diplomas.length,
+            motivationLetter: !!uploadedDocuments.motivationLetter
+          }
+        }
+      }, 201);
+      
+    } catch (uploadError) {
+      console.error('Error during file upload or database save:', uploadError);
+      
+      // Cleanup any uploaded files
+      if (uploadedFiles.length > 0) {
+        try {
+          await deleteMultipleDocuments(uploadedFiles);
+          console.log('Cleaned up uploaded files after error');
+        } catch (cleanupError) {
+          console.error('Error cleaning up files:', cleanupError);
+        }
+      }
+      
+      throw uploadError;
+    }
+    
   } catch (error) {
     console.error('Error submitting technician application:', error);
     return c.json({
@@ -109,13 +180,14 @@ technicianApplicationsRouter.post('/', async (c) => {
  */
 technicianApplicationsRouter.get('/', async (c) => {
   try {
-    // In a real app, check admin authentication here
+    // TODO: Add admin authentication middleware
     
     const applications = await TechnicianApplicationModel.getAll();
     
     return c.json({
       success: true,
-      data: applications
+      data: applications,
+      count: applications.length
     });
   } catch (error) {
     console.error('Error fetching technician applications:', error);
@@ -133,7 +205,7 @@ technicianApplicationsRouter.get('/', async (c) => {
  */
 technicianApplicationsRouter.get('/:id', async (c) => {
   try {
-    // In a real app, check admin authentication here
+    // TODO: Add admin authentication middleware
     
     const id = c.req.param('id');
     const application = await TechnicianApplicationModel.getById(parseInt(id, 10));
@@ -165,7 +237,7 @@ technicianApplicationsRouter.get('/:id', async (c) => {
  */
 technicianApplicationsRouter.patch('/:id/status', async (c) => {
   try {
-    // In a real app, check admin authentication here
+    // TODO: Add admin authentication middleware
     
     const id = c.req.param('id');
     const { status, notes } = await c.req.json();
@@ -173,7 +245,7 @@ technicianApplicationsRouter.patch('/:id/status', async (c) => {
     if (!['pending', 'reviewing', 'approved', 'rejected'].includes(status)) {
       return c.json({
         success: false,
-        message: 'Statut invalide'
+        message: 'Statut invalide. Statuts autorisés: pending, reviewing, approved, rejected'
       }, 400);
     }
     
@@ -199,7 +271,110 @@ technicianApplicationsRouter.patch('/:id/status', async (c) => {
     console.error(`Error updating technician application ${c.req.param('id')}:`, error);
     return c.json({
       success: false,
-      message: 'Erreur lors de la mise à jour du statut de la candidature',
+      message: 'Erreur lors de la mise à jour du statut',
+      error: error.message
+    }, 500);
+  }
+});
+
+/**
+ * POST /api/technician-applications/:id/approve
+ * Approve application and create technician account (admin only)
+ */
+technicianApplicationsRouter.post('/:id/approve', async (c) => {
+  try {
+    // TODO: Add admin authentication middleware
+    
+    const id = c.req.param('id');
+    const { notes } = await c.req.json();
+    
+    // Update status to approved (this will also create the technician)
+    const updatedApplication = await TechnicianApplicationModel.updateStatus(
+      parseInt(id, 10),
+      'approved',
+      notes || 'Candidature approuvée et compte technicien créé'
+    );
+    
+    if (!updatedApplication) {
+      return c.json({
+        success: false,
+        message: 'Candidature non trouvée'
+      }, 404);
+    }
+    
+    return c.json({
+      success: true,
+      message: 'Candidature approuvée et compte technicien créé avec succès',
+      data: {
+        application: updatedApplication,
+        technicianId: updatedApplication.technician_id
+      }
+    });
+  } catch (error) {
+    console.error(`Error approving technician application ${c.req.param('id')}:`, error);
+    return c.json({
+      success: false,
+      message: 'Erreur lors de l\'approbation de la candidature',
+      error: error.message
+    }, 500);
+  }
+});
+
+/**
+ * DELETE /api/technician-applications/:id
+ * Delete application and associated documents (admin only)
+ */
+technicianApplicationsRouter.delete('/:id', async (c) => {
+  try {
+    // TODO: Add admin authentication middleware
+    
+    const id = c.req.param('id');
+    
+    // Get application to retrieve document URLs for cleanup
+    const application = await TechnicianApplicationModel.getById(parseInt(id, 10));
+    
+    if (!application) {
+      return c.json({
+        success: false,
+        message: 'Candidature non trouvée'
+      }, 404);
+    }
+    
+    // Extract document public IDs for deletion
+    const documentsToDelete = [];
+    if (application.documents.cv?.public_id) {
+      documentsToDelete.push(application.documents.cv.public_id);
+    }
+    if (application.documents.diplomas?.length > 0) {
+      documentsToDelete.push(...application.documents.diplomas.map(doc => doc.public_id));
+    }
+    if (application.documents.motivationLetter?.public_id) {
+      documentsToDelete.push(application.documents.motivationLetter.public_id);
+    }
+    
+    // Delete documents from Cloudinary
+    if (documentsToDelete.length > 0) {
+      try {
+        await deleteMultipleDocuments(documentsToDelete);
+        console.log(`Deleted ${documentsToDelete.length} documents from Cloudinary`);
+      } catch (cloudinaryError) {
+        console.error('Error deleting documents from Cloudinary:', cloudinaryError);
+        // Continue with database deletion even if Cloudinary cleanup fails
+      }
+    }
+    
+    // Delete application from database
+    await TechnicianApplicationModel.delete(parseInt(id, 10));
+    
+    return c.json({
+      success: true,
+      message: 'Candidature et documents associés supprimés avec succès'
+    });
+  } catch (error) {
+    console.error(`Error deleting technician application ${c.req.param('id')}:`, error);
+    return c.json({
+      success: false,
+      message: 'Erreur lors de la suppression de la candidature',
       error: error.message
     }, 500);
   }
