@@ -71,6 +71,9 @@ export const TechnicianDashboard = () => {
   const isSmallScreen = useResponsive();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // State for mobile bottom menu
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   useEffect(() => {
     const storedTechInfo = localStorage.getItem('technicianInfo');
     if (storedTechInfo) {
@@ -404,11 +407,6 @@ export const TechnicianDashboard = () => {
   const Header = () => (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background/80 backdrop-blur-md px-4 sm:px-6">
       <div className="flex items-center">
-        {isSmallScreen && (
-          <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(!sidebarOpen)} className="mr-2 text-foreground hover:bg-muted">
-            {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </Button>
-        )}
         <h1 className="text-xl font-semibold text-foreground">{pageTitles[activeTab] || "Tableau de Bord Technicien"}</h1>
       </div>
       <div className="flex items-center space-x-2 sm:space-x-4">
@@ -474,7 +472,7 @@ export const TechnicianDashboard = () => {
       <Header />
       
       {/* Main content */}
-              <main className="flex-1 p-4 sm:p-6 space-y-6 pb-24 md:pb-6">
+      <main className="flex-1 p-4 sm:p-6 space-y-6 pb-20">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
           <TabsContent value="taches" className="mt-0">
               {renderTasksTab()} 
@@ -520,39 +518,147 @@ export const TechnicianDashboard = () => {
         </motion.div>
       )}
       
-      {/* MOBILE BOTTOM NAVIGATION BAR */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-blue-600 text-white shadow-lg z-[9999]" style={{position: 'fixed', bottom: 0}}>
-        <div className="flex justify-around h-16">
-          <button 
-            onClick={() => setActiveTab('taches')}
-            className={`flex flex-col items-center justify-center flex-1 ${activeTab === 'taches' ? 'bg-blue-700' : ''}`}
-          >
-            <List size={22} />
-            <span className="text-xs mt-1">Tâches</span>
-          </button>
-          <button 
-            onClick={() => setActiveTab('calendrier')}
-            className={`flex flex-col items-center justify-center flex-1 ${activeTab === 'calendrier' ? 'bg-blue-700' : ''}`}
-          >
-            <Calendar size={22} />
-            <span className="text-xs mt-1">Agenda</span>
-          </button>
-          <button 
-            onClick={() => setActiveTab('inventaire')}
-            className={`flex flex-col items-center justify-center flex-1 ${activeTab === 'inventaire' ? 'bg-blue-700' : ''}`}
-          >
-            <Wrench size={22} />
-            <span className="text-xs mt-1">Inventaire</span>
-          </button>
-          <button 
-            onClick={() => setActiveTab('profile')}
-            className={`flex flex-col items-center justify-center flex-1 ${activeTab === 'profile' ? 'bg-blue-700' : ''}`}
-          >
-            <User size={22} />
-            <span className="text-xs mt-1">Profil</span>
-          </button>
+      {/* DESKTOP NAVIGATION BAR - Hidden on mobile */}
+      <div className="hidden md:block fixed bottom-0 left-0 right-0 bg-card border-t border-border text-card-foreground shadow-lg z-[9999]">
+        <div className="flex justify-center">
+          <div className="flex justify-around max-w-4xl w-full h-16">
+            {[
+              { id: 'taches', label: 'Tâches', icon: List },
+              { id: 'calendrier', label: 'Calendrier', icon: Calendar },
+              { id: 'inventaire', label: 'Inventaire', icon: Wrench },
+            ].map((item) => {
+              const IconComponent = item.icon;
+              const isActive = activeTab === item.id;
+              
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id)}
+                  className={`flex flex-col items-center justify-center px-4 py-2 transition-all duration-200 rounded-lg mx-1 ${
+                    isActive 
+                      ? 'bg-primary text-primary-foreground shadow-sm' 
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                  }`}
+                >
+                  <IconComponent className="h-5 w-5 mb-1" />
+                  <span className="text-xs font-medium">{item.label}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
+
+      {/* MOBILE HAMBURGER MENU BUTTON - Only visible on mobile */}
+      <div className="md:hidden fixed bottom-4 right-4 z-[9999]">
+        <Button
+          onClick={() => setMobileMenuOpen(true)}
+          className="h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all duration-300 hover:scale-110"
+          size="icon"
+        >
+          <Menu className="h-6 w-6" />
+        </Button>
+      </div>
+
+      {/* MOBILE FULL-SCREEN BOTTOM MENU */}
+      {mobileMenuOpen && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 bg-black/60 z-[9998]"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+          
+          {/* Bottom Menu */}
+          <motion.div
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ 
+              type: "spring", 
+              stiffness: 300, 
+              damping: 30,
+              duration: 0.4 
+            }}
+            className="fixed bottom-0 left-0 right-0 bg-card border-t border-border rounded-t-3xl z-[9999] max-h-[80vh] overflow-hidden"
+          >
+            {/* Handle bar */}
+            <div className="flex justify-center pt-4 pb-2">
+              <div className="w-12 h-1 bg-muted-foreground/30 rounded-full"></div>
+            </div>
+            
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+              <h3 className="text-lg font-semibold text-foreground">Navigation</h3>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            
+            {/* Navigation Items */}
+            <div className="p-6 space-y-2">
+              {[
+                { id: 'taches', label: 'Tâches', icon: List },
+                { id: 'calendrier', label: 'Calendrier', icon: Calendar },
+                { id: 'inventaire', label: 'Inventaire', icon: Wrench },
+              ].map((item) => {
+                const IconComponent = item.icon;
+                const isActive = activeTab === item.id;
+                
+                return (
+                  <motion.button
+                    key={item.id}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => {
+                      setActiveTab(item.id);
+                      setMobileMenuOpen(false);
+                    }}
+                    className={`w-full flex items-center space-x-4 p-4 rounded-xl transition-all duration-200 ${
+                      isActive 
+                        ? 'bg-primary text-primary-foreground shadow-md' 
+                        : 'text-muted-foreground hover:bg-muted/70 hover:text-foreground'
+                    }`}
+                  >
+                    <IconComponent className="h-6 w-6" />
+                    <span className="text-base font-medium">{item.label}</span>
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeIndicator"
+                        className="ml-auto w-2 h-2 bg-primary-foreground rounded-full"
+                      />
+                    )}
+                  </motion.button>
+                );
+              })}
+            </div>
+            
+            {/* Footer with logout */}
+            <div className="px-6 py-4 border-t border-border">
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  handleLogout();
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full flex items-center space-x-4 p-4 text-destructive hover:bg-destructive/10 hover:text-destructive rounded-xl"
+              >
+                <LogOut className="h-6 w-6" />
+                <span className="text-base font-medium">Déconnexion</span>
+              </Button>
+            </div>
+          </motion.div>
+        </>
+      )}
     </div>
   );
 };

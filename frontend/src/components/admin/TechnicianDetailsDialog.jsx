@@ -14,11 +14,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const DetailItem = ({ label, value, isBadge, badgeVariant }) => (
   <div className="mb-3">
-    <p className="text-sm text-slate-400 font-medium">{label}</p>
+    <p className="text-sm text-muted-foreground font-medium">{label}</p>
     {isBadge ? (
       <Badge variant={badgeVariant} className="capitalize text-sm">{value ? value.replace('_',' ') : 'N/A'}</Badge>
     ) : (
-      <p className="text-slate-200 text-sm">{value || 'N/A'}</p>
+      <p className="text-foreground text-sm">{value || 'N/A'}</p>
     )}
   </div>
 );
@@ -41,25 +41,39 @@ const TechnicianDetailsDialog = ({ open, onOpenChange, technician }) => {
     return first + second || 'T';
   };
 
+  // Generate default UI Avatar URL if no profile picture exists
+  const getProfilePictureUrl = () => {
+    if (technician.profile_picture_url) {
+      return technician.profile_picture_url;
+    }
+    
+    // Generate UI Avatars URL as fallback
+    const fullName = `${technician.name || 'T'} ${technician.surname || ''}`.trim();
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=random&color=fff&size=128`;
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md bg-slate-850 border-slate-700 text-slate-200">
+      <DialogContent className="sm:max-w-md bg-card border-border text-card-foreground">
         <DialogHeader className="mb-4">
-          <DialogTitle className="text-cyan-400 text-xl flex items-center">
-            <Avatar className="h-12 w-12 mr-3 border-2 border-cyan-500">
-              <AvatarImage src={technician.profile_picture_url} alt={`${technician.name} ${technician.surname}`} />
-              <AvatarFallback className="text-xl bg-slate-700">
+          <DialogTitle className="text-primary text-xl flex items-center">
+            <Avatar className="h-12 w-12 mr-3 border-2 border-primary">
+              <AvatarImage 
+                src={getProfilePictureUrl()} 
+                alt={`${technician.name} ${technician.surname}`} 
+              />
+              <AvatarFallback className="text-xl bg-muted text-muted-foreground">
                 {getInitials(technician.name, technician.surname)}
               </AvatarFallback>
             </Avatar>
             {technician.name} {technician.surname}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-muted-foreground">
             Détails complets du technicien.
           </DialogDescription>
         </DialogHeader>
         
-        <div className="max-h-[60vh] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-slate-850">
+        <div className="max-h-[60vh] overflow-y-auto pr-2">
             <DetailItem label="ID" value={technician.id} />
             <DetailItem label="Email" value={technician.email} />
             <DetailItem label="Téléphone" value={technician.phone_number} />
@@ -72,12 +86,11 @@ const TechnicianDetailsDialog = ({ open, onOpenChange, technician }) => {
             />
             <DetailItem label="Date de création" value={technician.created_at ? new Date(technician.created_at).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'} />
             <DetailItem label="Dernière mise à jour" value={technician.updated_at ? new Date(technician.updated_at).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'} />
-            {/* Add more details here if fetched from a more comprehensive profile, e.g., from technician_applications data */}
         </div>
 
         <DialogFooter className="pt-6">
           <DialogClose asChild>
-            <Button type="button" variant="outline" className="border-slate-600 hover:bg-slate-700">
+            <Button type="button" variant="outline" className="border-border hover:bg-muted">
               Fermer
             </Button>
           </DialogClose>

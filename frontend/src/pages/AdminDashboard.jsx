@@ -46,7 +46,7 @@ import ProfilePictureUploader from "@/components/ProfilePictureUploader";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import CollapsibleSidebar from '@/components/CollapsibleSidebar';
 import useResponsive from '@/hooks/useResponsive';
-import { PROFILE_ENDPOINTS } from '@/config/api';
+import { PROFILE_ENDPOINTS, TECHNICIAN_ENDPOINTS, ADMIN_ENDPOINTS } from '@/config/api';
 import { useToast } from "@/components/ui/use-toast";
 import {
   Select,
@@ -184,24 +184,71 @@ export const AdminDashboard = () => {
     fetchTechnicians(page, limitPerPage, searchTerm, statusFilter);
   };
 
-  const fetchTechnicians = (page, limit, search, status) => {
+  const fetchTechnicians = async (page, limit, search, status) => {
     setIsLoadingTechnicians(true);
     setTechnicianError(null);
     
-    // Simulate API call with timeout
-    setTimeout(() => {
-      // Mock data for demonstration
-      const mockTechnicians = [
-        { id: 1, name: 'Jean', surname: 'Dupont', email: 'jean.dupont@example.com', phone_number: '0123456789', specialization: 'Réparation PC', status: 'active' },
-        { id: 2, name: 'Marie', surname: 'Martin', email: 'marie.martin@example.com', phone_number: '0987654321', specialization: 'Récupération de données', status: 'active' },
-        { id: 3, name: 'Pierre', surname: 'Dubois', email: 'pierre.dubois@example.com', phone_number: '0567891234', specialization: 'Configuration réseau', status: 'inactive' }
-      ];
+    try {
+      // Build query parameters
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+      });
       
-      setTechnicians(mockTechnicians);
-      setTotalTechnicians(mockTechnicians.length);
+      if (search) {
+        params.append('search', search);
+      }
+      
+      if (status) {
+        params.append('status', status);
+      }
+      
+      // Make API call to fetch technicians using admin endpoint
+      const response = await fetch(`${ADMIN_ENDPOINTS.GET_TECHNICIANS}?${params.toString()}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        // The admin endpoint returns { success: true, technicians, pagination }
+        const technicians = data.technicians || [];
+        const pagination = data.pagination || {};
+        
+        // Transform the data to match the expected format
+        const transformedTechnicians = technicians.map(tech => ({
+          id: tech.id,
+          name: tech.name || '',
+          surname: tech.surname || '',
+          email: tech.email,
+          phone_number: tech.phone_number,
+          specialization: tech.specialization || 'Non spécifié',
+          status: tech.status || 'active',
+          profile_picture_url: tech.profile_picture_url || null,
+        }));
+        
+        setTechnicians(transformedTechnicians);
+        setTotalTechnicians(pagination.total || transformedTechnicians.length);
+        setTotalPages(pagination.totalPages || Math.ceil((pagination.total || transformedTechnicians.length) / limit));
+      } else {
+        throw new Error(data.message || 'Erreur lors de la récupération des techniciens');
+      }
+    } catch (error) {
+      console.error('Error fetching technicians:', error);
+      setTechnicianError(error.message || 'Erreur lors de la récupération des techniciens');
+      setTechnicians([]);
+      setTotalTechnicians(0);
       setTotalPages(1);
+    } finally {
       setIsLoadingTechnicians(false);
-    }, 1000);
+    }
   };
 
   useEffect(() => {
@@ -847,7 +894,7 @@ export const AdminDashboard = () => {
                 <LogOut className="h-6 w-6" />
                 <span className="text-base font-medium">Déconnexion</span>
               </Button>
-            </div>
+        </div>
           </motion.div>
         </>
       )}
