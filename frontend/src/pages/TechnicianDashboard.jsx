@@ -43,7 +43,6 @@ import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import ProfilePictureUploader from "@/components/ProfilePictureUploader";
-import BottomDockNavigation from '@/components/SidebarNavigation';
 import CollapsibleSidebar from '@/components/CollapsibleSidebar';
 import useResponsive from '@/hooks/useResponsive';
 import { PROFILE_ENDPOINTS } from '@/config/api';
@@ -470,21 +469,32 @@ export const TechnicianDashboard = () => {
   );
 
   return (
-    <div className={`flex h-screen bg-background text-foreground ${isSmallScreen && sidebarOpen ? 'overflow-hidden' : ''}`}>
-      {!isSmallScreen && 
-        <CollapsibleSidebar 
-            userType="technician"
-            navigationItems={navigationItems} 
-            onNavigate={setActiveTabAndCloseSidebar} 
-            currentTab={activeTab}
-            profilePictureUrl={profilePictureUrl}
-            userName={`${technicianData.name || ''} ${technicianData.surname || ''}`.trim()}
-            userEmail={technicianData.email}
-            onLogoutClick={handleLogout}
-            onProfileClick={() => setActiveTabAndCloseSidebar('profile')}
-            onSettingsClick={() => setActiveTabAndCloseSidebar('parametres')}
-        />
-      }
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
+      {/* Header */}
+      <Header />
+      
+      {/* Main content */}
+              <main className="flex-1 p-4 sm:p-6 space-y-6 pb-24 md:pb-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
+          <TabsContent value="taches" className="mt-0">
+              {renderTasksTab()} 
+          </TabsContent>
+          <TabsContent value="calendrier" className="mt-0">
+              {renderCalendarTab()}
+          </TabsContent>
+          <TabsContent value="inventaire" className="mt-0">
+              {renderInventoryTab()}
+          </TabsContent>
+          <TabsContent value="parametres" className="mt-0">
+              {renderSettingsTab()}
+          </TabsContent>
+          <TabsContent value="profile" className="mt-0">
+              {renderProfileTab()}
+          </TabsContent>
+        </Tabs>
+      </main>
+      
+      {/* Mobile sidebar - only shown when toggled */}
       {isSmallScreen && sidebarOpen && (
         <motion.div
           initial={{ x: "-100%" }}
@@ -509,36 +519,39 @@ export const TechnicianDashboard = () => {
           <div className="fixed inset-0 bg-black/60 z-40" onClick={() => setSidebarOpen(false)}></div>
         </motion.div>
       )}
-
-      <div className="flex flex-1 flex-col overflow-y-auto">
-        <Header />
-        <main className="flex-1 p-4 sm:p-6 space-y-6">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
-            <TabsContent value="taches" className="mt-0">
-                {renderTasksTab()} 
-            </TabsContent>
-            <TabsContent value="calendrier" className="mt-0">
-                {renderCalendarTab()}
-            </TabsContent>
-            <TabsContent value="inventaire" className="mt-0">
-                {renderInventoryTab()}
-            </TabsContent>
-            <TabsContent value="parametres" className="mt-0">
-                {renderSettingsTab()}
-            </TabsContent>
-            <TabsContent value="profile" className="mt-0">
-                {renderProfileTab()}
-            </TabsContent>
-          </Tabs>
-        </main>
-        {isSmallScreen && !sidebarOpen && (
-          <BottomDockNavigation 
-            userType="technician"
-            items={navigationItems} 
-            onNavigate={setActiveTabAndCloseSidebar} 
-            currentTab={activeTab} 
-          />
-        )}
+      
+      {/* MOBILE BOTTOM NAVIGATION BAR */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-blue-600 text-white shadow-lg z-[9999]" style={{position: 'fixed', bottom: 0}}>
+        <div className="flex justify-around h-16">
+          <button 
+            onClick={() => setActiveTab('taches')}
+            className={`flex flex-col items-center justify-center flex-1 ${activeTab === 'taches' ? 'bg-blue-700' : ''}`}
+          >
+            <List size={22} />
+            <span className="text-xs mt-1">Tâches</span>
+          </button>
+          <button 
+            onClick={() => setActiveTab('calendrier')}
+            className={`flex flex-col items-center justify-center flex-1 ${activeTab === 'calendrier' ? 'bg-blue-700' : ''}`}
+          >
+            <Calendar size={22} />
+            <span className="text-xs mt-1">Agenda</span>
+          </button>
+          <button 
+            onClick={() => setActiveTab('inventaire')}
+            className={`flex flex-col items-center justify-center flex-1 ${activeTab === 'inventaire' ? 'bg-blue-700' : ''}`}
+          >
+            <Wrench size={22} />
+            <span className="text-xs mt-1">Inventaire</span>
+          </button>
+          <button 
+            onClick={() => setActiveTab('profile')}
+            className={`flex flex-col items-center justify-center flex-1 ${activeTab === 'profile' ? 'bg-blue-700' : ''}`}
+          >
+            <User size={22} />
+            <span className="text-xs mt-1">Profil</span>
+          </button>
+        </div>
       </div>
     </div>
   );

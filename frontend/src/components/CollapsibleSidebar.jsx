@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Home, User, List, Calendar, Wrench, Settings, LogOut, Server, LineChart, Users as AdminUsersIcon, X } from 'lucide-react';
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 const navLinksConfig = {
   admin: [
@@ -24,90 +25,104 @@ const navLinksConfig = {
 
 const CollapsibleSidebar = ({
   userType,
-  activeTab,
-  setActiveTab,
-  sidebarOpen,
-  setSidebarOpen,
-  handleLogout,
+  navigationItems,
+  onNavigate,
+  currentTab,
+  profilePictureUrl,
+  userName,
+  userEmail,
+  onLogoutClick,
+  onProfileClick,
+  onSettingsClick,
+  onClose,
   className = ''
 }) => {
-  const links = navLinksConfig[userType] || [];
+  const links = navigationItems || navLinksConfig[userType] || [];
   const logoText = userType === 'admin' ? 'Admin' : 'Technicien';
-
-  const handleNavLinkClick = (value) => {
-    setActiveTab(value);
-    setSidebarOpen(false);
-  };
-
-  const handleLogoutClick = () => {
-    handleLogout();
-    setSidebarOpen(false);
-  };
 
   return (
     <motion.aside
-      className={`fixed top-0 left-0 z-50 h-full bg-slate-900 shadow-xl ${className}
-                 ${sidebarOpen ? 'w-full' : 'w-0'} overflow-x-hidden overflow-y-auto`}
+      className={`${className} fixed top-0 left-0 z-50 h-full bg-background border-r border-border shadow-md`}
+      style={{ width: '16rem' }}
       initial={{ x: '-100%' }}
-      animate={{ x: sidebarOpen ? 0 : '-100%' }}
+      animate={{ x: 0 }}
       transition={{ type: "tween", ease: "easeInOut", duration: 0.3 }}
     >
-      {sidebarOpen && (
-        <div className="h-full flex flex-col justify-between py-5 px-4">
-          <div>
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center">
-                <div className="text-3xl font-bold text-cyan-400">IT13</div>
-                <div className="ml-3 text-xl font-semibold text-white">{logoText}</div>
-              </div>
+      <div className="h-full flex flex-col justify-between py-5 px-4">
+        <div>
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center">
+              <div className="text-3xl font-bold text-primary">IT13</div>
+              <div className="ml-3 text-xl font-semibold text-foreground">{logoText}</div>
+            </div>
+            {onClose && (
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setSidebarOpen(false)}
-                className="text-slate-300 hover:text-cyan-400 p-2"
+                onClick={onClose}
+                className="text-muted-foreground hover:text-primary p-2"
               >
                 <X className="h-7 w-7" />
               </Button>
+            )}
+          </div>
+
+          {/* User info section */}
+          {profilePictureUrl && userName && (
+            <div className="mb-6 pb-6 border-b border-border">
+              <div className="flex items-center">
+                <Avatar className="h-12 w-12 mr-3">
+                  <AvatarImage src={profilePictureUrl} alt={userName} />
+                  <AvatarFallback className="bg-muted text-muted-foreground">
+                    {userName.split(' ').map(n => n[0]).join('').toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="font-medium text-foreground">{userName}</p>
+                  {userEmail && <p className="text-xs text-muted-foreground">{userEmail}</p>}
+                </div>
+              </div>
             </div>
+          )}
 
-            <nav className="flex-grow">
-              <Tabs 
-                value={activeTab} 
-                onValueChange={handleNavLinkClick}
-                orientation="vertical" 
-                className="h-full"
-              >
-                <TabsList className="flex flex-col space-y-2 w-full bg-transparent h-full">
-                  {links.map((link) => {
-                    const IconComponent = link.icon;
-                    return (
-                      <TabsTrigger
-                        key={link.value}
-                        value={link.value}
-                        className="w-full flex items-center justify-center text-slate-300 hover:text-white px-3 py-3 rounded-md hover:bg-slate-800/80 data-[state=active]:bg-slate-800 data-[state=active]:text-cyan-400 transition-colors text-lg"
-                      >
-                        <IconComponent className="h-6 w-6 mr-4" />
-                        <span>{link.text}</span>
-                      </TabsTrigger>
-                    );
-                  })}
-                </TabsList>
-              </Tabs>
-            </nav>
-          </div>
-
-          <div className="mt-auto pt-6 pb-2 border-t border-slate-700">
-            <Button
-              variant="ghost"
-              className="w-full flex items-center justify-start px-3 py-3 rounded-md text-red-400 hover:text-red-300 hover:bg-red-900/20 transition-colors text-base"
-              onClick={handleLogoutClick}
+          <nav className="flex-grow">
+            <Tabs 
+              value={currentTab} 
+              onValueChange={onNavigate}
+              orientation="vertical" 
+              className="h-full"
             >
-              <LogOut className="h-6 w-6 mr-4" />
-              <span>Déconnexion</span>
-            </Button>
-          </div>
+              <TabsList className="flex flex-col space-y-2 w-full bg-transparent h-full">
+                {links.map((link) => {
+                  const IconComponent = link.icon;
+                  const value = link.tab || link.value;
+                  return (
+                    <TabsTrigger
+                      key={value}
+                      value={value}
+                      className="w-full flex items-center justify-start text-muted-foreground hover:text-foreground px-3 py-3 rounded-md hover:bg-muted/80 data-[state=active]:bg-muted data-[state=active]:text-primary transition-colors text-lg"
+                    >
+                      <IconComponent className="h-6 w-6 mr-4" />
+                      <span>{link.name || link.text}</span>
+                    </TabsTrigger>
+                  );
+                })}
+              </TabsList>
+            </Tabs>
+          </nav>
         </div>
-      )}
+
+        <div className="mt-auto pt-6 pb-2 border-t border-border">
+          <Button
+            variant="ghost"
+            className="w-full flex items-center justify-start px-3 py-3 rounded-md text-destructive hover:text-destructive/90 hover:bg-destructive/10 transition-colors text-base"
+            onClick={onLogoutClick}
+          >
+            <LogOut className="h-6 w-6 mr-4" />
+            <span>Déconnexion</span>
+          </Button>
+        </div>
+      </div>
     </motion.aside>
   );
 };

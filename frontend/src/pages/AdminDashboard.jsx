@@ -44,7 +44,6 @@ import { motion } from "framer-motion";
 import { Input } from '@/components/ui/input';
 import ProfilePictureUploader from "@/components/ProfilePictureUploader";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import BottomDockNavigation from '@/components/SidebarNavigation';
 import CollapsibleSidebar from '@/components/CollapsibleSidebar';
 import useResponsive from '@/hooks/useResponsive';
 import { PROFILE_ENDPOINTS } from '@/config/api';
@@ -58,6 +57,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { ThemeToggleButton } from '@/components/ThemeToggleButton';
+import { useEffect as useDebugEffect } from 'react';
 
 // Admin specific components
 import TechnicianTable from '@/components/admin/TechnicianTable';
@@ -107,6 +107,103 @@ export const AdminDashboard = () => {
   const [statusFilter, setStatusFilter] = useState(''); // e.g., 'active', 'inactive'
   const [limitPerPage, setLimitPerPage] = useState(10);
 
+  // State for mobile bottom menu
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Handler functions for technician management
+  const handleOpenAddForm = () => {
+    setCurrentTechnician(null); // Reset current technician data
+    setIsFormDialogOpen(true); // Open the form dialog
+  };
+
+  const handleOpenEditForm = (technician) => {
+    setCurrentTechnician(technician);
+    setIsFormDialogOpen(true);
+  };
+
+  const handleOpenDetails = (technician) => {
+    setCurrentTechnician(technician);
+    setIsDetailsDialogOpen(true);
+  };
+
+  const handleFormSubmit = (formData) => {
+    setIsSubmittingForm(true);
+    // Here you would typically call an API to save the technician data
+    console.log("Submitting technician data:", formData);
+    
+    // Simulate API call with timeout
+    setTimeout(() => {
+      setIsSubmittingForm(false);
+      setIsFormDialogOpen(false);
+      toast({
+        title: formData.id ? "Technicien mis à jour" : "Technicien ajouté",
+        description: `${formData.name} ${formData.surname} a été ${formData.id ? 'mis à jour' : 'ajouté'} avec succès.`,
+      });
+      // Refresh technicians list
+      fetchTechnicians(currentPage, limitPerPage, searchTerm, statusFilter);
+    }, 1000);
+  };
+
+  const handleDeleteTechnician = (technicianId) => {
+    // Here you would typically call an API to delete the technician
+    console.log("Deleting technician with ID:", technicianId);
+    
+    // Simulate API call with timeout
+    setTimeout(() => {
+      toast({
+        title: "Technicien supprimé",
+        description: "Le technicien a été supprimé avec succès.",
+      });
+      // Refresh technicians list
+      fetchTechnicians(currentPage, limitPerPage, searchTerm, statusFilter);
+    }, 1000);
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const handleStatusFilterChange = (value) => {
+    setStatusFilter(value === '_all_' ? '' : value);
+  };
+
+  const handleApplyFilters = () => {
+    setCurrentPage(1); // Reset to first page when filters change
+    fetchTechnicians(1, limitPerPage, searchTerm, statusFilter);
+  };
+
+  const handleResetFilters = () => {
+    setSearchTerm('');
+    setStatusFilter('');
+    setCurrentPage(1);
+    fetchTechnicians(1, limitPerPage, '', '');
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    fetchTechnicians(page, limitPerPage, searchTerm, statusFilter);
+  };
+
+  const fetchTechnicians = (page, limit, search, status) => {
+    setIsLoadingTechnicians(true);
+    setTechnicianError(null);
+    
+    // Simulate API call with timeout
+    setTimeout(() => {
+      // Mock data for demonstration
+      const mockTechnicians = [
+        { id: 1, name: 'Jean', surname: 'Dupont', email: 'jean.dupont@example.com', phone_number: '0123456789', specialization: 'Réparation PC', status: 'active' },
+        { id: 2, name: 'Marie', surname: 'Martin', email: 'marie.martin@example.com', phone_number: '0987654321', specialization: 'Récupération de données', status: 'active' },
+        { id: 3, name: 'Pierre', surname: 'Dubois', email: 'pierre.dubois@example.com', phone_number: '0567891234', specialization: 'Configuration réseau', status: 'inactive' }
+      ];
+      
+      setTechnicians(mockTechnicians);
+      setTotalTechnicians(mockTechnicians.length);
+      setTotalPages(1);
+      setIsLoadingTechnicians(false);
+    }, 1000);
+  };
+
   useEffect(() => {
     const storedAdminInfo = localStorage.getItem('adminInfo');
     if (storedAdminInfo) {
@@ -134,6 +231,22 @@ export const AdminDashboard = () => {
       fetchProfilePicture();
     }
   }, [adminData]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+      navigate('/adminlog');
+    } else {
+      setTimeout(() => setLoading(false), 500);
+    }
+  }, [navigate]);
+
+  // Fetch technicians on initial load
+  useEffect(() => {
+    if (activeTab === 'techniciens') {
+      fetchTechnicians(currentPage, limitPerPage, searchTerm, statusFilter);
+    }
+  }, [activeTab]);
 
   const fetchProfilePicture = async () => {
     const uiAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent((adminData?.name || 'A') + ' ' + (adminData?.surname || 'D'))}&background=random&color=fff&size=128`;
@@ -169,15 +282,6 @@ export const AdminDashboard = () => {
         // Keep UI Avatars URL on error
     }
   };
-  
-  useEffect(() => {
-    const token = localStorage.getItem('adminToken');
-    if (!token) {
-      navigate('/adminlog');
-    } else {
-      setTimeout(() => setLoading(false), 500);
-    }
-  }, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
@@ -210,6 +314,84 @@ export const AdminDashboard = () => {
     }
   };
   
+  // Helper function to combine navigation and closing sidebar
+  const setActiveTabAndCloseSidebar = (tab) => {
+    setActiveTab(tab);
+    if (isSmallScreen && sidebarOpen) { // Only close if small screen and sidebar is open
+      setSidebarOpen(false);
+    }
+  };
+  
+  const navigationItems = [
+    { name: 'Aperçu', icon: Home, tab: 'apercu' },
+    { name: 'Techniciens', icon: Users, tab: 'techniciens' },
+    { name: 'Clients', icon: Users, tab: 'clients' }, // Assuming 'Clients' is a desired tab
+    { name: 'Services', icon: List, tab: 'services' },
+    { name: 'Rapports', icon: LineChart, tab: 'rapports' },
+  ];
+
+  const Header = () => (
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background/80 backdrop-blur-md px-4 sm:px-6">
+      <div className="flex items-center">
+        <h1 className="text-xl font-semibold text-foreground">{pageTitles[activeTab] || "Tableau de Bord"}</h1>
+      </div>
+      <div className="flex items-center space-x-2 sm:space-x-4">
+        <Input 
+            type="search" 
+            placeholder="Rechercher..." 
+            className="hidden md:block bg-input border-border placeholder:text-muted-foreground text-sm w-64" 
+        />
+        <ThemeToggleButton />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="rounded-full text-foreground hover:bg-muted">
+              <Bell className="h-5 w-5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-80 bg-popover border-border text-popover-foreground">
+            <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-border" />
+            <div className="p-4 text-sm text-muted-foreground">
+              Aucune nouvelle notification.
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+              <Avatar className="h-9 w-9 border-2 border-transparent hover:border-primary transition-colors">
+                <AvatarImage src={profilePictureUrl} alt={`${adminData.name} ${adminData.surname}`} />
+                <AvatarFallback className="bg-muted text-muted-foreground">
+                   {`${(adminData.name || 'A').charAt(0)}${(adminData.surname || 'D').charAt(0)}`}
+                </AvatarFallback>
+              </Avatar>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56 bg-popover border-border text-popover-foreground">
+            <DropdownMenuLabel>
+              <p className="font-medium text-foreground">{`${adminData.name || ''} ${adminData.surname || ''}`.trim() || "Admin"}</p>
+              <p className="text-xs text-muted-foreground">{adminData.email}</p>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-border" />
+            <DropdownMenuItem onClick={() => setActiveTabAndCloseSidebar('profile')} className="hover:!bg-muted focus:!bg-muted cursor-pointer">
+              <User className="mr-2 h-4 w-4" />
+              <span>Profil</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setActiveTabAndCloseSidebar('parametres')} className="hover:!bg-muted focus:!bg-muted cursor-pointer">
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Paramètres</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="bg-border" />
+            <DropdownMenuItem onClick={handleLogout} className="text-destructive hover:!bg-destructive/10 hover:!text-destructive focus:!bg-destructive/10 focus:!text-destructive cursor-pointer">
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Déconnexion</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </header>
+  );
+
   // Individual render functions for each tab
   const renderOverviewTab = () => (
     <>
@@ -474,6 +656,14 @@ export const AdminDashboard = () => {
               </Card>
   );
   
+  // Add debugging to console log
+  useDebugEffect(() => {
+    console.log('--- AdminDashboard mounted ---');
+    console.log('Window width:', typeof window !== 'undefined' ? window.innerWidth : 'N/A');
+    console.log('User agent:', typeof navigator !== 'undefined' ? navigator.userAgent : 'N/A');
+    console.log('Current tab:', activeTab);
+  }, [activeTab]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
@@ -483,169 +673,192 @@ export const AdminDashboard = () => {
     );
   }
 
-  // Helper function to combine navigation and closing sidebar
-  const setActiveTabAndCloseSidebar = (tab) => {
-    setActiveTab(tab);
-    if (isSmallScreen && sidebarOpen) { // Only close if small screen and sidebar is open
-      setSidebarOpen(false);
-    }
-  };
-  
-  const navigationItems = [
-    { name: 'Aperçu', icon: Home, tab: 'apercu' },
-    { name: 'Techniciens', icon: Users, tab: 'techniciens' },
-    { name: 'Clients', icon: Users, tab: 'clients' }, // Assuming 'Clients' is a desired tab
-    { name: 'Services', icon: List, tab: 'services' },
-    { name: 'Rapports', icon: LineChart, tab: 'rapports' },
-  ];
-
-  const Header = () => (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background/80 backdrop-blur-md px-4 sm:px-6">
-      <div className="flex items-center">
-        {isSmallScreen && (
-          <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(!sidebarOpen)} className="mr-2 text-foreground hover:bg-muted">
-            {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </Button>
-        )}
-        <h1 className="text-xl font-semibold text-foreground">{pageTitles[activeTab] || "Tableau de Bord"}</h1>
-      </div>
-      <div className="flex items-center space-x-2 sm:space-x-4">
-        <Input 
-            type="search" 
-            placeholder="Rechercher..." 
-            className="hidden md:block bg-input border-border placeholder:text-muted-foreground text-sm w-64" 
-        />
-        <ThemeToggleButton />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="rounded-full text-foreground hover:bg-muted">
-              <Bell className="h-5 w-5" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-80 bg-popover border-border text-popover-foreground">
-            <DropdownMenuLabel>Notifications</DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-border" />
-            <div className="p-4 text-sm text-muted-foreground">
-              Aucune nouvelle notification.
-            </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-              <Avatar className="h-9 w-9 border-2 border-transparent hover:border-primary transition-colors">
-                <AvatarImage src={profilePictureUrl} alt={`${adminData.name} ${adminData.surname}`} />
-                <AvatarFallback className="bg-muted text-muted-foreground">
-                   {`${(adminData.name || 'A').charAt(0)}${(adminData.surname || 'D').charAt(0)}`}
-                </AvatarFallback>
-              </Avatar>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 bg-popover border-border text-popover-foreground">
-            <DropdownMenuLabel>
-              <p className="font-medium text-foreground">{`${adminData.name || ''} ${adminData.surname || ''}`.trim() || "Admin"}</p>
-              <p className="text-xs text-muted-foreground">{adminData.email}</p>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-border" />
-            <DropdownMenuItem onClick={() => setActiveTabAndCloseSidebar('profile')} className="hover:!bg-muted focus:!bg-muted cursor-pointer">
-              <User className="mr-2 h-4 w-4" />
-              <span>Profil</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setActiveTabAndCloseSidebar('parametres')} className="hover:!bg-muted focus:!bg-muted cursor-pointer">
-              <Settings className="mr-2 h-4 w-4" />
-              <span>Paramètres</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-border" />
-            <DropdownMenuItem onClick={handleLogout} className="text-destructive hover:!bg-destructive/10 hover:!text-destructive focus:!bg-destructive/10 focus:!text-destructive cursor-pointer">
-              <LogOut className="mr-2 h-4 w-4" />
-              <span>Déconnexion</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-    </header>
-  );
-
+  // Main content
   return (
-    <div className={`flex h-screen bg-background text-foreground ${isSmallScreen && sidebarOpen ? 'overflow-hidden' : ''}`}>
-      {/* Sidebar: Render based on screen size and open state */}
-      {!isSmallScreen && 
-        <CollapsibleSidebar 
-            userType="admin"
-            navigationItems={navigationItems} 
-            onNavigate={setActiveTabAndCloseSidebar} 
-            currentTab={activeTab}
-            profilePictureUrl={profilePictureUrl}
-            userName={`${adminData.name || ''} ${adminData.surname || ''}`.trim()}
-            userEmail={adminData.email}
-            onLogoutClick={handleLogout}
-            onProfileClick={() => setActiveTabAndCloseSidebar('profile')}
-            onSettingsClick={() => setActiveTabAndCloseSidebar('parametres')}
-        />
-      }
-      {isSmallScreen && sidebarOpen && (
-        <motion.div
-          initial={{ x: "-100%" }}
-          animate={{ x: 0 }}
-          exit={{ x: "-100%" }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className="fixed inset-0 z-50 flex" // Increased z-index for sidebar
-        >
-          <CollapsibleSidebar 
-            userType="admin"
-            navigationItems={navigationItems} 
-            onNavigate={setActiveTabAndCloseSidebar} 
-            currentTab={activeTab}
-            profilePictureUrl={profilePictureUrl}
-            userName={`${adminData.name || ''} ${adminData.surname || ''}`.trim()}
-            userEmail={adminData.email}
-            onLogoutClick={handleLogout}
-            onProfileClick={() => setActiveTabAndCloseSidebar('profile')}
-            onSettingsClick={() => setActiveTabAndCloseSidebar('parametres')}
-            onClose={() => setSidebarOpen(false)} // Pass close handler
-          />
-          <div className="fixed inset-0 bg-black/60 z-40" onClick={() => setSidebarOpen(false)}></div>
-        </motion.div>
-      )}
-
-      <div className="flex flex-1 flex-col overflow-y-auto">
-        <Header />
-        <main className="flex-1 p-4 sm:p-6 space-y-6">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
-            <TabsContent value="apercu" className="mt-0">
-              {renderOverviewTab()} 
-            </TabsContent>
-            <TabsContent value="techniciens" className="mt-0">
-              {renderTechniciansTab()}
-            </TabsContent>
-            <TabsContent value="clients" className="mt-0">
-               {renderClientsTab()}
-            </TabsContent>
-            <TabsContent value="services" className="mt-0">
-               {renderServicesTab()}
-            </TabsContent>
-            <TabsContent value="rapports" className="mt-0">
-               {renderReportsTab()}
-            </TabsContent>
-            <TabsContent value="parametres" className="mt-0">
-               {renderSettingsTab()}
-            </TabsContent>
-            <TabsContent value="profile" className="mt-0">
-              {renderProfileTab()}
-            </TabsContent>
-          </Tabs>
-        </main>
-        {isSmallScreen && !sidebarOpen && ( // Ensure BottomDock is only for small screens when sidebar is closed
-          <BottomDockNavigation 
-            userType="admin"
-            items={navigationItems} 
-            onNavigate={setActiveTabAndCloseSidebar} 
-            currentTab={activeTab} 
-          />
-        )}
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
+      {/* Header (both mobile and desktop) */}
+      <Header />
+      
+      {/* Main content */}
+      <main className="flex-1 p-4 sm:p-6 space-y-6 pb-20">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
+          <TabsContent value="apercu" className="mt-0">
+            {renderOverviewTab()} 
+          </TabsContent>
+          <TabsContent value="techniciens" className="mt-0">
+            {renderTechniciansTab()}
+          </TabsContent>
+          <TabsContent value="clients" className="mt-0">
+            {renderClientsTab()}
+          </TabsContent>
+          <TabsContent value="services" className="mt-0">
+            {renderServicesTab()}
+          </TabsContent>
+          <TabsContent value="rapports" className="mt-0">
+            {renderReportsTab()}
+          </TabsContent>
+          <TabsContent value="parametres" className="mt-0">
+            {renderSettingsTab()}
+          </TabsContent>
+          <TabsContent value="profile" className="mt-0">
+            {renderProfileTab()}
+          </TabsContent>
+        </Tabs>
+      </main>
+      
+      {/* DESKTOP NAVIGATION BAR - Hidden on mobile */}
+      <div className="hidden md:block fixed bottom-0 left-0 right-0 bg-card border-t border-border text-card-foreground shadow-lg z-[9999]">
+        <div className="flex justify-center">
+          <div className="flex justify-around max-w-4xl w-full h-16">
+            {[
+              { id: 'apercu', label: 'Aperçu', icon: Home },
+              { id: 'techniciens', label: 'Techniciens', icon: Users },
+              { id: 'clients', label: 'Clients', icon: Users },
+              { id: 'services', label: 'Services', icon: List },
+              { id: 'rapports', label: 'Rapports', icon: LineChart },
+              { id: 'parametres', label: 'Paramètres', icon: Settings },
+              { id: 'profile', label: 'Mon Profil', icon: User },
+            ].map((item) => {
+              const IconComponent = item.icon;
+              const isActive = activeTab === item.id;
+              
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id)}
+                  className={`flex flex-col items-center justify-center px-4 py-2 transition-all duration-200 rounded-lg mx-1 ${
+                    isActive 
+                      ? 'bg-primary text-primary-foreground shadow-sm' 
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                  }`}
+                >
+                  <IconComponent className="h-5 w-5 mb-1" />
+                  <span className="text-xs font-medium">{item.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
+
+      {/* MOBILE HAMBURGER MENU BUTTON - Only visible on mobile */}
+      <div className="md:hidden fixed bottom-4 right-4 z-[9999]">
+        <Button
+          onClick={() => setMobileMenuOpen(true)}
+          className="h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all duration-300 hover:scale-110"
+          size="icon"
+        >
+          <Menu className="h-6 w-6" />
+        </Button>
+      </div>
+
+      {/* MOBILE FULL-SCREEN BOTTOM MENU */}
+      {mobileMenuOpen && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 bg-black/60 z-[9998]"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+          
+          {/* Bottom Menu */}
+          <motion.div
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ 
+              type: "spring", 
+              stiffness: 300, 
+              damping: 30,
+              duration: 0.4 
+            }}
+            className="fixed bottom-0 left-0 right-0 bg-card border-t border-border rounded-t-3xl z-[9999] max-h-[80vh] overflow-hidden"
+          >
+            {/* Handle bar */}
+            <div className="flex justify-center pt-4 pb-2">
+              <div className="w-12 h-1 bg-muted-foreground/30 rounded-full"></div>
+            </div>
+            
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+              <h3 className="text-lg font-semibold text-foreground">Navigation</h3>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            
+            {/* Navigation Items */}
+            <div className="p-6 space-y-2">
+              {[
+                { id: 'apercu', label: 'Aperçu', icon: Home },
+                { id: 'techniciens', label: 'Techniciens', icon: Users },
+                { id: 'clients', label: 'Clients', icon: Users },
+                { id: 'services', label: 'Services', icon: List },
+                { id: 'rapports', label: 'Rapports', icon: LineChart },
+                { id: 'parametres', label: 'Paramètres', icon: Settings },
+                { id: 'profile', label: 'Mon Profil', icon: User },
+              ].map((item) => {
+                const IconComponent = item.icon;
+                const isActive = activeTab === item.id;
+                
+                return (
+                  <motion.button
+                    key={item.id}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => {
+                      setActiveTab(item.id);
+                      setMobileMenuOpen(false);
+                    }}
+                    className={`w-full flex items-center space-x-4 p-4 rounded-xl transition-all duration-200 ${
+                      isActive 
+                        ? 'bg-primary text-primary-foreground shadow-md' 
+                        : 'text-muted-foreground hover:bg-muted/70 hover:text-foreground'
+                    }`}
+                  >
+                    <IconComponent className="h-6 w-6" />
+                    <span className="text-base font-medium">{item.label}</span>
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeIndicator"
+                        className="ml-auto w-2 h-2 bg-primary-foreground rounded-full"
+                      />
+                    )}
+                  </motion.button>
+                );
+              })}
+            </div>
+            
+            {/* Footer with logout */}
+            <div className="px-6 py-4 border-t border-border">
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  handleLogout();
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full flex items-center space-x-4 p-4 text-destructive hover:bg-destructive/10 hover:text-destructive rounded-xl"
+              >
+                <LogOut className="h-6 w-6" />
+                <span className="text-base font-medium">Déconnexion</span>
+              </Button>
+            </div>
+          </motion.div>
+        </>
+      )}
     </div>
   );
+
+
 };
 
 export default AdminDashboard; 

@@ -903,20 +903,20 @@ export const ServiceRequest = () => {
                   </div>
                 </div>
                 
-                <div className="mt-6 text-gray-400">
-                  <p>En soumettant cette demande, vous acceptez nos <a href="#" className="text-cyan-400 underline">Conditions d'utilisation</a> et notre <a href="#" className="text-cyan-400 underline">Politique de confidentialité</a>.</p>
+                <div className="mt-6 text-muted-foreground">
+                  <p>En soumettant cette demande, vous acceptez nos <a href="#" className="text-primary underline">Conditions d'utilisation</a> et notre <a href="#" className="text-primary underline">Politique de confidentialité</a>.</p>
                 </div>
               </motion.div>
             </form>
           </CardContent>
           
-          <CardFooter className="flex justify-between py-6 border-t border-slate-700">
+          <CardFooter className="flex justify-between py-6 border-t border-border">
             {step > 1 && (
               <Button
                 type="button"
                 variant="outline"
                 onClick={prevStep}
-                className="border-slate-600"
+                className="border-border"
               >
                 <ChevronLeft className="w-4 h-4 mr-2" /> Retour
               </Button>
@@ -925,7 +925,7 @@ export const ServiceRequest = () => {
               <Button
                 type="button"
                 onClick={nextStep}
-                className="ml-auto bg-cyan-500 hover:bg-cyan-600"
+                className="ml-auto bg-primary hover:bg-primary/90 text-primary-foreground"
               >
                 Suivant <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
@@ -933,7 +933,7 @@ export const ServiceRequest = () => {
               <Button
                 type="submit"
                 onClick={handleSubmit}
-                className="ml-auto bg-cyan-500 hover:bg-cyan-600"
+                className="ml-auto bg-primary hover:bg-primary/90 text-primary-foreground"
               >
                 Soumettre la demande
               </Button>
