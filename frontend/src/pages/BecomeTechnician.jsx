@@ -202,71 +202,71 @@ export const BecomeTechnician = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white py-20 px-4">
+    <div className="min-h-screen bg-background text-foreground py-20 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-10">
-          <Badge className="mb-4 px-3 py-1 bg-cyan-500/20 text-cyan-400 border-cyan-500 inline-flex w-auto">
+          <Badge className="mb-4 px-3 py-1 bg-primary/20 text-primary border-primary inline-flex w-auto">
             Rejoignez Notre Équipe
           </Badge>
-          <h1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-300">
+          <h1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
             Devenez un Technicien Certifié
           </h1>
-          <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Rejoignez notre réseau de techniciens qualifiés et aidez nos clients à résoudre leurs problèmes techniques.
           </p>
         </div>
 
         {/* Benefits Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          <Card className="bg-slate-800 border-slate-700">
+          <Card className="bg-card border-border">
             <CardContent className="pt-6">
               <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 rounded-lg bg-cyan-500/20">
-                  <Wrench className="w-6 h-6 text-cyan-400" />
+                <div className="p-2 rounded-lg bg-primary/20">
+                  <Wrench className="w-6 h-6 text-primary" />
                 </div>
-                <h3 className="text-lg font-semibold">Horaires Flexibles</h3>
+                <h3 className="text-lg font-semibold text-foreground">Horaires Flexibles</h3>
               </div>
-              <p className="text-gray-400">Travaillez selon vos conditions et choisissez votre disponibilité.</p>
+              <p className="text-muted-foreground">Travaillez selon vos conditions et choisissez votre disponibilité.</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-slate-800 border-slate-700">
+          <Card className="bg-card border-border">
             <CardContent className="pt-6">
               <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 rounded-lg bg-cyan-500/20">
-                  <Award className="w-6 h-6 text-cyan-400" />
+                <div className="p-2 rounded-lg bg-primary/20">
+                  <Award className="w-6 h-6 text-primary" />
                 </div>
-                <h3 className="text-lg font-semibold">Évolution Professionnelle</h3>
+                <h3 className="text-lg font-semibold text-foreground">Évolution Professionnelle</h3>
               </div>
-              <p className="text-gray-400">Accédez à des formations et opportunités de certification.</p>
+              <p className="text-muted-foreground">Accédez à des formations et opportunités de certification.</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-slate-800 border-slate-700">
+          <Card className="bg-card border-border">
             <CardContent className="pt-6">
               <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 rounded-lg bg-cyan-500/20">
-                  <Star className="w-6 h-6 text-cyan-400" />
+                <div className="p-2 rounded-lg bg-primary/20">
+                  <Star className="w-6 h-6 text-primary" />
                 </div>
-                <h3 className="text-lg font-semibold">Rémunération Compétitive</h3>
+                <h3 className="text-lg font-semibold text-foreground">Rémunération Compétitive</h3>
               </div>
-              <p className="text-gray-400">Gagnez des tarifs compétitifs basés sur votre expertise.</p>
+              <p className="text-muted-foreground">Gagnez des tarifs compétitifs basés sur votre expertise.</p>
             </CardContent>
           </Card>
         </div>
 
         {/* Application Form */}
-        <Card className="bg-slate-800 border-slate-700">
+        <Card className="bg-card border-border">
           <CardContent className="pt-6">
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Personal Information */}
               <div className="space-y-4">
-                <h2 className="text-xl font-semibold text-cyan-400 mb-4">Informations Personnelles</h2>
+                <h2 className="text-xl font-semibold text-primary mb-4">Informations Personnelles</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Nom Complet</Label>
+                    <Label className="text-foreground">Nom Complet</Label>
                     <Input
-                      className="bg-slate-900 border-slate-700"
+                      className="bg-input border-border text-foreground placeholder:text-muted-foreground"
                       placeholder="Entrez votre nom complet"
                       value={formData.personalInfo.fullName}
                       onChange={(e) => updateFormData('personalInfo', 'fullName', e.target.value)}
@@ -274,10 +274,10 @@ export const BecomeTechnician = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Email</Label>
+                    <Label className="text-foreground">Email</Label>
                     <Input
                       type="email"
-                      className="bg-slate-900 border-slate-700"
+                      className="bg-input border-border text-foreground placeholder:text-muted-foreground"
                       placeholder="Entrez votre email"
                       value={formData.personalInfo.email}
                       onChange={(e) => updateFormData('personalInfo', 'email', e.target.value)}
@@ -285,10 +285,10 @@ export const BecomeTechnician = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Numéro de Téléphone</Label>
+                    <Label className="text-foreground">Numéro de Téléphone</Label>
                     <Input
                       type="tel"
-                      className="bg-slate-900 border-slate-700"
+                      className="bg-input border-border text-foreground placeholder:text-muted-foreground"
                       placeholder="Entrez votre numéro de téléphone"
                       value={formData.personalInfo.phone}
                       onChange={(e) => updateFormData('personalInfo', 'phone', e.target.value)}
@@ -296,9 +296,9 @@ export const BecomeTechnician = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Localisation</Label>
+                    <Label className="text-foreground">Localisation</Label>
                     <Input
-                      className="bg-slate-900 border-slate-700"
+                      className="bg-input border-border text-foreground placeholder:text-muted-foreground"
                       placeholder="Ville, Région"
                       value={formData.personalInfo.location}
                       onChange={(e) => updateFormData('personalInfo', 'location', e.target.value)}
@@ -310,19 +310,19 @@ export const BecomeTechnician = () => {
 
               {/* Professional Information */}
               <div className="space-y-4">
-                <h2 className="text-xl font-semibold text-cyan-400 mb-4">Informations Professionnelles</h2>
+                <h2 className="text-xl font-semibold text-primary mb-4">Informations Professionnelles</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Spécialisation Principale</Label>
+                    <Label className="text-foreground">Spécialisation Principale</Label>
                     <Select
                       value={formData.professionalInfo.specialization}
                       onValueChange={(value) => updateFormData('professionalInfo', 'specialization', value)}
                       required
                     >
-                      <SelectTrigger className="bg-slate-900 border-slate-700">
+                      <SelectTrigger className="bg-input border-border text-foreground">
                         <SelectValue placeholder="Sélectionnez votre spécialisation" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-popover border-border text-popover-foreground">
                         {specializations.map((spec) => (
                           <SelectItem key={spec} value={spec}>{spec}</SelectItem>
                         ))}
@@ -330,10 +330,10 @@ export const BecomeTechnician = () => {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label>Années d'Expérience</Label>
+                    <Label className="text-foreground">Années d'Expérience</Label>
                     <Input
                       type="number"
-                      className="bg-slate-900 border-slate-700"
+                      className="bg-input border-border text-foreground placeholder:text-muted-foreground"
                       placeholder="Années d'expérience"
                       value={formData.professionalInfo.yearsExperience}
                       onChange={(e) => updateFormData('professionalInfo', 'yearsExperience', e.target.value)}
@@ -342,9 +342,9 @@ export const BecomeTechnician = () => {
                     />
                   </div>
                   <div className="space-y-2 col-span-2">
-                    <Label>Certifications</Label>
+                    <Label className="text-foreground">Certifications</Label>
                     <Textarea
-                      className="bg-slate-900 border-slate-700"
+                      className="bg-input border-border text-foreground placeholder:text-muted-foreground"
                       placeholder="Listez vos certifications pertinentes"
                       value={formData.professionalInfo.certifications}
                       onChange={(e) => updateFormData('professionalInfo', 'certifications', e.target.value)}
@@ -355,21 +355,21 @@ export const BecomeTechnician = () => {
 
               {/* Background Information */}
               <div className="space-y-4">
-                <h2 className="text-xl font-semibold text-cyan-400 mb-4">Informations Contextuelles</h2>
+                <h2 className="text-xl font-semibold text-primary mb-4">Informations Contextuelles</h2>
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label>Formation</Label>
+                    <Label className="text-foreground">Formation</Label>
                     <Textarea
-                      className="bg-slate-900 border-slate-700"
+                      className="bg-input border-border text-foreground placeholder:text-muted-foreground"
                       placeholder="Décrivez votre parcours éducatif"
                       value={formData.background.education}
                       onChange={(e) => updateFormData('background', 'education', e.target.value)}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Expérience Professionnelle</Label>
+                    <Label className="text-foreground">Expérience Professionnelle</Label>
                     <Textarea
-                      className="bg-slate-900 border-slate-700"
+                      className="bg-input border-border text-foreground placeholder:text-muted-foreground"
                       placeholder="Résumez votre expérience professionnelle pertinente"
                       value={formData.background.workHistory}
                       onChange={(e) => updateFormData('background', 'workHistory', e.target.value)}
@@ -380,23 +380,23 @@ export const BecomeTechnician = () => {
 
               {/* Document Upload Section */}
               <div className="space-y-4">
-                <h2 className="text-xl font-semibold text-cyan-400 mb-4">Documents</h2>
+                <h2 className="text-xl font-semibold text-primary mb-4">Documents</h2>
                 
                 {/* CV Upload */}
                 <div className="space-y-2">
-                  <Label>CV / Curriculum Vitae <span className="text-red-500">*</span></Label>
+                  <Label className="text-foreground">CV / Curriculum Vitae <span className="text-destructive">*</span></Label>
                   <div className="flex flex-col space-y-2">
                     <div className="grid grid-cols-1 gap-2">
                       {documents.cv ? (
-                        <div className="flex items-center justify-between p-3 bg-slate-900 border border-slate-700 rounded-md">
+                        <div className="flex items-center justify-between p-3 bg-muted border border-border rounded-md">
                           <div className="flex items-center">
                             <CheckCircle className="mr-2 h-4 w-4 text-green-500" />
-                            <span className="text-sm truncate">{documents.cv.name}</span>
+                            <span className="text-sm truncate text-foreground">{documents.cv.name}</span>
                           </div>
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="text-red-400 hover:text-red-500"
+                            className="text-destructive hover:text-destructive/80"
                             onClick={() => removeFile('cv')}
                             type="button"
                           >
@@ -414,16 +414,16 @@ export const BecomeTechnician = () => {
                           />
                           <Label
                             htmlFor="cv-upload"
-                            className="cursor-pointer flex flex-col items-center justify-center p-4 bg-slate-900 border border-dashed border-slate-700 rounded-md hover:bg-slate-800 transition-colors"
+                            className="cursor-pointer flex flex-col items-center justify-center p-4 bg-muted border border-dashed border-border rounded-md hover:bg-muted/80 transition-colors"
                           >
-                            <Upload className="h-8 w-8 text-slate-400 mb-2" />
-                            <span className="text-sm font-medium">Télécharger votre CV</span>
-                            <span className="text-xs text-slate-500 mt-1">PDF, DOC, DOCX (max. 5MB)</span>
+                            <Upload className="h-8 w-8 text-muted-foreground mb-2" />
+                            <span className="text-sm font-medium text-foreground">Télécharger votre CV</span>
+                            <span className="text-xs text-muted-foreground mt-1">PDF, DOC, DOCX (max. 5MB)</span>
                           </Label>
                         </div>
                       )}
                       {fileErrors.cv && (
-                        <div className="flex items-center text-red-500 text-sm mt-1">
+                        <div className="flex items-center text-destructive text-sm mt-1">
                           <AlertCircle className="h-4 w-4 mr-1" />
                           {fileErrors.cv}
                         </div>
@@ -434,21 +434,21 @@ export const BecomeTechnician = () => {
                 
                 {/* Diplomas Upload */}
                 <div className="space-y-2">
-                  <Label>Diplômes et Certificats</Label>
+                  <Label className="text-foreground">Diplômes et Certificats</Label>
                   <div className="flex flex-col space-y-2">
                     <div className="grid grid-cols-1 gap-2">
                       {documents.diplomas.length > 0 && (
                         <div className="space-y-2">
                           {documents.diplomas.map((diploma, index) => (
-                            <div key={index} className="flex items-center justify-between p-3 bg-slate-900 border border-slate-700 rounded-md">
+                            <div key={index} className="flex items-center justify-between p-3 bg-muted border border-border rounded-md">
                               <div className="flex items-center">
                                 <CheckCircle className="mr-2 h-4 w-4 text-green-500" />
-                                <span className="text-sm truncate">{diploma.name}</span>
+                                <span className="text-sm truncate text-foreground">{diploma.name}</span>
                               </div>
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="text-red-400 hover:text-red-500"
+                                className="text-destructive hover:text-destructive/80"
                                 onClick={() => removeFile('diplomas', index)}
                                 type="button"
                               >
@@ -469,15 +469,15 @@ export const BecomeTechnician = () => {
                         />
                         <Label
                           htmlFor="diplomas-upload"
-                          className="cursor-pointer flex flex-col items-center justify-center p-4 bg-slate-900 border border-dashed border-slate-700 rounded-md hover:bg-slate-800 transition-colors"
+                          className="cursor-pointer flex flex-col items-center justify-center p-4 bg-muted border border-dashed border-border rounded-md hover:bg-muted/80 transition-colors"
                         >
-                          <Upload className="h-8 w-8 text-slate-400 mb-2" />
-                          <span className="text-sm font-medium">Télécharger vos diplômes</span>
-                          <span className="text-xs text-slate-500 mt-1">PDF, JPG, PNG (max. 5MB chacun)</span>
+                          <Upload className="h-8 w-8 text-muted-foreground mb-2" />
+                          <span className="text-sm font-medium text-foreground">Télécharger vos diplômes</span>
+                          <span className="text-xs text-muted-foreground mt-1">PDF, JPG, PNG (max. 5MB chacun)</span>
                         </Label>
                       </div>
                       {fileErrors.diplomas && (
-                        <div className="flex items-center text-red-500 text-sm mt-1">
+                        <div className="flex items-center text-destructive text-sm mt-1">
                           <AlertCircle className="h-4 w-4 mr-1" />
                           {fileErrors.diplomas}
                         </div>
@@ -488,19 +488,19 @@ export const BecomeTechnician = () => {
                 
                 {/* Motivation Letter Upload */}
                 <div className="space-y-2">
-                  <Label>Lettre de Motivation</Label>
+                  <Label className="text-foreground">Lettre de Motivation</Label>
                   <div className="flex flex-col space-y-2">
                     <div className="grid grid-cols-1 gap-2">
                       {documents.motivationLetter ? (
-                        <div className="flex items-center justify-between p-3 bg-slate-900 border border-slate-700 rounded-md">
+                        <div className="flex items-center justify-between p-3 bg-muted border border-border rounded-md">
                           <div className="flex items-center">
                             <CheckCircle className="mr-2 h-4 w-4 text-green-500" />
-                            <span className="text-sm truncate">{documents.motivationLetter.name}</span>
+                            <span className="text-sm truncate text-foreground">{documents.motivationLetter.name}</span>
                           </div>
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="text-red-400 hover:text-red-500"
+                            className="text-destructive hover:text-destructive/80"
                             onClick={() => removeFile('motivationLetter')}
                             type="button"
                           >
@@ -518,16 +518,16 @@ export const BecomeTechnician = () => {
                           />
                           <Label
                             htmlFor="motivation-letter-upload"
-                            className="cursor-pointer flex flex-col items-center justify-center p-4 bg-slate-900 border border-dashed border-slate-700 rounded-md hover:bg-slate-800 transition-colors"
+                            className="cursor-pointer flex flex-col items-center justify-center p-4 bg-muted border border-dashed border-border rounded-md hover:bg-muted/80 transition-colors"
                           >
-                            <Upload className="h-8 w-8 text-slate-400 mb-2" />
-                            <span className="text-sm font-medium">Télécharger votre lettre de motivation</span>
-                            <span className="text-xs text-slate-500 mt-1">PDF, DOC, DOCX (max. 5MB)</span>
+                            <Upload className="h-8 w-8 text-muted-foreground mb-2" />
+                            <span className="text-sm font-medium text-foreground">Télécharger votre lettre de motivation</span>
+                            <span className="text-xs text-muted-foreground mt-1">PDF, DOC, DOCX (max. 5MB)</span>
                           </Label>
                         </div>
                       )}
                       {fileErrors.motivationLetter && (
-                        <div className="flex items-center text-red-500 text-sm mt-1">
+                        <div className="flex items-center text-destructive text-sm mt-1">
                           <AlertCircle className="h-4 w-4 mr-1" />
                           {fileErrors.motivationLetter}
                         </div>
@@ -540,7 +540,7 @@ export const BecomeTechnician = () => {
               <div className="flex justify-end pt-6">
                 <Button 
                   type="submit" 
-                  className="bg-cyan-500 hover:bg-cyan-600" 
+                  className="bg-primary text-primary-foreground hover:bg-primary/90" 
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? 'Envoi en cours...' : 'Soumettre la Candidature'}
